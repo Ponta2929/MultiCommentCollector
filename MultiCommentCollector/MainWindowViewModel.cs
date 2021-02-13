@@ -47,6 +47,8 @@ namespace MultiCommentCollector
         public ReactiveCommand<string> EnterCommand { get; }
         public ReactiveCommand<ConnectionData> ActivateCommand { get; }
         public ReactiveCommand<ConnectionData> InactivateCommand { get; }
+        public ReactiveCommand<ConnectionData> DeleteCommand { get; }
+        public ReactiveCommand<ConnectionData> ToggleCommand { get; }
 
         public MainWindowViewModel()
         {
@@ -63,8 +65,22 @@ namespace MultiCommentCollector
             ShowOptionWindowCommand = new ReactiveCommand().WithSubscribe(WindowManager.ShowOptionWindow).AddTo(disposable);
             ApplicationShutdownCommand = new ReactiveCommand().WithSubscribe(WindowManager.ApplicationShutdown).AddTo(disposable);
             EnterCommand = new ReactiveCommand<string>().WithSubscribe(x => MCC.Core.MultiCommentCollector.GetInstance().AddURL(x)).AddTo(disposable);
-            ActivateCommand = new ReactiveCommand<ConnectionData>().WithSubscribe(x =>　MCC.Core.MultiCommentCollector.GetInstance().Activate(x)).AddTo(disposable);
+            ActivateCommand = new ReactiveCommand<ConnectionData>().WithSubscribe(x => MCC.Core.MultiCommentCollector.GetInstance().Activate(x)).AddTo(disposable);
             InactivateCommand = new ReactiveCommand<ConnectionData>().WithSubscribe(x => MCC.Core.MultiCommentCollector.GetInstance().Inactivate(x)).AddTo(disposable);
+            DeleteCommand = new ReactiveCommand<ConnectionData>().WithSubscribe(x =>
+            {
+                MCC.Core.MultiCommentCollector.GetInstance().Inactivate(x);
+                ConnectionManager.GetInstance().Items.Remove(x);
+            }).AddTo(disposable);
+            ToggleCommand = new ReactiveCommand<ConnectionData>().WithSubscribe(x =>
+            {
+                if (x is null)
+                    return;
+                if (x.IsActive.Value)
+                    MCC.Core.MultiCommentCollector.GetInstance().Inactivate(x);
+                else
+                    MCC.Core.MultiCommentCollector.GetInstance().Activate(x);
+            }).AddTo(disposable);
 
             setting.Theme.IsDarkMode.Subscribe(x => ThemeManager.Current.ChangeTheme(Application.Current, $"{(x ? "Dark" : "Light")}.{setting.Theme.ThemeColor.Value}"));
             setting.Theme.ThemeColor.Subscribe(x => ThemeManager.Current.ChangeTheme(Application.Current, $"{(setting.Theme.IsDarkMode.Value ? "Dark" : "Light")}.{x}"));

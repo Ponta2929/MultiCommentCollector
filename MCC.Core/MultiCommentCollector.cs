@@ -74,7 +74,7 @@ namespace MCC.Core
 
                         if (info.IsActive.Value)
                         {
-                            Activate(info);
+                            Activate(info, true);
                         }
                     }
                     else
@@ -118,9 +118,9 @@ namespace MCC.Core
         /// <summary>
         /// プラグインを有効化
         /// </summary>
-        public void Activate(ConnectionData info)
+        public void Activate(ConnectionData info, bool forced = false)
         {
-            if (info is null || info.IsActive.Value)
+            if (info is null || info.IsActive.Value && !forced)
                 return;
 
             if (info.Plugin is ILogged log)

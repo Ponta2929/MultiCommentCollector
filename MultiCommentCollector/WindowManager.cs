@@ -16,7 +16,23 @@ namespace MultiCommentCollector
         {
             Setting setting = Setting.GetInstance();
 
-            Application.Current.MainWindow.Closing += (_, _) => ApplicationShutdown();
+            Application.Current.MainWindow.Closing += (_, _) =>
+            {
+                MCC.Core.MultiCommentCollector.GetInstance().ServerStop();
+
+                Setting.GetInstance().ConnectionList = ConnectionManager.GetInstance().Items;
+
+                try
+                {
+                    XmlSerializer.FileSerialize<Setting>($"{Path.GetDirectoryName(Environment.GetCommandLineArgs()[0])}\\setting.xml", Setting.GetInstance());
+                }
+                catch
+                {
+
+                }
+
+                LogWindow.GetInstance().IsOwnerClose = true;
+            };
 
             foreach (var item in Setting.GetInstance().ConnectionList)
                 ConnectionManager.GetInstance().Items.Add(item);
@@ -36,20 +52,7 @@ namespace MultiCommentCollector
 
         public static void ApplicationShutdown()
         {
-            MCC.Core.MultiCommentCollector.GetInstance().ServerStop();
-
-            Setting.GetInstance().ConnectionList = ConnectionManager.GetInstance().Items;
-
-            try
-            {
-                XmlSerializer.FileSerialize<Setting>($"{Path.GetDirectoryName(Environment.GetCommandLineArgs()[0])}\\setting.xml", Setting.GetInstance());
-            }
-            catch
-            {
-
-            }
-
-            LogWindow.GetInstance().IsOwnerClose = true;
+            Application.Current.MainWindow.Close();
         }
     }
 }

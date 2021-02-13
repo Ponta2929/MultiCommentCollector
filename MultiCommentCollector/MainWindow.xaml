@@ -3,13 +3,15 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:local="clr-namespace:MultiCommentCollector"
         xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
         mc:Ignorable="d"
         Title="MultiCommentCollector" Height="{Binding Height.Value, Mode=TwoWay}" Width="{Binding Width.Value, Mode=TwoWay}"
-        Top="{Binding Top.Value, Mode=TwoWay}" Left="{Binding Left.Value, Mode=TwoWay}"> 
+        Top="{Binding Top.Value, Mode=TwoWay}" Left="{Binding Left.Value, Mode=TwoWay}" d:DesignWidth="800" d:DesignHeight="600">
     <Window.Resources>
         <local:HeaderWidthConverter x:Key="HeaderWidthConverter"/>
+        <local:IsActiveToStringConverter x:Key="IsActiveToStringConverter"/>
     </Window.Resources>
     <Window.DataContext>
         <local:MainWindowViewModel />
@@ -68,9 +70,14 @@
                                 <Button Content="有効" Command="{Binding ActivateCommand}" CommandParameter="{Binding SelectedItem, ElementName=ConnectionListView}"/>
                                 <Button Content="無効" Command="{Binding InactivateCommand}" CommandParameter="{Binding SelectedItem, ElementName=ConnectionListView}"/>
                                 <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Margin="5" />
-                                <Button Content="削除"/>
+                                <Button Content="削除" Command="{Binding DeleteCommand}" CommandParameter="{Binding SelectedItem, ElementName=ConnectionListView}"/>
                             </StackPanel>
                             <ListView x:Name="ConnectionListView" ScrollViewer.HorizontalScrollBarVisibility="Hidden" >
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="MouseDoubleClick">
+                                        <i:InvokeCommandAction Command="{Binding ToggleCommand}" CommandParameter="{Binding SelectedItem, ElementName=ConnectionListView}"/>
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
                                 <ListView.View>
                                     <GridView>
                                         <GridViewColumn Header="サイト" DisplayMemberBinding="{Binding Plugin.SiteName}" x:Name="ConnectionSite" />
@@ -83,7 +90,7 @@
                                                 </MultiBinding>
                                             </GridViewColumn.Width>
                                         </GridViewColumn>
-                                        <GridViewColumn Header="状態" DisplayMemberBinding="{Binding IsActive.Value}" x:Name="ConnectionState"/>
+                                        <GridViewColumn Header="状態" DisplayMemberBinding="{Binding IsActive.Value, Converter={StaticResource IsActiveToStringConverter}}" x:Name="ConnectionState" />
                                     </GridView>
                                 </ListView.View>
                             </ListView>
