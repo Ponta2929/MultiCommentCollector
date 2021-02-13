@@ -1,0 +1,36 @@
+﻿<Controls:MetroWindow x:Class="MultiCommentCollector.LogWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MultiCommentCollector"
+        xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+        mc:Ignorable="d"
+        Title="ログ " Height="{Binding Height.Value, Mode=TwoWay}" Width="{Binding Width.Value, Mode=TwoWay}"
+        Top="{Binding Top.Value, Mode=TwoWay}" Left="{Binding Left.Value, Mode=TwoWay}" Closing="LogWindow_Closing" >
+    <Window.Resources>
+        <local:HeaderWidthConverter x:Key="HeaderWidthConverter"/>
+    </Window.Resources>
+    <Window.DataContext>
+        <local:LogWindowViewModel />
+    </Window.DataContext>
+    <Grid>
+        <ListView x:Name="LogListView" ScrollViewer.HorizontalScrollBarVisibility="Hidden">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="発信元" DisplayMemberBinding="{Binding SenderName}" x:Name="ColumnSender"/>
+                    <GridViewColumn Header="時刻" DisplayMemberBinding="{Binding Date, StringFormat=yyyy/MM/dd HH:mm:ss}" x:Name="ColumnDate"/>
+                    <GridViewColumn Header="ログ" DisplayMemberBinding="{Binding Log}">
+                        <GridViewColumn.Width>
+                            <MultiBinding Converter="{StaticResource HeaderWidthConverter}">
+                                <Binding ElementName="LogListView" Path="ActualWidth" />
+                                <Binding ElementName="ColumnSender" Path="ActualWidth" />
+                                <Binding ElementName="ColumnDate" Path="ActualWidth" />
+                            </MultiBinding>
+                        </GridViewColumn.Width>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
+    </Grid>
+</Controls:MetroWindow>

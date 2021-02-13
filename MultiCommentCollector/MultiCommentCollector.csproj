@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net5.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MahApps.Metro" Version="2.4.3" />
+    <PackageReference Include="ReactiveProperty" Version="7.7.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MCC.Core\MCC.Core.csproj" />
+    <ProjectReference Include="..\MCC.Plugin\MCC.Plugin.csproj" />
+    <ProjectReference Include="..\MCC.Utility\MCC.Utility.csproj" />
+  </ItemGroup>
+
+</Project>
