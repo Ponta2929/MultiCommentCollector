@@ -15,6 +15,8 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Media;
 using System.Xml.Serialization;
 
@@ -49,6 +51,7 @@ namespace MultiCommentCollector
         public ReactiveCommand<ConnectionData> InactivateCommand { get; }
         public ReactiveCommand<ConnectionData> DeleteCommand { get; }
         public ReactiveCommand<ConnectionData> ToggleCommand { get; }
+        public ReactiveCommand<RoutedEventArgs> ColumnHeaderClickCommand { get; }
 
         public MainWindowViewModel()
         {
@@ -81,12 +84,30 @@ namespace MultiCommentCollector
                 else
                     MCC.Core.MultiCommentCollector.GetInstance().Activate(x);
             }).AddTo(disposable);
+            ColumnHeaderClickCommand = new ReactiveCommand<RoutedEventArgs>().WithSubscribe(x => UserHeaderClick(x)).AddTo(disposable);
 
             setting.Theme.IsDarkMode.Subscribe(x => ThemeManager.Current.ChangeTheme(Application.Current, $"{(x ? "Dark" : "Light")}.{setting.Theme.ThemeColor.Value}"));
             setting.Theme.ThemeColor.Subscribe(x => ThemeManager.Current.ChangeTheme(Application.Current, $"{(setting.Theme.IsDarkMode.Value ? "Dark" : "Light")}.{x}"));
 
             disposable.Add(setting.Theme.IsDarkMode);
             disposable.Add(setting.Theme.ThemeColor);
+        }
+
+        private void UserHeaderClick(RoutedEventArgs e)
+        {
+            if (e.OriginalSource is GridViewColumnHeader header)
+            {
+                if (header.Content.Equals("ユーザー名"))
+                {
+                    header.Content = "ユーザーID";
+                    header.Column.DisplayMemberBinding = new Binding("UserID");
+                }
+                else if (header.Content.Equals("ユーザーID"))
+                {
+                    header.Content = "ユーザー名";
+                    header.Column.DisplayMemberBinding = new Binding("UserName");
+                }
+            }
         }
     }
 }

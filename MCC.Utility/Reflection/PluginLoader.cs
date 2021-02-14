@@ -33,5 +33,32 @@ namespace MCC.Utility.Reflection
 
             return interfaces.ToArray();
         }
+
+        public static bool IsImplementation<T>(string fileName)
+        {
+            if (!File.Exists(fileName))
+                throw new FileNotFoundException();
+
+            var interfaceName = typeof(T).Name;
+
+            try
+            {
+                var assembly = Assembly.LoadFrom(fileName);
+
+                foreach (var type in assembly.GetTypes())
+                {
+                    if (type.IsClass && type.IsPublic && !type.IsAbstract && type.GetInterface(interfaceName) != null)
+                    {
+                        return true;
+                    }
+                }
+            }
+            catch
+            {
+                return false;
+            }
+
+            return false;
+        }
     }
 }

@@ -18,12 +18,6 @@ namespace MCC.Core
     [Serializable]
     public class ConnectionData
     {
-        public ConnectionData()
-        {
-            // IsActive.Subscribe(x => State.Value = x ? "有効" : "無効");
-            // State = IsActive.Select(x => x ? "有効" : "無効").ToReactiveProperty();
-        }
-
         /// <summary>
         /// プラグインのインスタンス
         /// </summary>
@@ -44,8 +38,5 @@ namespace MCC.Core
         /// プラグインのアクティブ状態
         /// </summary>
         public ReactiveProperty<bool> IsActive { get; init; } = new(false);
-
-        [XmlIgnore]
-        public ReactiveProperty<string> State { get; } = new("無効");
     }
 }

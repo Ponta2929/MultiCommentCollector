@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:local="clr-namespace:MultiCommentCollector"
         xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
         mc:Ignorable="d"
@@ -16,6 +17,9 @@
     </Window.DataContext>
     <Grid>
         <ListView x:Name="LogListView" ScrollViewer.HorizontalScrollBarVisibility="Hidden">
+            <i:Interaction.Behaviors>
+                <local:ListViewBehavior/>
+            </i:Interaction.Behaviors>
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="発信元" DisplayMemberBinding="{Binding SenderName}" x:Name="ColumnSender"/>

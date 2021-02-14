@@ -36,11 +36,22 @@
         <Controls:SplitView IsPaneOpen="{Binding IsPaneOpen.Value}" DisplayMode="Inline" OpenPaneLength="{Binding PaneWidth.Value, Mode=TwoWay}" CanResizeOpenPane="true" >
             <GroupBox Header="コメントデータ" Margin="5">
                 <ListView x:Name="CommentListView" ScrollViewer.HorizontalScrollBarVisibility="Hidden">
+                    <i:Interaction.Behaviors>
+                        <local:ListViewBehavior/>
+                    </i:Interaction.Behaviors>
                     <ListView.View>
                         <GridView>
                             <GridViewColumn Header="配信サイト" DisplayMemberBinding="{Binding LiveName}" x:Name="ColumnLiveName" />
                             <GridViewColumn Header="時間" DisplayMemberBinding="{Binding PostTime, StringFormat=HH:mm:ss}" x:Name="ColumnPostTime" />
-                            <GridViewColumn Header="ユーザー名" DisplayMemberBinding="{Binding UserName}" x:Name="ColumnUser" Width="75" />
+                            <GridViewColumn DisplayMemberBinding="{Binding UserName}" x:Name="ColumnUser" Width="75" >
+                                <GridViewColumnHeader Content="ユーザー名">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="Click">
+                                            <i:InvokeCommandAction Command="{Binding ColumnHeaderClickCommand}" PassEventArgsToCommand="True"/>
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </GridViewColumnHeader>
+                            </GridViewColumn>
                             <GridViewColumn Header="コメント" DisplayMemberBinding="{Binding Comment}" x:Name="ColumnComment">
                                 <GridViewColumn.Width>
                                     <MultiBinding Converter="{StaticResource HeaderWidthConverter}">
