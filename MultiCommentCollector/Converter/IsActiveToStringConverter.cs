@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
 
-namespace MultiCommentCollector
+namespace MultiCommentCollector.Converter
 {
     class IsActiveToStringConverter : IValueConverter
     {

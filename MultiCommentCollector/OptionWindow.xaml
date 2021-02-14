@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:local="clr-namespace:MultiCommentCollector"
+        xmlns:behavior="clr-namespace:MultiCommentCollector.Behavior"
         xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
         mc:Ignorable="d"
         Title="オプション" Height="280" Width="400" ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
@@ -20,7 +21,7 @@
                             <Label Content="待受ポート" Height="26" Width="60"/>
                             <TextBox Text="{Binding CommentReceiverServerPort.Value}" TextAlignment="Right" Height="20" Width="100" InputMethod.IsInputMethodEnabled="False">
                                 <i:Interaction.Behaviors>
-                                    <local:TextBoxBehavior/>
+                                    <behavior:TextBoxBehavior/>
                                 </i:Interaction.Behaviors>
                             </TextBox>
                         </StackPanel>
@@ -30,7 +31,7 @@
                             <Label Content="待受ポート" Height="26" Width="60"/>
                             <TextBox Text="{Binding CommentGeneratorServerPort.Value}" TextAlignment="Right" Height="20" Width="100" InputMethod.IsInputMethodEnabled="False">
                                 <i:Interaction.Behaviors>
-                                    <local:TextBoxBehavior/>
+                                    <behavior:TextBoxBehavior/>
                                 </i:Interaction.Behaviors>
                             </TextBox>
                         </StackPanel>
@@ -45,7 +46,7 @@
                             <Label Content="保持数" Height="26" Width="50" />
                             <TextBox Text="{Binding MaxComments.Value}" TextAlignment="Right" Height="20" Width="100" InputMethod.IsInputMethodEnabled="False" >
                                 <i:Interaction.Behaviors>
-                                    <local:TextBoxBehavior/>
+                                    <behavior:TextBoxBehavior/>
                                 </i:Interaction.Behaviors>
                             </TextBox>
                         </StackPanel>
@@ -55,7 +56,7 @@
                             <Label Content="保持数" Height="26" Width="50" />
                             <TextBox Text="{Binding MaxLogs.Value}" TextAlignment="Right" Height="20" Width="100" InputMethod.IsInputMethodEnabled="False">
                                 <i:Interaction.Behaviors>
-                                    <local:TextBoxBehavior/>
+                                    <behavior:TextBoxBehavior/>
                                 </i:Interaction.Behaviors>
                             </TextBox>
                         </StackPanel>

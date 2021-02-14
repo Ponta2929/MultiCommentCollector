@@ -9,12 +9,17 @@ namespace MCC.Plugin
     public interface IPluginBase
     {
         /// <summary>
+        /// 製作者名
+        /// </summary>
+        string Author { get; }
+
+        /// <summary>
         /// プラグイン名です。
         /// </summary>
         string PluginName { get; }
 
         /// <summary>
-        /// プラグイン名の詳細説明です。
+        /// プラグインの詳細説明です。
         /// </summary>
         string Description { get; }
 

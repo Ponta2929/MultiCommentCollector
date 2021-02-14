@@ -24,7 +24,9 @@ namespace MultiCommentCollector
 {
     public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
     {
+#pragma warning disable 0067
         public event PropertyChangedEventHandler PropertyChanged;
+#pragma warning restore 0067
 
         private readonly CompositeDisposable disposable = new();
 
@@ -44,6 +46,7 @@ namespace MultiCommentCollector
         public ReactiveProperty<int> PaneWidth { get; }
 
         public ReactiveCommand ShowLogWindowCommand { get; }
+        public ReactiveCommand ShowPluginWindowCommand { get; }
         public ReactiveCommand ShowOptionWindowCommand { get; }
         public ReactiveCommand ApplicationShutdownCommand { get; }
         public ReactiveCommand<string> EnterCommand { get; }
@@ -65,6 +68,7 @@ namespace MultiCommentCollector
             PaneWidth = setting.PaneWidth.ToReactivePropertyAsSynchronized(x => x.Value).AddTo(disposable);
 
             ShowLogWindowCommand = new ReactiveCommand().WithSubscribe(WindowManager.ShowLogWindow).AddTo(disposable);
+            ShowPluginWindowCommand = new ReactiveCommand().WithSubscribe(WindowManager.ShowPluginWindow).AddTo(disposable);
             ShowOptionWindowCommand = new ReactiveCommand().WithSubscribe(WindowManager.ShowOptionWindow).AddTo(disposable);
             ApplicationShutdownCommand = new ReactiveCommand().WithSubscribe(WindowManager.ApplicationShutdown).AddTo(disposable);
             EnterCommand = new ReactiveCommand<string>().WithSubscribe(x => MCC.Core.MultiCommentCollector.GetInstance().AddURL(x)).AddTo(disposable);

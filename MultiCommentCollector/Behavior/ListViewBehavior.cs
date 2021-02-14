@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 
-namespace MultiCommentCollector
+namespace MultiCommentCollector.Behavior
 {
     public class ListViewBehavior : Behavior<ListView>
     {

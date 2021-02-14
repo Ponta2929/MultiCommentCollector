@@ -5,7 +5,7 @@
         #region Singleton
 
         private static ConnectionManager instance;
-        public static ConnectionManager GetInstance() => instance ?? (instance = new ConnectionManager());
+        public static ConnectionManager GetInstance() => instance ??= new();
         public static void SetInstance(ConnectionManager inst) => instance = inst;
 
         #endregion

@@ -21,9 +21,11 @@ namespace MCC.TwitCasting
         private int movieId;
         private bool connect;
 
+        public string Author => "ぽんた";
+
         public string PluginName => "TwitCasting";
 
-        public string Description => "TwitCastingのコメントを取得します。";
+        public string Description => "TwitCastingの配信中のコメントを取得します。";
 
         public string Version => "1.0.0";
 
@@ -34,6 +36,7 @@ namespace MCC.TwitCasting
 
         private string ServerName { get; set; } = "localhost";
         private int Port { get; set; } = 29291;
+
         private JsonSerializerOptions options = new();
 
         public TwitCasting()

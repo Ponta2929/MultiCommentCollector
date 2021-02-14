@@ -5,12 +5,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:local="clr-namespace:MultiCommentCollector"
+        xmlns:converter="clr-namespace:MultiCommentCollector.Converter"
+        xmlns:behavior="clr-namespace:MultiCommentCollector.Behavior"
         xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
         mc:Ignorable="d"
         Title="ログ " Height="{Binding Height.Value, Mode=TwoWay}" Width="{Binding Width.Value, Mode=TwoWay}"
         Top="{Binding Top.Value, Mode=TwoWay}" Left="{Binding Left.Value, Mode=TwoWay}" Closing="LogWindow_Closing" >
     <Window.Resources>
-        <local:HeaderWidthConverter x:Key="HeaderWidthConverter"/>
+        <converter:HeaderWidthConverter x:Key="HeaderWidthConverter"/>
     </Window.Resources>
     <Window.DataContext>
         <local:LogWindowViewModel />
@@ -18,7 +20,7 @@
     <Grid>
         <ListView x:Name="LogListView" ScrollViewer.HorizontalScrollBarVisibility="Hidden">
             <i:Interaction.Behaviors>
-                <local:ListViewBehavior/>
+                <behavior:ListViewBehavior/>
             </i:Interaction.Behaviors>
             <ListView.View>
                 <GridView>

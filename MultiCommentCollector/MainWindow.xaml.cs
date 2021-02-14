@@ -24,7 +24,7 @@ namespace MultiCommentCollector
 
             // バインド
             this.CommentListView.ItemsSource = CommentManager.GetInstance().Items;
-            this.ConnectionListView.ItemsSource = ConnectionManager.GetInstance().Items;
+            this.ConnectionListView.ItemsSource = ConnectionManager.GetInstance().Items;          
         }
     }
 }

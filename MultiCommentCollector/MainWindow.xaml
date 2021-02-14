@@ -5,13 +5,15 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:local="clr-namespace:MultiCommentCollector"
+        xmlns:converter="clr-namespace:MultiCommentCollector.Converter"
+        xmlns:behavior="clr-namespace:MultiCommentCollector.Behavior"
         xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
         mc:Ignorable="d"
         Title="MultiCommentCollector" Height="{Binding Height.Value, Mode=TwoWay}" Width="{Binding Width.Value, Mode=TwoWay}"
         Top="{Binding Top.Value, Mode=TwoWay}" Left="{Binding Left.Value, Mode=TwoWay}" d:DesignWidth="800" d:DesignHeight="600">
     <Window.Resources>
-        <local:HeaderWidthConverter x:Key="HeaderWidthConverter"/>
-        <local:IsActiveToStringConverter x:Key="IsActiveToStringConverter"/>
+        <converter:HeaderWidthConverter x:Key="HeaderWidthConverter"/>
+        <converter:IsActiveToStringConverter x:Key="IsActiveToStringConverter"/>
     </Window.Resources>
     <Window.DataContext>
         <local:MainWindowViewModel />
@@ -24,7 +26,8 @@
             <MenuItem Header="ウィンドウ(_W)">
                 <MenuItem Header="接続(_C)" IsChecked="{Binding IsPaneOpen.Value}" IsCheckable="True"/>
                 <Separator />
-                <MenuItem Header="ログ(_L)" Command="{Binding ShowLogWindowCommand}"/>
+                <MenuItem Header="ログ(_L)..." Command="{Binding ShowLogWindowCommand}"/>
+                <MenuItem Header="プラグイン(_P)..." Command="{Binding ShowPluginWindowCommand}"/>
             </MenuItem>
             <MenuItem Header="ツール(_T)">
                 <MenuItem Header="オプション(_O)..." Command="{Binding ShowOptionWindowCommand}"/>
@@ -37,7 +40,7 @@
             <GroupBox Header="コメントデータ" Margin="5">
                 <ListView x:Name="CommentListView" ScrollViewer.HorizontalScrollBarVisibility="Hidden">
                     <i:Interaction.Behaviors>
-                        <local:ListViewBehavior/>
+                        <behavior:ListViewBehavior/>
                     </i:Interaction.Behaviors>
                     <ListView.View>
                         <GridView>

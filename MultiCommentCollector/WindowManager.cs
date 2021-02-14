@@ -42,6 +42,12 @@ namespace MultiCommentCollector
         }
 
         public static void ShowLogWindow() => LogWindow.GetInstance().Show();
+        public static void ShowPluginWindow()
+        {
+            var plugin = new PluginWindow();
+            plugin.Owner = Application.Current.MainWindow;
+            plugin.ShowDialog();
+        } 
 
         public static void ShowOptionWindow()
         {

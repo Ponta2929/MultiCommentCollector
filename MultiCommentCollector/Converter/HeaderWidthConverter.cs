@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Windows.Data;
 
-namespace MultiCommentCollector
+namespace MultiCommentCollector.Converter
 {
     public class HeaderWidthConverter : IMultiValueConverter
     {
