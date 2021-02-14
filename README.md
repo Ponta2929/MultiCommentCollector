@@ -1,0 +1,2 @@
+# MultiCommentCollector
+MultiCommentCollectorは、いろいろなライブ配信サイトのコメントデータを一つに集めて、送信するプログラムです。
