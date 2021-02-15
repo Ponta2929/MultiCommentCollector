@@ -11,7 +11,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MCC.Plugin", "MCC.Plugin\MC
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MCC.TwitCasting", "MCC.TwitCasting\MCC.TwitCasting.csproj", "{548EBC4B-B76E-45CF-9C41-663246919A47}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MCC.Core", "MCC.Core\MCC.Core.csproj", "{39157C53-3D66-4788-A83F-47164816126D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MCC.Core", "MCC.Core\MCC.Core.csproj", "{39157C53-3D66-4788-A83F-47164816126D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultiCommentCollectorCLI", "MultiCommentCollectorCLI\MultiCommentCollectorCLI.csproj", "{59674380-9CC7-4015-BC8F-1234FDE4C36D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{39157C53-3D66-4788-A83F-47164816126D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{39157C53-3D66-4788-A83F-47164816126D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{39157C53-3D66-4788-A83F-47164816126D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{59674380-9CC7-4015-BC8F-1234FDE4C36D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{59674380-9CC7-4015-BC8F-1234FDE4C36D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{59674380-9CC7-4015-BC8F-1234FDE4C36D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{59674380-9CC7-4015-BC8F-1234FDE4C36D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

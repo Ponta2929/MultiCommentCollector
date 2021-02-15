@@ -3,6 +3,7 @@ using MCC.Utility;
 using MCC.Utility.Reflection;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -26,6 +27,8 @@ namespace MCC.Core
         private ConnectionManager connectionManager = ConnectionManager.GetInstance();
         private CommentManager commentManager = CommentManager.GetInstance();
         private LogManager logManager = LogManager.GetInstance();
+        private object syncObjectLog = new();
+        private object syncObjectComment = new();
         // ------------------------------------------------------------------------------------ //
         private string[] pluginList = Directory.GetFiles($"{Path.GetDirectoryName(Environment.GetCommandLineArgs()[0])}\\plugins", "*.dll", SearchOption.AllDirectories);
 
@@ -101,7 +104,7 @@ namespace MCC.Core
         }
 
         /// <summary>
-        /// サーバー開始
+        /// サーバー停止
         /// </summary>
         public void ServerStop()
         {
@@ -128,6 +131,8 @@ namespace MCC.Core
 
             info.Plugin.OnCommentReceived += OnCommentReceived;
             info.IsActive.Value = info.Plugin.Activate();
+
+            OnLogged(this, new($"プラグインを有効化しました。[{info.PluginName}]"));
         }
 
         /// <summary>
@@ -144,9 +149,11 @@ namespace MCC.Core
                 log.OnLogged -= OnLogged;
 
             info.Plugin.OnCommentReceived -= OnCommentReceived;
+
+            OnLogged(this, new($"プラグインを無効化しました。[{info.PluginName}]"));
         }
 
-        public void AddURL(string url)
+        public void AddURL(string url, bool isActive = false)
         {
             if (url.Length == 0)
                 return;
@@ -177,21 +184,33 @@ namespace MCC.Core
 
                         ConnectionManager.GetInstance().Items.Add(info);
 
-                        var t = connectionManager.Items;
+                        OnLogged(this, new($"URLを追加しました。[{url}]"));
+
+                        if (isActive)
+                        {
+                            Activate(info);
+                        }
                     }
                     else
                     {
                         @interface.PluginClose();
+
+                        OnLogged(this, new($"無効なURLが入力されました。[{url}]"));
                     }
                 }
             }
         }
         private void OnLogged(object sender, LoggedEventArgs e)
         {
-            if (sender is IPluginSender pluginSender)
-                logManager.Items.AddOnScheduler(new(pluginSender.PluginName, e.Date, e.Log));
-            else
-                logManager.Items.AddOnScheduler(new(sender, e.Date, e.Log));
+            lock (syncObjectLog)
+            {
+                if (sender is IPluginSender pluginSender)
+                    logManager.Items.AddOnScheduler(new(pluginSender.PluginName, e.Date, e.Log));
+                else
+                    logManager.Items.AddOnScheduler(new(sender, e.Date, e.Log));
+            }
+            Debug.WriteLine($"[{sender.ToString()}] [{e.Date.ToShortTimeString()}] {e.Log}");
+
         }
 
         private void OnCommentReceived(object sender, CommentReceivedEventArgs e)
@@ -199,8 +218,11 @@ namespace MCC.Core
             // コメントジェネレーターで送信
             generatorServer.SendData<CommentData>(e.CommentData);
 
-            // コメント追加
-            commentManager.Items.AddOnScheduler(e.CommentData);
+            lock (syncObjectComment)
+            {
+                // コメント追加
+                commentManager.Items.AddOnScheduler(e.CommentData);
+            }
         }
     }
 }

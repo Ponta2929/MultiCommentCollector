@@ -36,7 +36,8 @@ namespace MultiCommentCollector
 
             foreach (var item in Setting.GetInstance().ConnectionList)
                 ConnectionManager.GetInstance().Items.Add(item);
-
+            MCC.Core.CommentGeneratorServer.GetInstance().Port = setting.Servers.CommentGeneratorServerPort.Value;
+            MCC.Core.CommentReceiverServer.GetInstance().Port = setting.Servers.CommentReceiverServerPort.Value;
             MCC.Core.MultiCommentCollector.GetInstance().Apply();
             MCC.Core.MultiCommentCollector.GetInstance().ServerStart();
         }

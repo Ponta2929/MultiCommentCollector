@@ -33,74 +33,88 @@ namespace MCC.Core
 
         public void Stop()
         {
-            IsClosed = true;
-
             Logged($"サーバーを停止しました。");
 
-            try
-            {
-                Close();
-            }
-            catch
-            {
-            }
-            listener.Close();
+            Abort();
         }
 
         private async void StartListen()
         {
-            if (IsClosed)
-                return;
+            if (listener is null)
+                listener = new();
 
-            // リスナー設定
-            listener.Prefixes.Clear();
-            listener.Prefixes.Add($"http://{ServerName}:{Port}/");
-
-            Logged($"サーバーを開始します。[{ServerName}:{Port}]");
-
-            listener.Start();
-
-            try
+            if (!listener.IsListening)
             {
-                while (listener.IsListening)
+                // リスナー設定
+                listener.Prefixes.Clear();
+                listener.Prefixes.Add($"http://{ServerName}:{Port}/");
+
+                Logged($"サーバーを開始します。[{ServerName}:{Port}]");
+
+                listener.Start();
+
+                try
                 {
-                    Logged($"接続要求を待機しています。");
-
-                    var context = await listener.GetContextAsync();
-
-                    if (context.Request.IsWebSocketRequest)
+                    while (listener.IsListening)
                     {
-                        Logged($"接続が開始されました。");
+                        Logged($"接続要求を待機しています。");
 
-                        Request(context);
-                    }
-                    else
-                    {
-                        using (var response = context.Response)
-                        using (var stream = response.OutputStream)
+                        var context = await listener.GetContextAsync();
+
+                        if (context.Request.IsWebSocketRequest)
                         {
-                            Logged($"接続要求は破棄されました。");
+                            Logged($"ソケット接続が開始されました。");
 
-                            var writeData = Encoding.UTF8.GetBytes("接続要求は破棄されました。");
-                            response.StatusCode = 400;
-                            stream.Write(writeData, 0, writeData.Length);
-                            context.Response.Close();
+                            Request(context);
                         }
+                        else
+                        {
+                            using (var response = context.Response)
+                            using (var stream = response.OutputStream)
+                            {
+                                Logged($"接続要求は破棄されました。");
+
+                                var writeData = Encoding.UTF8.GetBytes("接続要求は破棄されました。");
+                                response.StatusCode = 400;
+                                stream.Write(writeData, 0, writeData.Length);
+                                context.Response.Close();
+                            }
+                        }
+
+                        await Task.Delay(1);
                     }
-
-                    await Task.Delay(1);
                 }
-            }
-            catch
-            {
+                catch(Exception e)
+                {
 
-            }
-            finally
-            {
-                Logged($"サーバーが停止されました。");
+                }
+                finally
+                {
+                    Logged($"サーバーが停止されました。");
+
+                    Abort();
+                }
             }
         }
 
+        private void Abort()
+        {
+            if (listener is not null)
+            {
+                try
+                {
+                    Close();
+                }
+                catch
+                {
+                }
+                finally
+                {
+                    listener?.Abort();
+                    listener = null;
+                }
+            }
+        }
         private async void Request(HttpListenerContext context)
         {
             var task = await context.AcceptWebSocketAsync(null);

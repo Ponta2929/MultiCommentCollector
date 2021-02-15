@@ -1,5 +1,6 @@
 ﻿using MCC.Utility;
 using System;
+using System.Collections.Generic;
 using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
@@ -27,6 +28,7 @@ namespace MCC.Core
         {
             try
             {
+                var received = new List<byte>();
                 var buffer = new byte[4096];
 
                 while (socket.State == WebSocketState.Open)
@@ -40,7 +42,18 @@ namespace MCC.Core
                         return;
                     }
 
-                    var receive = Encoding.UTF8.GetString(buffer, 0, result.Count);
+                    int count = result.Count;
+                    received.Clear();
+                    received.AddRange(buffer);
+
+                    while (!result.EndOfMessage)
+                    {
+                        result = await socket.ReceiveAsync(segment, CancellationToken.None);
+                        received.AddRange(buffer);
+                        count += result.Count;
+                    }
+
+                    var receive = Encoding.UTF8.GetString(received.ToArray(), 0, count);
                     var dataType = JsonSerializer.Deserialize<PostHeader>(receive);
 
                     // コメント処理
@@ -57,7 +70,9 @@ namespace MCC.Core
             }
             finally
             {
-                Logged($"接続が終了しました。");
+                Close(socket);
+
+                Logged($"ソケット接続が終了しました。");
             }
         }
     }
