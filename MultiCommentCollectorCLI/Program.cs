@@ -52,7 +52,7 @@ namespace MultiCommentCollectorCLI
 
             if (commands.ContainsKey("exit"))
             {
-                ApplicationClose();
+                ApplicationExit();
                 Environment.Exit(0);
             }
 
@@ -123,6 +123,21 @@ namespace MultiCommentCollectorCLI
             }
         }
 
+        static void Log_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            var item = LogManager.GetInstance().Items[e.NewStartingIndex];
+            Console.WriteLine($"[{item.Date}] {item.SenderName} * {item.Log}");
+        }
+
+        static void Comment_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (IsComment)
+            {
+                var item = CommentManager.GetInstance().Items[e.NewStartingIndex];
+                Console.WriteLine($"[{item.PostTime}] {item.LiveName} * {item.UserName} - {item.Comment}");
+            }
+        }
+
         static void ApplicationStart()
         {
             AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
@@ -137,27 +152,7 @@ namespace MultiCommentCollectorCLI
             MultiCommentCollector.GetInstance().ServerStart();
         }
 
-        private static void CurrentDomain_ProcessExit(object sender, EventArgs e)
-        {
-            ApplicationClose();
-        }
-
-        private static void Log_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            var item = LogManager.GetInstance().Items[e.NewStartingIndex];
-            Console.WriteLine($"[{item.Date}] {item.SenderName} * {item.Log}");
-        }
-
-        private static void Comment_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            if (IsComment)
-            {
-                var item = CommentManager.GetInstance().Items[e.NewStartingIndex];
-                Console.WriteLine($"[{item.PostTime}] {item.LiveName} * {item.UserName} - {item.Comment}");
-            }
-        }
-
-        static void ApplicationClose()
+        static void ApplicationExit()
         {
             MCC.Core.MultiCommentCollector.GetInstance().ServerStop();
 
@@ -171,6 +166,11 @@ namespace MultiCommentCollectorCLI
             {
 
             }
+        }
+
+        static void CurrentDomain_ProcessExit(object sender, EventArgs e)
+        {
+            ApplicationExit();
         }
     }
 }

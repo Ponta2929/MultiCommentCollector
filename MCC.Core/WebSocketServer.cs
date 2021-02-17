@@ -33,8 +33,6 @@ namespace MCC.Core
 
         public void Stop()
         {
-            Logged($"サーバーを停止しました。");
-
             Abort();
         }
 
@@ -45,16 +43,16 @@ namespace MCC.Core
 
             if (!listener.IsListening)
             {
-                // リスナー設定
-                listener.Prefixes.Clear();
-                listener.Prefixes.Add($"http://{ServerName}:{Port}/");
-
-                Logged($"サーバーを開始します。[{ServerName}:{Port}]");
-
-                listener.Start();
-
                 try
                 {
+                    // リスナー設定
+                    listener.Prefixes.Clear();
+                    listener.Prefixes.Add($"http://{ServerName}:{Port}/");
+
+                    Logged($"サーバーを開始します。[{ServerName}:{Port}]");
+
+                    listener.Start();
+
                     while (listener.IsListening)
                     {
                         Logged($"接続要求を待機しています。");
@@ -63,7 +61,7 @@ namespace MCC.Core
 
                         if (context.Request.IsWebSocketRequest)
                         {
-                            Logged($"ソケット接続が開始されました。");
+                            Logged($"接続が開始されました。");
 
                             Request(context);
                         }
@@ -84,14 +82,16 @@ namespace MCC.Core
                         await Task.Delay(1);
                     }
                 }
-                catch(Exception e)
+                catch (HttpListenerException)
                 {
-
+                    Logged($"指定されたポートはすでに使用されています。");
+                }
+                catch (Exception e)
+                {
+                    Logged($"未知のエラーが発生しました。 : {e.Message.ToString()}");
                 }
                 finally
                 {
-                    Logged($"サーバーが停止されました。");
-
                     Abort();
                 }
             }
@@ -99,20 +99,13 @@ namespace MCC.Core
 
         private void Abort()
         {
+            Logged($"サーバーを停止しました。");
+
             if (listener is not null)
             {
-                try
-                {
-                    Close();
-                }
-                catch
-                {
-                }
-                finally
-                {
-                    listener?.Abort();
-                    listener = null;
-                }
+                Close();
+                listener.Abort();
+                listener = null;
             }
         }
         private async void Request(HttpListenerContext context)
@@ -127,45 +120,45 @@ namespace MCC.Core
             Process(task.WebSocket);
         }
 
-        protected virtual async void Process(WebSocket socket)
+        protected virtual void Process(WebSocket socket)
         {
-            await Task.Delay(1);
+            throw new NotImplementedException();
         }
 
         /// <summary>
         /// 開いているソケットを終了させます。
         /// </summary>
-        public async void Close()
+        public void Close()
         {
-            foreach (var socket in sockets)
-            {
-                if (socket.State == WebSocketState.Open)
-                {
-                    await socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "OK", CancellationToken.None);
-                    socket.Dispose();
-                }
-            }
-
-            Logged("すべてのソケットを閉じました。");
-
             lock (syncObject)
             {
+                for (var i = 0; i < sockets.Count; i++)
+                {
+                    var socket = sockets[i];
+
+                    if (socket.State == WebSocketState.Open)
+                        socket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "OK", CancellationToken.None);
+
+                    socket.Dispose();
+                }
+
                 sockets.Clear();
             }
+
+            Logged("すべての接続を閉じました。");
         }
 
         /// <summary>
         /// 開いている対象のソケットを終了させます。
         /// </summary>
-        public async void Close(WebSocket socket)
+        public void Close(WebSocket socket)
         {
             if (socket.State == WebSocketState.Open)
-            {
-                await socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "OK", CancellationToken.None);
-                socket.Dispose();
+                socket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "OK", CancellationToken.None);
 
-                Logged("対象のソケットを閉じました。");
-            }
+            socket.Dispose();
+
+            Logged("対象の接続を閉じました。");
 
             lock (syncObject)
             {

@@ -30,10 +30,14 @@ namespace MCC.Core
         private object syncObjectLog = new();
         private object syncObjectComment = new();
         // ------------------------------------------------------------------------------------ //
-        private string[] pluginList = Directory.GetFiles($"{Path.GetDirectoryName(Environment.GetCommandLineArgs()[0])}\\plugins", "*.dll", SearchOption.AllDirectories);
+        private string[] pluginList;
 
         public MultiCommentCollector()
         {
+            var path = $"{Path.GetDirectoryName(Environment.GetCommandLineArgs()[0])}\\plugins";
+
+            if (Directory.Exists(path))
+                pluginList = Directory.GetFiles($"{Path.GetDirectoryName(Environment.GetCommandLineArgs()[0])}\\plugins", "*.dll", SearchOption.AllDirectories);
 
         }
 
@@ -54,7 +58,7 @@ namespace MCC.Core
         /// </summary>
         public void Apply(ConnectionData info)
         {
-            if (info.Plugin is not null)
+            if (info.Plugin is not null || pluginList is null)
                 return;
 
             foreach (var plugin in pluginList)
@@ -205,9 +209,9 @@ namespace MCC.Core
             lock (syncObjectLog)
             {
                 if (sender is IPluginSender pluginSender)
-                    logManager.Items.AddOnScheduler(new(pluginSender.PluginName, e.Date, e.Log));
+                    logManager.Items.Add(new(pluginSender.PluginName, e.Date, e.Log));
                 else
-                    logManager.Items.AddOnScheduler(new(sender, e.Date, e.Log));
+                    logManager.Items.Add(new(sender, e.Date, e.Log));
             }
             Debug.WriteLine($"[{sender.ToString()}] [{e.Date.ToShortTimeString()}] {e.Log}");
 
@@ -221,7 +225,7 @@ namespace MCC.Core
             lock (syncObjectComment)
             {
                 // コメント追加
-                commentManager.Items.AddOnScheduler(e.CommentData);
+                commentManager.Items.Add(e.CommentData);
             }
         }
     }

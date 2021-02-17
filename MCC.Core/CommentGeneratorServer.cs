@@ -32,7 +32,7 @@ namespace MCC.Core
         #region Singleton
 
         private static CommentGeneratorServer instance;
-        public static CommentGeneratorServer GetInstance() => instance ?? (instance = new ());
+        public static CommentGeneratorServer GetInstance() => instance ?? (instance = new());
         public static void SetInstance(CommentGeneratorServer inst) => instance = inst;
 
         #endregion
@@ -41,40 +41,55 @@ namespace MCC.Core
 
         public CommentGeneratorServer(string serverName, int port) : base(serverName, port) { }
 
-        public void SendData<T>(T data, DataType type = DataType.Json)
+        protected override async void Process(WebSocket socket)
         {
-            WebSocket temp = null;
-
             try
             {
-                foreach (var socket in sockets)
+                var buffer = new byte[32];
+
+                while (socket.State == WebSocketState.Open)
                 {
-                    temp = socket;
+                    var segment = new ArraySegment<byte>(buffer);
+                    var result = await socket.ReceiveAsync(segment, CancellationToken.None);
 
-                    if (socket.State == WebSocketState.Open)
+                    if (result.MessageType == WebSocketMessageType.Close)
                     {
-                        var converted = XSSConvert(data);
-                        string response = string.Empty;
-
-                        if (type == DataType.Json)
-                            response = System.Text.Json.JsonSerializer.Serialize<T>((T)converted);
-                        else if (type == DataType.Xml)
-                            response = XmlSerializer.Serialize<T>(converted);
-
-                        var buffer = Encoding.UTF8.GetBytes(response);
-                        var segment = new ArraySegment<byte>(buffer);
-
-                        socket.SendAsync(segment, WebSocketMessageType.Text, true, CancellationToken.None);
+                        return;
                     }
                 }
             }
-            catch
+            catch (WebSocketException)
             {
-                if (temp != null)
-                {
-                    Logged($"接続が終了しました。");
+                Logged($"接続エラーが発生しました。");
+            }
+            catch (Exception e)
+            {
+                Logged($"未知のエラーが発生しました。 : {e.Message.ToString()}");
+            }
+            finally
+            {
+                Close(socket);
+            }
+        }
 
-                    Close(temp);
+        public async void SendData<T>(T data, DataType type = DataType.Json)
+        {
+            foreach (var socket in sockets)
+            {
+                if (socket.State == WebSocketState.Open)
+                {
+                    var converted = XSSConvert(data);
+                    var response = string.Empty;
+
+                    if (type == DataType.Json)
+                        response = System.Text.Json.JsonSerializer.Serialize<T>((T)converted);
+                    else if (type == DataType.Xml)
+                        response = XmlSerializer.Serialize<T>(converted);
+
+                    var buffer = Encoding.UTF8.GetBytes(response);
+                    var segment = new ArraySegment<byte>(buffer);
+
+                    await socket.SendAsync(segment, WebSocketMessageType.Text, true, CancellationToken.None);
                 }
             }
         }

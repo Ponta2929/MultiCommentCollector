@@ -37,10 +37,7 @@ namespace MCC.Core
                     var result = await socket.ReceiveAsync(segment, CancellationToken.None);
 
                     if (result.MessageType == WebSocketMessageType.Close)
-                    {
-                        await socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "OK", CancellationToken.None);
                         return;
-                    }
 
                     int count = result.Count;
                     received.Clear();
@@ -59,20 +56,23 @@ namespace MCC.Core
                     // コメント処理
                     if (dataType.PostType == PostType.Comment)
                         OnCommentReceived?.Invoke(this, new(JsonSerializer.Deserialize<CommentData>(receive)));
-
                 }
+            }
+            catch (WebSocketException)
+            {
+                Logged($"接続エラーが発生しました。");
+            }
+            catch (JsonException)
+            {
+                Logged($"デコードエラーが発生しました。");
             }
             catch (Exception e)
             {
-                Logged($"エラーが発生しました。{e.Message}");
-
-                return;
+                Logged($"未知のエラーが発生しました。 : {e.Message.ToString()}");
             }
             finally
             {
                 Close(socket);
-
-                Logged($"ソケット接続が終了しました。");
             }
         }
     }

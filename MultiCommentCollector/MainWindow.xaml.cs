@@ -26,16 +26,5 @@ namespace MultiCommentCollector
             this.CommentListView.ItemsSource = CommentManager.GetInstance().Items;
             this.ConnectionListView.ItemsSource = ConnectionManager.GetInstance().Items;          
         }
-
-        private void MenuItem_Click(object sender, RoutedEventArgs e)
-        {
-            CommentGeneratorServer.GetInstance().Start();
-        }
-
-        private void MenuItem_Click_1(object sender, RoutedEventArgs e)
-        {
-            CommentGeneratorServer.GetInstance().Stop();
-
-        }
     }
 }

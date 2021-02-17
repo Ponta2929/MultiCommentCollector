@@ -1,11 +1,6 @@
 ﻿using MCC.Plugin;
 using MCC.Utility.Reflection;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MCC.Core
 {
@@ -26,28 +21,30 @@ namespace MCC.Core
 
         public void プラグインとして有効なDLLを取得する関数(string folderPath)
         {
-            this.Items.Clear();
+            Items.Clear();
 
-            var pluginList = Directory.GetFiles(folderPath, "*.dll", SearchOption.AllDirectories);
-
-            try
+            if (Directory.Exists(folderPath))
             {
-                foreach (var plugin in pluginList)
-                {
-                    var impl = PluginLoader.Load<IPluginBase>(plugin);
+                var pluginList = Directory.GetFiles(folderPath, "*.dll", SearchOption.AllDirectories);
 
-                    if (impl is not null)
+                try
+                {
+                    foreach (var plugin in pluginList)
                     {
-                        foreach (var item in impl)
-                            this.Items.Add(item);
+                        var impl = PluginLoader.Load<IPluginBase>(plugin);
+
+                        if (impl is not null)
+                        {
+                            foreach (var item in impl)
+                                Items.Add(item);
+                        }
                     }
                 }
-            }
-            catch
-            {
+                catch
+                {
 
+                }
             }
-
-        } //GetValidPluginList()
+        }
     }
 }
