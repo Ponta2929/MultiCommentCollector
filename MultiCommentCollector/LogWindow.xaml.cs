@@ -35,7 +35,7 @@ namespace MultiCommentCollector
             InitializeComponent();
 
             // バインド
-            LogListView.ItemsSource = LogManager.GetInstance().Items;
+            LogListView.ItemsSource = LogManager.GetInstance();
         }
 
 

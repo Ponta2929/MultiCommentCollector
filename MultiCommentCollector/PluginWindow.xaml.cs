@@ -33,7 +33,7 @@ namespace MultiCommentCollector
             InitializeComponent();
 
             // バインド
-            PluginList.ItemsSource = PluginManager.GetInstance().Items;
+            PluginList.ItemsSource = PluginManager.GetInstance();
         }
     }
 }

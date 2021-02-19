@@ -1,11 +1,7 @@
 ﻿using MCC.Core;
 using MCC.Utility.IO;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace MultiCommentCollector
@@ -16,39 +12,46 @@ namespace MultiCommentCollector
         {
             Setting setting = Setting.GetInstance();
 
-            Application.Current.MainWindow.Closing += (_, _) =>
-            {
-                MCC.Core.MultiCommentCollector.GetInstance().ServerStop();
+            Application.Current.MainWindow.Closing += ApplicationClosing;
 
-                Setting.GetInstance().ConnectionList = ConnectionManager.GetInstance().Items;
-
-                try
-                {
-                    XmlSerializer.FileSerialize<Setting>($"{Path.GetDirectoryName(Environment.GetCommandLineArgs()[0])}\\setting.xml", Setting.GetInstance());
-                }
-                catch
-                {
-
-                }
-
-                LogWindow.GetInstance().IsOwnerClose = true;
-            };
-
+            // 接続リスト
             foreach (var item in Setting.GetInstance().ConnectionList)
-                ConnectionManager.GetInstance().Items.Add(item);
-            MCC.Core.CommentGeneratorServer.GetInstance().Port = setting.Servers.CommentGeneratorServerPort.Value;
-            MCC.Core.CommentReceiverServer.GetInstance().Port = setting.Servers.CommentReceiverServerPort.Value;
+                ConnectionManager.GetInstance().Add(item);
+
+            // サーバー開始
+            CommentGeneratorServer.GetInstance().Port = setting.Servers.CommentGeneratorServerPort.Value;
+            CommentReceiverServer.GetInstance().Port = setting.Servers.CommentReceiverServerPort.Value;
             MCC.Core.MultiCommentCollector.GetInstance().Apply();
             MCC.Core.MultiCommentCollector.GetInstance().ServerStart();
         }
 
-        public static void ShowLogWindow() => LogWindow.GetInstance().Show();
+        private static void ApplicationClosing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            MCC.Core.MultiCommentCollector.GetInstance().ServerStop();
+
+            Setting.GetInstance().ConnectionList = ConnectionManager.GetInstance();
+
+            try
+            {
+                XmlSerializer.FileSerialize<Setting>($"{Path.GetDirectoryName(Environment.GetCommandLineArgs()[0])}\\setting.xml", Setting.GetInstance());
+            }
+            catch
+            {
+
+            }
+
+            LogWindow.GetInstance().IsOwnerClose = true;
+        }
+
+        public static void ShowLogWindow()
+            => LogWindow.GetInstance().Show();
+
         public static void ShowPluginWindow()
         {
             var plugin = new PluginWindow();
             plugin.Owner = Application.Current.MainWindow;
             plugin.ShowDialog();
-        } 
+        }
 
         public static void ShowOptionWindow()
         {
@@ -58,8 +61,6 @@ namespace MultiCommentCollector
         }
 
         public static void ApplicationShutdown()
-        {
-            Application.Current.MainWindow.Close();
-        }
+            => Application.Current.MainWindow.Close();
     }
 }

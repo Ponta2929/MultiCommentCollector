@@ -16,7 +16,7 @@ namespace MCC.TwitCasting
 {
     public class TwitCasting : IPluginSender, ILogged
     {
-        private ClientWebSocket twitcas_client;
+        private ClientWebSocket client;
 
         private string userId;
         private int movieId;
@@ -77,19 +77,19 @@ namespace MCC.TwitCasting
 
         private async void Connect()
         {
-            if (twitcas_client is null)
-                twitcas_client = new();
+            if (client is null)
+                client = new();
 
             while (connect)
             {
                 // ツイキャス側クライアント
-                if (twitcas_client.State == WebSocketState.None || twitcas_client.State == WebSocketState.Closed || twitcas_client.State == WebSocketState.Aborted)
+                if (client.State == WebSocketState.None || client.State == WebSocketState.Closed || client.State == WebSocketState.Aborted)
                 {
-                    if (twitcas_client.State == WebSocketState.Closed || twitcas_client.State == WebSocketState.Aborted)
+                    if (client.State == WebSocketState.Closed || client.State == WebSocketState.Aborted)
                     {
                         OnLogged?.Invoke(this, new($"TwitCastingへ再接続をします。"));
-                        twitcas_client.Dispose();
-                        twitcas_client = new();
+                        client.Dispose();
+                        client = new();
                     }
 
                     try
@@ -99,7 +99,7 @@ namespace MCC.TwitCasting
 
                         if (latest.Movie.IsOnLive)
                         {
-                            await twitcas_client.ConnectAsync(new(GetChatWebSocket(movieId = latest.Movie.ID)), CancellationToken.None);
+                            await client.ConnectAsync(new(GetChatWebSocket(movieId = latest.Movie.ID)), CancellationToken.None);
 
                             OnLogged?.Invoke(this, new($"TwitCastingへ接続を開始しました。"));
 
@@ -145,27 +145,26 @@ namespace MCC.TwitCasting
 
                 try
                 {
-                    while (twitcas_client.State == WebSocketState.Open)
+                    while (client.State == WebSocketState.Open)
                     {
-                        var segment = new ArraySegment<byte>(buffer);
-                        var result = await twitcas_client.ReceiveAsync(segment, CancellationToken.None);
-
-                        if (result.MessageType == WebSocketMessageType.Close)
-                        {
-                            Abort();
-
-                            return;
-                        }
-
-                        int count = result.Count;
                         received.Clear();
-                        received.AddRange(buffer);
 
-                        while (!result.EndOfMessage)
+                        var segment = new ArraySegment<byte>(buffer);
+                        var count = 0;
+
+                        while (true)
                         {
-                            result = await twitcas_client.ReceiveAsync(segment, CancellationToken.None);
+                            var result = await client.ReceiveAsync(segment, CancellationToken.None);
+
+                            if (result.MessageType == WebSocketMessageType.Close)
+                            {
+                                return;
+                            }
                             received.AddRange(buffer);
                             count += result.Count;
+
+                            if (result.EndOfMessage)
+                                break;
                         }
 
                         var message = Encoding.UTF8.GetString(received.ToArray(), 0, count);
@@ -189,13 +188,20 @@ namespace MCC.TwitCasting
                         }
                     }
                 }
+                catch (WebSocketException)
+                {
+                    OnLogged?.Invoke(this, new($"接続エラーが発生しました。"));
+                }
+                catch (JsonException)
+                {
+                    OnLogged?.Invoke(this, new($"デコードエラーが発生しました。"));
+                }
                 catch (Exception e)
                 {
-                    OnLogged?.Invoke(this, new(e.Message));
+                    OnLogged?.Invoke(this, new($"未知のエラーが発生しました。 : {e.Message.ToString()}"));
                 }
                 finally
                 {
-                    OnLogged?.Invoke(this, new($"TwitCastingへの接続が終了しました。"));
 
                     // 終了
                     Abort();
@@ -207,10 +213,10 @@ namespace MCC.TwitCasting
         {
             try
             {
-                if (twitcas_client is not null && twitcas_client.State == WebSocketState.Open)
+                if (client is not null && client.State == WebSocketState.Open)
                 {
-                    twitcas_client.CloseAsync(WebSocketCloseStatus.NormalClosure, "OK", CancellationToken.None);
-                    twitcas_client.Abort();
+                    client.CloseAsync(WebSocketCloseStatus.NormalClosure, "OK", CancellationToken.None);
+                    client.Abort();
                 }
             }
             catch
@@ -218,8 +224,10 @@ namespace MCC.TwitCasting
             }
             finally
             {
-                if (twitcas_client is not null)
-                    twitcas_client.Dispose();
+                if (client is not null)
+                    client.Dispose();
+
+                OnLogged?.Invoke(this, new($"TwitCastingへの接続が終了しました。"));
             }
         }
 

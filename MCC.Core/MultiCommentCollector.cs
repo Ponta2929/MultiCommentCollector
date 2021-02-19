@@ -27,8 +27,6 @@ namespace MCC.Core
         private ConnectionManager connectionManager = ConnectionManager.GetInstance();
         private CommentManager commentManager = CommentManager.GetInstance();
         private LogManager logManager = LogManager.GetInstance();
-        private object syncObjectLog = new();
-        private object syncObjectComment = new();
         // ------------------------------------------------------------------------------------ //
         private string[] pluginList;
 
@@ -37,8 +35,9 @@ namespace MCC.Core
             var path = $"{Path.GetDirectoryName(Environment.GetCommandLineArgs()[0])}\\plugins";
 
             if (Directory.Exists(path))
+            {
                 pluginList = Directory.GetFiles($"{Path.GetDirectoryName(Environment.GetCommandLineArgs()[0])}\\plugins", "*.dll", SearchOption.AllDirectories);
-
+            }
         }
 
         /// <summary>
@@ -47,7 +46,7 @@ namespace MCC.Core
         public void Apply()
         {
             // プラグインロード
-            foreach (var info in connectionManager.Items)
+            foreach (var info in connectionManager)
             {
                 Apply(info);
             }
@@ -186,7 +185,7 @@ namespace MCC.Core
                             URL = url
                         };
 
-                        ConnectionManager.GetInstance().Items.Add(info);
+                        ConnectionManager.GetInstance().Add(info);
 
                         OnLogged(this, new($"URLを追加しました。[{url}]"));
 
@@ -206,15 +205,12 @@ namespace MCC.Core
         }
         private void OnLogged(object sender, LoggedEventArgs e)
         {
-            lock (syncObjectLog)
-            {
-                if (sender is IPluginSender pluginSender)
-                    logManager.Items.Add(new(pluginSender.PluginName, e.Date, e.Log));
-                else
-                    logManager.Items.Add(new(sender, e.Date, e.Log));
-            }
-            Debug.WriteLine($"[{sender.ToString()}] [{e.Date.ToShortTimeString()}] {e.Log}");
+            if (sender is IPluginBase pluginSender)
+                logManager.Add(new(pluginSender.PluginName, e.Date, e.Log));
+            else
+                logManager.Add(new(sender, e.Date, e.Log));
 
+            Debug.WriteLine($"[{sender.ToString()}] [{e.Date.ToShortTimeString()}] {e.Log}");
         }
 
         private void OnCommentReceived(object sender, CommentReceivedEventArgs e)
@@ -222,11 +218,8 @@ namespace MCC.Core
             // コメントジェネレーターで送信
             generatorServer.SendData<CommentData>(e.CommentData);
 
-            lock (syncObjectComment)
-            {
-                // コメント追加
-                commentManager.Items.Add(e.CommentData);
-            }
+            // コメント追加
+            commentManager.Add(e.CommentData);
         }
     }
 }

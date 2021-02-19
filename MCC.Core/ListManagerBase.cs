@@ -3,12 +3,9 @@ using System.Collections.Specialized;
 
 namespace MCC.Core
 {
-    public class ListManagerBase<T>
+    public class ListManagerBase<T> : ReactiveCollection<T>
     {
-        /// <summary>
-        /// リスト
-        /// </summary>
-        public ReactiveCollection<T> Items { get; private set; } = new();
+        private object syncObject = new();
 
         /// <summary>
         /// リストが保持できる件数です。
@@ -21,28 +18,69 @@ namespace MCC.Core
         public ReactivePropertySlim<bool> IsLimit { get; set; } = new(true);
 
         public ListManagerBase()
-            => Items.CollectionChanged += CollectionChanged;
+        {
+            CollectionChanged += OnCollectionChanged;
+        }
 
-        private void CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        public new void Add(T item)
+        {
+            lock (syncObject)
+            {
+                AddOnScheduler(item);
+            }
+        }
+
+        public new void RemoveAt(int index)
+        {
+            lock (syncObject)
+            {
+                RemoveAtOnScheduler(index);
+            }
+        }
+
+        public new void Remove(T item)
+        {
+            lock (syncObject)
+            {
+                RemoveOnScheduler(item);
+            }
+        }
+
+        public new void Clear()
+        {
+            lock (syncObject)
+            {
+                ClearOnScheduler();
+            }
+        }
+        public void AddRange(params T[] items)
+        {
+            lock (syncObject)
+            {
+                AddRangeOnScheduler(items);
+            }
+        }
+
+        private void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (!IsLimit.Value)
                 return;
 
             try
             {
-                Items.CollectionChanged -= CollectionChanged;
+                CollectionChanged -= OnCollectionChanged;
 
                 if (e.Action == NotifyCollectionChangedAction.Add)
                 {
                     if (Items.Count > MaxSize.Value)
                     {
-                        Items.RemoveAt(0);
+                        RemoveAt(0);
                     }
                 }
             }
             finally
             {
-                Items.CollectionChanged += CollectionChanged;
+                CollectionChanged += OnCollectionChanged;
             }
         }
     }

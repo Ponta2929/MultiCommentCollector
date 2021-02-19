@@ -1,8 +1,10 @@
 ﻿using MCC.Utility;
 using MCC.Utility.IO;
+using MCC.Utility.Net;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net.WebSockets;
 using System.Text;
@@ -74,7 +76,7 @@ namespace MCC.Core
 
         public async void SendData<T>(T data, DataType type = DataType.Json)
         {
-            foreach (var socket in sockets)
+            foreach (var socket in Sockets)
             {
                 if (socket.State == WebSocketState.Open)
                 {

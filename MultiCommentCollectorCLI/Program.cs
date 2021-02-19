@@ -60,12 +60,12 @@ namespace MultiCommentCollectorCLI
             {
                 Console.WriteLine($"接続リスト一覧");
 
-                if (ConnectionManager.GetInstance().Items.Count == 0)
+                if (ConnectionManager.GetInstance().Count == 0)
                     Console.WriteLine($"    なし");
                 else
-                    for (var i = 0; i < ConnectionManager.GetInstance().Items.Count; i++)
+                    for (var i = 0; i < ConnectionManager.GetInstance().Count; i++)
                     {
-                        var item = ConnectionManager.GetInstance().Items[i];
+                        var item = ConnectionManager.GetInstance()[i];
                         Console.WriteLine($"{i} - {item.PluginName}　URL:{item.URL}　状態:{(item.IsActive.Value ? "有効" : "無効")}");
                     }
             }
@@ -76,26 +76,26 @@ namespace MultiCommentCollectorCLI
 
             if (commands.TryGetValue("-remove", out var remove))
             {
-                if (int.TryParse(remove, out var result) && result < ConnectionManager.GetInstance().Items.Count)
+                if (int.TryParse(remove, out var result) && result < ConnectionManager.GetInstance().Count)
                 {
-                    var item = ConnectionManager.GetInstance().Items[result];
+                    var item = ConnectionManager.GetInstance()[result];
                     MultiCommentCollector.GetInstance().Inactivate(item);
-                    ConnectionManager.GetInstance().Items.Remove(item);
+                    ConnectionManager.GetInstance().Remove(item);
                 }
             }
             if (commands.TryGetValue("-activate", out var activate))
             {
-                if (int.TryParse(activate, out var result) && result < ConnectionManager.GetInstance().Items.Count)
+                if (int.TryParse(activate, out var result) && result < ConnectionManager.GetInstance().Count)
                 {
-                    var item = ConnectionManager.GetInstance().Items[result];
+                    var item = ConnectionManager.GetInstance()[result];
                     MultiCommentCollector.GetInstance().Activate(item);
                 }
             }
             if (commands.TryGetValue("-inactivate", out var inactivate))
             {
-                if (int.TryParse(inactivate, out var result) && result < ConnectionManager.GetInstance().Items.Count)
+                if (int.TryParse(inactivate, out var result) && result < ConnectionManager.GetInstance().Count)
                 {
-                    var item = ConnectionManager.GetInstance().Items[result];
+                    var item = ConnectionManager.GetInstance()[result];
                     MultiCommentCollector.GetInstance().Inactivate(item);
                 }
             }
@@ -125,7 +125,7 @@ namespace MultiCommentCollectorCLI
 
         static void Log_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            var item = LogManager.GetInstance().Items[e.NewStartingIndex];
+            var item = LogManager.GetInstance()[e.NewStartingIndex];
             Console.WriteLine($"[{item.Date}] {item.SenderName} * {item.Log}");
         }
 
@@ -133,7 +133,7 @@ namespace MultiCommentCollectorCLI
         {
             if (IsComment)
             {
-                var item = CommentManager.GetInstance().Items[e.NewStartingIndex];
+                var item = CommentManager.GetInstance()[e.NewStartingIndex];
                 Console.WriteLine($"[{item.PostTime}] {item.LiveName} * {item.UserName} - {item.Comment}");
             }
         }
@@ -142,11 +142,11 @@ namespace MultiCommentCollectorCLI
         {
             AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
             Setting setting = Setting.GetInstance();
-            LogManager.GetInstance().Items.CollectionChanged += Log_CollectionChanged;
-            CommentManager.GetInstance().Items.CollectionChanged += Comment_CollectionChanged;
+            LogManager.GetInstance().CollectionChanged += Log_CollectionChanged;
+            CommentManager.GetInstance().CollectionChanged += Comment_CollectionChanged;
 
             foreach (var item in Setting.GetInstance().ConnectionList)
-                ConnectionManager.GetInstance().Items.Add(item);
+                ConnectionManager.GetInstance().Add(item);
 
             MultiCommentCollector.GetInstance().Apply();
             MultiCommentCollector.GetInstance().ServerStart();
@@ -156,7 +156,7 @@ namespace MultiCommentCollectorCLI
         {
             MCC.Core.MultiCommentCollector.GetInstance().ServerStop();
 
-            Setting.GetInstance().ConnectionList = ConnectionManager.GetInstance().Items;
+            Setting.GetInstance().ConnectionList = ConnectionManager.GetInstance();
 
             try
             {

@@ -1,4 +1,5 @@
 ﻿using MCC.Utility;
+using MCC.Utility.Net;
 using System;
 using System.Collections.Generic;
 using System.Net.WebSockets;
@@ -33,21 +34,23 @@ namespace MCC.Core
 
                 while (socket.State == WebSocketState.Open)
                 {
-                    var segment = new ArraySegment<byte>(buffer);
-                    var result = await socket.ReceiveAsync(segment, CancellationToken.None);
-
-                    if (result.MessageType == WebSocketMessageType.Close)
-                        return;
-
-                    int count = result.Count;
                     received.Clear();
-                    received.AddRange(buffer);
 
-                    while (!result.EndOfMessage)
+                    var segment = new ArraySegment<byte>(buffer);
+                    var count = 0;
+
+                    while (true)
                     {
-                        result = await socket.ReceiveAsync(segment, CancellationToken.None);
+                        var result = await socket.ReceiveAsync(segment, CancellationToken.None);
+
+                        if (result.MessageType == WebSocketMessageType.Close)
+                            return;
+
                         received.AddRange(buffer);
                         count += result.Count;
+
+                        if (result.EndOfMessage)
+                            break;
                     }
 
                     var receive = Encoding.UTF8.GetString(received.ToArray(), 0, count);

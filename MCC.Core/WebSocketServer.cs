@@ -1,6 +1,7 @@
 ﻿using MCC.Utility;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Net.WebSockets;
 using System.Text;
@@ -13,13 +14,17 @@ namespace MCC.Core
     {
         private object syncObject = new();
         private HttpListener listener = new();
-        protected List<WebSocket> sockets = new();
+        protected List<WebSocket> Sockets = new();
 
+        /// <summary>
+        /// 接続先のサーバー名
+        /// </summary>
         public string ServerName { get; set; }
 
+        /// <summary>
+        /// 接続先のポート番号
+        /// </summary>
         public int Port { get; set; }
-
-        public bool IsClosed { get; private set; }
 
         public event LoggedEventHandler OnLogged;
 
@@ -61,30 +66,24 @@ namespace MCC.Core
 
                         if (context.Request.IsWebSocketRequest)
                         {
-                            Logged($"接続が開始されました。");
-
                             Request(context);
                         }
                         else
                         {
                             using (var response = context.Response)
                             using (var stream = response.OutputStream)
+                            using (var writer = new StreamWriter(stream, Encoding.UTF8))
                             {
-                                Logged($"接続要求は破棄されました。");
-
-                                var writeData = Encoding.UTF8.GetBytes("接続要求は破棄されました。");
                                 response.StatusCode = 400;
-                                stream.Write(writeData, 0, writeData.Length);
-                                context.Response.Close();
+                                writer.Write("Bad Request");
+                                Logged($"接続要求は破棄されました。");
                             }
                         }
-
-                        await Task.Delay(1);
                     }
                 }
                 catch (HttpListenerException)
                 {
-                    Logged($"指定されたポートはすでに使用されています。");
+                    Logged($"指定のプレフィックスはすでに使用されています。");
                 }
                 catch (Exception e)
                 {
@@ -99,22 +98,27 @@ namespace MCC.Core
 
         private void Abort()
         {
-            Logged($"サーバーを停止しました。");
-
             if (listener is not null)
             {
+                // ソケットを閉じる
                 Close();
+
+                // リスナー削除
                 listener.Abort();
                 listener = null;
             }
+
+            Logged($"サーバーを停止しました。");
         }
         private async void Request(HttpListenerContext context)
         {
             var task = await context.AcceptWebSocketAsync(null);
 
+            Logged($"接続が開始されました。");
+
             lock (syncObject)
             {
-                sockets.Add(task.WebSocket);
+                Sockets.Add(task.WebSocket);
             }
 
             Process(task.WebSocket);
@@ -132,9 +136,9 @@ namespace MCC.Core
         {
             lock (syncObject)
             {
-                for (var i = 0; i < sockets.Count; i++)
+                for (var i = 0; i < Sockets.Count; i++)
                 {
-                    var socket = sockets[i];
+                    var socket = Sockets[i];
 
                     if (socket.State == WebSocketState.Open)
                         socket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "OK", CancellationToken.None);
@@ -142,7 +146,7 @@ namespace MCC.Core
                     socket.Dispose();
                 }
 
-                sockets.Clear();
+                Sockets.Clear();
             }
 
             Logged("すべての接続を閉じました。");
@@ -162,7 +166,7 @@ namespace MCC.Core
 
             lock (syncObject)
             {
-                sockets.Remove(socket);
+                Sockets.Remove(socket);
             }
         }
 

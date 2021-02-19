@@ -1,4 +1,5 @@
 ﻿using ControlzEx.Theming;
+using MCC.Core;
 using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
 using System;
@@ -45,12 +46,10 @@ namespace MultiCommentCollector
             IsDarkMode = setting.Theme.IsDarkMode.ToReactivePropertyAsSynchronized(x => x.Value).AddTo(disposable);
             ThemeColor = setting.Theme.ThemeColor.ToReactivePropertyAsSynchronized(x => x.Value).AddTo(disposable);
 
-            IsDarkMode.Subscribe(x => ThemeManager.Current.ChangeTheme(Application.Current, $"{(x ? "Dark" : "Light")}.{ThemeColor.Value}"));
-            ThemeColor.Subscribe(x => ThemeManager.Current.ChangeTheme(Application.Current, $"{(IsDarkMode.Value ? "Dark" : "Light")}.{x}"));
-
-            disposable.Add(IsDarkMode);
-            disposable.Add(ThemeColor);
+            IsDarkMode.Subscribe(x => ThemeManager.Current.ChangeTheme(Application.Current, $"{(x ? "Dark" : "Light")}.{ThemeColor.Value}")).AddTo(disposable);
+            ThemeColor.Subscribe(x => ThemeManager.Current.ChangeTheme(Application.Current, $"{(IsDarkMode.Value ? "Dark" : "Light")}.{x}")).AddTo(disposable);
+            MaxComments.Subscribe(x => CommentManager.GetInstance().MaxSize.Value = x);
+            MaxLogs.Subscribe(x => LogManager.GetInstance().MaxSize.Value = x);
         }
     }
 }
-;
