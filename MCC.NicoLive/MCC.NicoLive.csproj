@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <OutputPath>C:\Users\reaer\source\repos\MultiCommentCollector\MultiCommentCollector\bin\Debug\net5.0-windows\plugins\</OutputPath>
+    <OutputPath>..\MultiCommentCollector\bin\Debug\net5.0-windows\plugins\</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>

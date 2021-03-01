@@ -6,20 +6,20 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <OutputPath>C:\Users\reaer\source\repos\MultiCommentCollector\MultiCommentCollector\bin\Debug\net5.0-windows\plugins\</OutputPath>
+    <OutputPath>..\MultiCommentCollector\bin\Debug\net5.0-windows\plugins\</OutputPath>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutputPath>C:\Users\reaer\source\repos\MultiCommentCollector\MultiCommentCollector\bin\Debug\net5.0-windows\plugins\</OutputPath>
+    <OutputPath>..\MultiCommentCollector\bin\Debug\net5.0-windows\plugins\</OutputPath>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <OutputPath>C:\Users\reaer\source\repos\MultiCommentCollector\MultiCommentCollector\bin\Release\net5.0-windows\plugins\</OutputPath>
+    <OutputPath>..\MultiCommentCollector\bin\Release\net5.0-windows\plugins\</OutputPath>
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutputPath>C:\Users\reaer\source\repos\MultiCommentCollector\MultiCommentCollector\bin\Release\net5.0-windows\plugins\</OutputPath>
+    <OutputPath>..\MultiCommentCollector\bin\Release\net5.0-windows\plugins\</OutputPath>
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
 

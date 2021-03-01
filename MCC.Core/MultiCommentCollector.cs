@@ -33,7 +33,12 @@ namespace MCC.Core
 
         public MultiCommentCollector()
         {
-            var path = $"{Path.GetDirectoryName(Environment.GetCommandLineArgs()[0])}\\plugins";
+            var path ="";
+
+            if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+                path = $"{Path.GetDirectoryName(Environment.GetCommandLineArgs()[0])}\\plugins";
+            else
+                path = $"{Path.GetDirectoryName(Environment.GetCommandLineArgs()[0])}/plugins";
 
             // プラグイン
             pluginManager.Load(path);
