@@ -66,7 +66,7 @@ namespace MultiCommentCollectorCLI
                     for (var i = 0; i < ConnectionManager.GetInstance().Count; i++)
                     {
                         var item = ConnectionManager.GetInstance()[i];
-                        Console.WriteLine($"{i} - {item.PluginName}　URL:{item.URL}　状態:{(item.IsActive.Value ? "有効" : "無効")}");
+                        Console.WriteLine($"{i} - {item.Plugin.PluginName}　URL:{item.URL}　状態:{(item.IsActive.Value ? "有効" : "無効")}");
                     }
             }
 

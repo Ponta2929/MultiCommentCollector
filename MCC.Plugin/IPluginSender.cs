@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace MCC.Plugin
 {
@@ -15,6 +16,7 @@ namespace MCC.Plugin
         /// </summary>
         event CommentReceivedEventHandler OnCommentReceived;
 
+        [XmlIgnore]
         /// <summary>
         /// サイト名です。
         /// </summary>

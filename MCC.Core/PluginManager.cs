@@ -1,11 +1,16 @@
 ﻿using MCC.Plugin;
 using MCC.Utility.Reflection;
+using System;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 
 namespace MCC.Core
 {
     public class PluginManager : ListManagerBase<IPluginBase>
     {
+        public ListManagerBase<IPluginBase> Parent = new();
+
         #region Singleton
 
         private static PluginManager instance;
@@ -14,29 +19,31 @@ namespace MCC.Core
 
         #endregion
 
+
         public PluginManager()
         {
             IsLimit.Value = false;
         }
 
-        public void プラグインとして有効なDLLを取得する関数(string folderPath)
+        public void Load(string folderPath)
         {
-            Items.Clear();
+            if (!Directory.Exists(folderPath))
+                throw new DirectoryNotFoundException();
 
-            if (Directory.Exists(folderPath))
+            var interfaceName = typeof(IPluginBase).Name;
+            var plugins = Directory.GetFiles(folderPath, "*.dll", SearchOption.AllDirectories);
+
+            foreach (var plugin in plugins)
             {
-                var pluginList = Directory.GetFiles(folderPath, "*.dll", SearchOption.AllDirectories);
-
                 try
                 {
-                    foreach (var plugin in pluginList)
-                    {
-                        var impl = PluginLoader.Load<IPluginBase>(plugin);
+                    var assembly = Assembly.LoadFrom(plugin);
 
-                        if (impl is not null)
+                    foreach (var type in assembly.GetTypes())
+                    {
+                        if (type.IsClass && type.IsPublic && !type.IsAbstract && type.GetInterface(interfaceName) is not null)
                         {
-                            foreach (var item in impl)
-                                Items.Add(item);
+                            Parent.Add((IPluginBase)assembly.CreateInstance(type.FullName));
                         }
                     }
                 }
@@ -44,6 +51,30 @@ namespace MCC.Core
                 {
 
                 }
+            }
+
+
+            // IPluginReceiver
+            var receiver = Parent.Where(x => x is IPluginReceiver).Select(x => CreateInstance(x)).ToArray();
+
+            foreach (var item in receiver)
+                item.PluginLoad();
+
+            AddRange(receiver);
+        }
+
+        public IPluginBase CreateInstance(IPluginBase plugin)
+        {
+            try
+            {
+                var type = plugin.GetType();
+                var assembly = type.Assembly;
+
+                return assembly.CreateInstance(type.FullName) as IPluginBase;
+            }
+            catch
+            {
+                return null;
             }
         }
     }

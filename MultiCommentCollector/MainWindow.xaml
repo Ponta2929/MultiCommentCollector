@@ -21,12 +21,14 @@
     <DockPanel>
         <Menu x:Name="menu" VerticalAlignment="Top" DockPanel.Dock="top" FontSize="12">
             <MenuItem Header="ファイル(_F)">
+                <MenuItem Header="TESTA" Click="MenuItem_Click"/>
                 <MenuItem Header="終了(_X)" Command="{Binding ApplicationShutdownCommand}"/>
             </MenuItem>
+            <MenuItem Header="プラグイン(_P)" ItemsSource="{Binding ParentMenu}"/>
             <MenuItem Header="ウィンドウ(_W)">
                 <MenuItem Header="接続(_C)" IsChecked="{Binding IsPaneOpen.Value}" IsCheckable="True"/>
                 <Separator />
-                <MenuItem Header="プラグイン(_P)..." Command="{Binding ShowPluginWindowCommand}"/>
+                <MenuItem Header="プラグイン(_P)..." Command="{Binding ShowPluginWindowCommand}" />
                 <MenuItem Header="ログ(_L)..." Command="{Binding ShowLogWindowCommand}"/>
             </MenuItem>
             <MenuItem Header="ツール(_T)">

@@ -1,15 +1,5 @@
 ﻿using MCC.Core;
-using MCC.Plugin;
-using MCC.Utility;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using System.IO;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Input;
 
 namespace MultiCommentCollector
 {
@@ -23,8 +13,13 @@ namespace MultiCommentCollector
             InitializeComponent();
 
             // バインド
-            this.CommentListView.ItemsSource = CommentManager.GetInstance();
-            this.ConnectionListView.ItemsSource = ConnectionManager.GetInstance();          
+            CommentListView.ItemsSource = CommentManager.GetInstance();
+            ConnectionListView.ItemsSource = ConnectionManager.GetInstance();
+        }
+
+        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            MCC.Core.Win.MultiCommentCollector.GetInstance().TestA(new MahApps.Metro.Controls.MetroWindow());
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using MCC.Plugin;
+using MCC.Utility;
 using Reactive.Bindings;
 using System;
 using System.Collections.Generic;
@@ -23,11 +24,6 @@ namespace MCC.Core
         /// </summary>
         [XmlIgnore]
         public IPluginSender Plugin { get; set; }
-
-        /// <summary>
-        /// プラグイン名
-        /// </summary>
-        public string PluginName { get; set; }
 
         /// <summary>
         /// 処理するURL

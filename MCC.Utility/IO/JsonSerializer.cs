@@ -28,8 +28,11 @@ namespace MCC.Utility.IO
         /// Xmlデータをファイルから読み込みます。
         /// </summary>
         /// <param name="fileName">対象のファイル名。</param>
-        public static T FileDeserialize<T>(string fileName)
+        public static T FileDeserialize<T>(string fileName) where T : new()
         {
+            if (!File.Exists(fileName))
+                return new T();
+
             using (var stream = new FileStream(fileName, FileMode.Open, FileAccess.Read))
                 return (T)(new DataContractJsonSerializer(typeof(T), Settings)).ReadObject(stream);
         }

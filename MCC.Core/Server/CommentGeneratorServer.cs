@@ -11,10 +11,12 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MCC.Core
+namespace MCC.Core.Server
 {
     public sealed class CommentGeneratorServer : WebSocketServer
     {
+        private object syncObject = new object();
+
         /// <summary>
         /// クラスの構造タイプです。
         /// </summary>
@@ -74,24 +76,27 @@ namespace MCC.Core
             }
         }
 
-        public async void SendData<T>(T data, DataType type = DataType.Json)
+        public void SendData<T>(T data, DataType type = DataType.Json)
         {
-            foreach (var socket in Sockets)
+            lock (syncObject)
             {
-                if (socket.State == WebSocketState.Open)
+                foreach (var socket in Sockets)
                 {
-                    var converted = XSSConvert(data);
-                    var response = string.Empty;
+                    if (socket.State == WebSocketState.Open)
+                    {
+                        var converted = XSSConvert(data);
+                        var response = string.Empty;
 
-                    if (type == DataType.Json)
-                        response = System.Text.Json.JsonSerializer.Serialize<T>((T)converted);
-                    else if (type == DataType.Xml)
-                        response = XmlSerializer.Serialize<T>(converted);
+                        if (type == DataType.Json)
+                            response = System.Text.Json.JsonSerializer.Serialize<T>((T)converted);
+                        else if (type == DataType.Xml)
+                            response = XmlSerializer.Serialize<T>(converted);
 
-                    var buffer = Encoding.UTF8.GetBytes(response);
-                    var segment = new ArraySegment<byte>(buffer);
+                        var buffer = Encoding.UTF8.GetBytes(response);
+                        var segment = new ArraySegment<byte>(buffer);
 
-                    await socket.SendAsync(segment, WebSocketMessageType.Text, true, CancellationToken.None);
+                        socket.SendAsync(segment, WebSocketMessageType.Text, true, CancellationToken.None);
+                    }
                 }
             }
         }

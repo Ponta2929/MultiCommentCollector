@@ -1,5 +1,6 @@
 ﻿using ControlzEx.Theming;
 using MCC.Core;
+using MCC.Plugin.Win;
 using MCC.Utility;
 using MCC.Utility.IO;
 using Reactive.Bindings;
@@ -56,6 +57,8 @@ namespace MultiCommentCollector
         public ReactiveCommand<ConnectionData> ToggleCommand { get; }
         public ReactiveCommand<RoutedEventArgs> ColumnHeaderClickCommand { get; }
 
+        public ReactiveCollection<MenuItem> ParentMenu { get; }
+
         public MainWindowViewModel()
         {
             WindowManager.ApplicationStart();
@@ -71,9 +74,9 @@ namespace MultiCommentCollector
             ShowPluginWindowCommand = new ReactiveCommand().WithSubscribe(WindowManager.ShowPluginWindow).AddTo(disposable);
             ShowOptionWindowCommand = new ReactiveCommand().WithSubscribe(WindowManager.ShowOptionWindow).AddTo(disposable);
             ApplicationShutdownCommand = new ReactiveCommand().WithSubscribe(WindowManager.ApplicationShutdown).AddTo(disposable);
-            EnterCommand = new ReactiveCommand<string>().WithSubscribe(x => MCC.Core.MultiCommentCollector.GetInstance().AddURL(x)).AddTo(disposable);
-            ActivateCommand = new ReactiveCommand<ConnectionData>().WithSubscribe(x => MCC.Core.MultiCommentCollector.GetInstance().Activate(x)).AddTo(disposable);
-            InactivateCommand = new ReactiveCommand<ConnectionData>().WithSubscribe(x => MCC.Core.MultiCommentCollector.GetInstance().Inactivate(x)).AddTo(disposable);
+            EnterCommand = new ReactiveCommand<string>().WithSubscribe(x => MCC.Core.Win.MultiCommentCollector.GetInstance().AddURL(x)).AddTo(disposable);
+            ActivateCommand = new ReactiveCommand<ConnectionData>().WithSubscribe(x => MCC.Core.Win.MultiCommentCollector.GetInstance().Activate(x)).AddTo(disposable);
+            InactivateCommand = new ReactiveCommand<ConnectionData>().WithSubscribe(x => MCC.Core.Win.MultiCommentCollector.GetInstance().Inactivate(x)).AddTo(disposable);
             DeleteCommand = new ReactiveCommand<ConnectionData>().WithSubscribe(x =>
             {
                 MCC.Core.MultiCommentCollector.GetInstance().Inactivate(x);
@@ -84,12 +87,27 @@ namespace MultiCommentCollector
                 if (x is null)
                     return;
                 if (x.IsActive.Value)
-                    MCC.Core.MultiCommentCollector.GetInstance().Inactivate(x);
+                    MCC.Core.Win.MultiCommentCollector.GetInstance().Inactivate(x);
                 else
-                    MCC.Core.MultiCommentCollector.GetInstance().Activate(x);
+                    MCC.Core.Win.MultiCommentCollector.GetInstance().Activate(x);
             }).AddTo(disposable);
             ColumnHeaderClickCommand = new ReactiveCommand<RoutedEventArgs>().WithSubscribe(x => UserHeaderClick(x)).AddTo(disposable);
+            ParentMenu = new ReactiveCollection<MenuItem>().AddTo(disposable);
 
+            var pluginManager = PluginManager.GetInstance();
+            var parent = pluginManager.Parent.Select(x => new MenuItem() { Header = x.PluginName });
+
+            foreach (var item in parent)
+            {
+                item.ItemsSource = pluginManager.Where(x => x.PluginName.Equals(item.Header) && x is ISetting);
+                item.DisplayMemberPath = "MenuItemName";
+                item.Click += MeunItemClick;
+
+                // 追加
+                ParentMenu.Add(item);
+            }
+
+            // Theme
             setting.Theme.IsDarkMode.Subscribe(x => ThemeManager.Current.ChangeTheme(Application.Current, $"{(x ? "Dark" : "Light")}.{setting.Theme.ThemeColor.Value}"));
             setting.Theme.ThemeColor.Subscribe(x => ThemeManager.Current.ChangeTheme(Application.Current, $"{(setting.Theme.IsDarkMode.Value ? "Dark" : "Light")}.{x}"));
 
@@ -111,6 +129,15 @@ namespace MultiCommentCollector
                     header.Content = "ユーザー名";
                     header.Column.DisplayMemberBinding = new Binding("UserName");
                 }
+            }
+        }
+        private void MeunItemClick(object sender, RoutedEventArgs e)
+        {
+            var item = (MenuItem)sender;
+
+            if (item.Items is not null && item.Items.Count > 0)
+            {
+                ((ISetting)item.Items[0]).ShowWindow(new MahApps.Metro.Controls.MetroWindow() { Owner = Application.Current.MainWindow });
             }
         }
     }

@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MCC.Core
+namespace MCC.Core.Server
 {
     public class WebSocketServer : ILogged
     {

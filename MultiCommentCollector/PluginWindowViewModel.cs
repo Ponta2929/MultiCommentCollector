@@ -32,19 +32,19 @@ namespace MultiCommentCollector
         public ReactiveProperty<string> Description { get; }
         public ReactiveProperty<string> Version { get; }
         public ReactiveProperty<string> SiteName { get; }
+        public ReactiveProperty<bool> Visibility { get; }
 
         public ReactiveCommand<IPluginBase> SelectedChangedCommand { get; }
 
 
         public PluginWindowViewModel()
         {
-            PluginManager.GetInstance().プラグインとして有効なDLLを取得する関数($"{Path.GetDirectoryName(Environment.GetCommandLineArgs()[0])}\\plugins");
-
             PluginName = new ReactiveProperty<string>("").AddTo(disposable);
             Author = new ReactiveProperty<string>("").AddTo(disposable);
             Description = new ReactiveProperty<string>("").AddTo(disposable);
             Version = new ReactiveProperty<string>("").AddTo(disposable);
             SiteName = new ReactiveProperty<string>("").AddTo(disposable);
+            Visibility = new ReactiveProperty<bool>(false).AddTo(disposable);
             SelectedChangedCommand = new ReactiveCommand<IPluginBase>().WithSubscribe(x =>
             {
                 PluginName.Value = x.PluginName;
@@ -53,8 +53,14 @@ namespace MultiCommentCollector
                 Version.Value = x.Version;
 
                 if (x is IPluginSender sender)
+                {
+                    Visibility.Value = true;
                     SiteName.Value = sender.SiteName;
-
+                }
+                else
+                {
+                    Visibility.Value = false;
+                }
             }).AddTo(disposable);
         }
     }

@@ -1,4 +1,5 @@
-﻿using MCC.Plugin;
+﻿using MCC.Core.Server;
+using MCC.Plugin;
 using MCC.Utility;
 using MCC.Utility.Reflection;
 using System;
@@ -26,18 +27,16 @@ namespace MCC.Core
         private CommentGeneratorServer generatorServer = CommentGeneratorServer.GetInstance();
         private ConnectionManager connectionManager = ConnectionManager.GetInstance();
         private CommentManager commentManager = CommentManager.GetInstance();
+        private PluginManager pluginManager = PluginManager.GetInstance();
         private LogManager logManager = LogManager.GetInstance();
         // ------------------------------------------------------------------------------------ //
-        private string[] pluginList;
 
         public MultiCommentCollector()
         {
             var path = $"{Path.GetDirectoryName(Environment.GetCommandLineArgs()[0])}\\plugins";
 
-            if (Directory.Exists(path))
-            {
-                pluginList = Directory.GetFiles($"{Path.GetDirectoryName(Environment.GetCommandLineArgs()[0])}\\plugins", "*.dll", SearchOption.AllDirectories);
-            }
+            // プラグイン
+            pluginManager.Load(path);
         }
 
         /// <summary>
@@ -57,36 +56,33 @@ namespace MCC.Core
         /// </summary>
         public void Apply(ConnectionData info)
         {
-            if (info.Plugin is not null || pluginList is null)
+            if (info.Plugin is not null)
                 return;
 
-            foreach (var plugin in pluginList)
+            var plugins = pluginManager.Parent.Where(x => x is IPluginSender).ToArray();
+
+            foreach (var plugin in plugins)
             {
-                var interfaces = PluginLoader.Load<IPluginSender>(plugin);
+                var @interface = pluginManager.CreateInstance(plugin) as IPluginSender;
 
-                if (interfaces is null)
-                    continue;
+                @interface.PluginLoad();
 
-                foreach (var @interface in interfaces)
+                if (@interface.IsSupport(info.URL))
                 {
-                    if (@interface is null || !info.PluginName.Equals(@interface.PluginName))
-                        continue;
+                    info.Plugin = @interface;
 
-                    @interface.PluginLoad();
-
-                    if (@interface.IsSupport(info.URL))
+                    if (info.IsActive.Value)
                     {
-                        info.Plugin = @interface;
+                        Activate(info, true);
+                    }
 
-                        if (info.IsActive.Value)
-                        {
-                            Activate(info, true);
-                        }
-                    }
-                    else
-                    {
-                        @interface.PluginClose();
-                    }
+                    pluginManager.Add(@interface);
+
+                    break;
+                }
+                else
+                {
+                    @interface.PluginClose();
                 }
             }
         }
@@ -135,7 +131,7 @@ namespace MCC.Core
             info.Plugin.OnCommentReceived += OnCommentReceived;
             info.IsActive.Value = info.Plugin.Activate();
 
-            OnLogged(this, new($"プラグインを有効化しました。[{info.PluginName}]"));
+            OnLogged(this, new($"プラグインを有効化しました。[{info.Plugin.PluginName}]"));
         }
 
         /// <summary>
@@ -153,7 +149,7 @@ namespace MCC.Core
 
             info.Plugin.OnCommentReceived -= OnCommentReceived;
 
-            OnLogged(this, new($"プラグインを無効化しました。[{info.PluginName}]"));
+            OnLogged(this, new($"プラグインを無効化しました。[{info.Plugin.PluginName}]"));
         }
 
         public void AddURL(string url, bool isActive = false)
@@ -161,56 +157,50 @@ namespace MCC.Core
             if (url.Length == 0)
                 return;
 
-            foreach (var plugin in pluginList)
+            var plugins = pluginManager.Parent.Where(x => x is IPluginSender).ToArray();
+
+            foreach (var plugin in plugins)
             {
-                var interfaces = PluginLoader.Load<IPluginSender>(plugin);
+                var @interface = pluginManager.CreateInstance(plugin) as IPluginSender;
 
-                if (interfaces is null)
-                    continue;
+                @interface.PluginLoad();
 
-                foreach (var @interface in interfaces)
+                if (@interface.IsSupport(url))
                 {
-                    if (@interface is null)
-                        continue;
-
-                    @interface.PluginLoad();
-
-                    if (@interface.IsSupport(url))
+                    var info = new ConnectionData()
                     {
-                        var info = new ConnectionData()
-                        {
-                            Plugin = @interface,
-                            PluginName = @interface.PluginName,
-                            IsActive = new(false),
-                            URL = url
-                        };
+                        Plugin = @interface,
+                        IsActive = new(false),
+                        URL = url
+                    };
 
-                        ConnectionManager.GetInstance().Add(info);
+                    ConnectionManager.GetInstance().Add(info);
 
-                        OnLogged(this, new($"URLを追加しました。[{url}]"));
+                    OnLogged(this, new($"URLを追加しました。[{url}]"));
 
-                        if (isActive)
-                        {
-                            Activate(info);
-                        }
-                    }
-                    else
+                    if (isActive)
                     {
-                        @interface.PluginClose();
-
-                        OnLogged(this, new($"無効なURLが入力されました。[{url}]"));
+                        Activate(info);
                     }
+
+                    pluginManager.Add(@interface);
+
+                    break;
+                }
+                else
+                {
+                    @interface.PluginClose();
+
+                    OnLogged(this, new($"無効なURLが入力されました。[{url}]"));
                 }
             }
         }
         private void OnLogged(object sender, LoggedEventArgs e)
         {
             if (sender is IPluginBase pluginSender)
-                logManager.Add(new(pluginSender.PluginName, e.Date, e.Log));
+                logManager.SyncAdd(new(pluginSender.PluginName, e.Date, e.Log));
             else
-                logManager.Add(new(sender, e.Date, e.Log));
-
-            Debug.WriteLine($"[{sender.ToString()}] [{e.Date.ToShortTimeString()}] {e.Log}");
+                logManager.SyncAdd(new(sender, e.Date, e.Log));
         }
 
         private void OnCommentReceived(object sender, CommentReceivedEventArgs e)
@@ -218,8 +208,15 @@ namespace MCC.Core
             // コメントジェネレーターで送信
             generatorServer.SendData<CommentData>(e.CommentData);
 
+            // プラグインで送信
+            foreach (var item in PluginManager.GetInstance())
+            {
+                if (item is IPluginReceiver receiver)
+                    receiver.Receive(e.CommentData);
+            }
+
             // コメント追加
-            commentManager.Add(e.CommentData);
+            commentManager.SyncAdd(e.CommentData);
         }
     }
 }

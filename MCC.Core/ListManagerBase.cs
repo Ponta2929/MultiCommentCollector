@@ -22,7 +22,7 @@ namespace MCC.Core
             CollectionChanged += OnCollectionChanged;
         }
 
-        public new void Add(T item)
+        public void SyncAdd(T item)
         {
             lock (syncObject)
             {
@@ -30,7 +30,7 @@ namespace MCC.Core
             }
         }
 
-        public new void RemoveAt(int index)
+        public void SyncRemoveAt(int index)
         {
             lock (syncObject)
             {
@@ -38,7 +38,7 @@ namespace MCC.Core
             }
         }
 
-        public new void Remove(T item)
+        public void SyncRemove(T item)
         {
             lock (syncObject)
             {
@@ -46,18 +46,26 @@ namespace MCC.Core
             }
         }
 
-        public new void Clear()
+        public void SyncClear()
         {
             lock (syncObject)
             {
                 ClearOnScheduler();
             }
         }
-        public void AddRange(params T[] items)
+        public void SyncAddRange(params T[] items)
         {
             lock (syncObject)
             {
                 AddRangeOnScheduler(items);
+            }
+        }
+        public void AddRange(params T[] items)
+        {
+            lock (syncObject)
+            {
+                foreach (var item in items)
+                    Add(item);
             }
         }
 

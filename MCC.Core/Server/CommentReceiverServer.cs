@@ -7,7 +7,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 
-namespace MCC.Core
+namespace MCC.Core.Server
 {
     public class CommentReceiverServer : WebSocketServer
     {
