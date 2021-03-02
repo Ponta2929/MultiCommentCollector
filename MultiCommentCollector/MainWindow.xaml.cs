@@ -16,10 +16,5 @@ namespace MultiCommentCollector
             CommentListView.ItemsSource = CommentManager.GetInstance();
             ConnectionListView.ItemsSource = ConnectionManager.GetInstance();
         }
-
-        private void MenuItem_Click(object sender, RoutedEventArgs e)
-        {
-            MCC.Core.Win.MultiCommentCollector.GetInstance().TestA(new MahApps.Metro.Controls.MetroWindow());
-        }
     }
 }

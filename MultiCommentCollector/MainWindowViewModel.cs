@@ -93,19 +93,7 @@ namespace MultiCommentCollector
             }).AddTo(disposable);
             ColumnHeaderClickCommand = new ReactiveCommand<RoutedEventArgs>().WithSubscribe(x => UserHeaderClick(x)).AddTo(disposable);
             ParentMenu = new ReactiveCollection<MenuItem>().AddTo(disposable);
-
-            var pluginManager = PluginManager.GetInstance();
-            var parent = pluginManager.Parent.Select(x => new MenuItem() { Header = x.PluginName });
-
-            foreach (var item in parent)
-            {
-                item.ItemsSource = pluginManager.Where(x => x.PluginName.Equals(item.Header) && x is ISetting);
-                item.DisplayMemberPath = "MenuItemName";
-                item.Click += MeunItemClick;
-
-                // 追加
-                ParentMenu.Add(item);
-            }
+            AddMenuItem();
 
             // Theme
             setting.Theme.IsDarkMode.Subscribe(x => ThemeManager.Current.ChangeTheme(Application.Current, $"{(x ? "Dark" : "Light")}.{setting.Theme.ThemeColor.Value}"));
@@ -138,6 +126,22 @@ namespace MultiCommentCollector
             if (item.Items is not null && item.Items.Count > 0)
             {
                 ((ISetting)item.Items[0]).ShowWindow(new MahApps.Metro.Controls.MetroWindow() { Owner = Application.Current.MainWindow });
+            }
+        }
+
+        private void AddMenuItem()
+        {
+            var pluginManager = PluginManager.GetInstance();
+            var parent = pluginManager.Parent.Select(x => new MenuItem() { Header = x.PluginName });
+
+            foreach (var item in parent)
+            {
+                item.ItemsSource = pluginManager.Where(x => x.PluginName.Equals(item.Header) && x is ISetting);
+                item.DisplayMemberPath = "MenuItemName";
+                item.Click += MeunItemClick;
+
+                // 追加
+                ParentMenu.Add(item);
             }
         }
     }

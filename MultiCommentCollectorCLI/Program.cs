@@ -12,7 +12,7 @@ namespace MultiCommentCollectorCLI
 {
     class Program
     {
-        private static bool IsComment = false;
+        static bool IsComment = false;
 
         [MTAThread]
         static void Main(string[] args)
@@ -37,7 +37,7 @@ namespace MultiCommentCollectorCLI
 
         static Dictionary<string, string> AnalyzeCommand(string[] args)
         {
-            var options = new HashSet<string> { "-add", "-activate", "-inactivate", "-list", "-s", "-h", "exit", "-remove" };
+            var options = new HashSet<string> { "-add", "-activate", "-inactivate", "-list", "-show", "-hide", "exit", "-remove" };
 
             string key = null;
             return args
@@ -100,7 +100,7 @@ namespace MultiCommentCollectorCLI
                 }
             }
 
-            if (commands.TryGetValue("-s", out var s) && s is not null)
+            if (commands.TryGetValue("-show", out var s) && s is not null)
             {
                 switch (s.ToLower())
                 {
@@ -111,7 +111,7 @@ namespace MultiCommentCollectorCLI
                 }
             }
 
-            if (commands.TryGetValue("-h", out var h) && h is not null)
+            if (commands.TryGetValue("-hide", out var h) && h is not null)
             {
                 switch (h.ToLower())
                 {
@@ -157,6 +157,9 @@ namespace MultiCommentCollectorCLI
             MCC.Core.MultiCommentCollector.GetInstance().ServerStop();
 
             Setting.GetInstance().ConnectionList = ConnectionManager.GetInstance();
+
+            foreach (var item in PluginManager.GetInstance())
+                item.PluginClose();
 
             try
             {

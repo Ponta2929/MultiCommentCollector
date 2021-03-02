@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -51,14 +52,22 @@ namespace MCC.Bouyomi
             }
         }
 
+        /// <summary>
+        /// 棒読みちゃんが存在しないなら起動
+        /// </summary>
         public void ExecuteProcess()
         {
             var process = Process.GetProcessesByName("BouyomiChan");
         
-            if (process.Length == 0 && (setting.ApplicationPath != "" || setting.ApplicationPath is not null))
+            if (process.Length == 0 && File.Exists(setting.ApplicationPath))
                 Process.Start(setting.ApplicationPath);
         }
 
+        /// <summary>
+        /// 対応する文字列を補間
+        /// </summary>
+        /// <param name="comment"></param>
+        /// <returns></returns>
         public string DataFormat(CommentData comment)
         {
             var format = setting.Format;

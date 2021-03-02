@@ -13,6 +13,9 @@ using System.Threading.Tasks;
 
 namespace MCC.Core.Server
 {
+    /// <summary>
+    /// コメント送信サーバー
+    /// </summary>
     public sealed class CommentGeneratorServer : WebSocketServer
     {
         private object syncObject = new object();
@@ -45,6 +48,10 @@ namespace MCC.Core.Server
 
         public CommentGeneratorServer(string serverName, int port) : base(serverName, port) { }
 
+        /// <summary>
+        /// 終了メッセージ受信
+        /// </summary>
+        /// <param name="socket"></param>
         protected override async void Process(WebSocket socket)
         {
             try
@@ -76,6 +83,9 @@ namespace MCC.Core.Server
             }
         }
 
+        /// <summary>
+        /// データ送信
+        /// </summary>
         public void SendData<T>(T data, DataType type = DataType.Json)
         {
             lock (syncObject)
@@ -101,6 +111,9 @@ namespace MCC.Core.Server
             }
         }
 
+        /// <summary>
+        /// クロスサイトスクリプト変換
+        /// </summary>
         private object XSSConvert(object data)
         {
             foreach (var info in data.GetType().GetFields())

@@ -21,7 +21,6 @@
     <DockPanel>
         <Menu x:Name="menu" VerticalAlignment="Top" DockPanel.Dock="top" FontSize="12">
             <MenuItem Header="ファイル(_F)">
-                <MenuItem Header="TESTA" Click="MenuItem_Click"/>
                 <MenuItem Header="終了(_X)" Command="{Binding ApplicationShutdownCommand}"/>
             </MenuItem>
             <MenuItem Header="プラグイン(_P)" ItemsSource="{Binding ParentMenu}"/>

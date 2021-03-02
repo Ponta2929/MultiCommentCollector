@@ -17,14 +17,15 @@ namespace MCC.NicoLive
     public class NicoLive : IPluginSender, ILogged
     {
         private string liveId;
+        private bool resume;
         private WebSocketClient viewingClient = new WebSocketClient();
         private WebSocketClient chatClient = new WebSocketClient();
 
-        private string message_1 = "{\"type\":\"startWatching\",\"data\":{\"stream\":{\"quality\":\"abr\",\"protocol\":\"hls\",\"latency\":\"low\",\"chasePlay\":false},\"room\":{\"protocol\":\"webSocket\",\"commentable\":true},\"reconnect\":false}}";// "{\"type\":\"startWatching\",\"data\":{\"stream\":{\"quality\":\"abr\",\"protocol\":\"hls\",\"latency\":\"low\",\"chasePlay\":false},\"room\":{\"protocol\":\"webSocket\",\"commentable\":True},\"reconnect\":false}}";
-        private string message_2 = "{\"type\":\"getAkashic\",\"data\":{\"chasePlay\":false}}";//"{\"type\":\"getAkashic\",\"data\":{\"chasePlay\":false}}";
+        private const string message_1 = "{\"type\":\"startWatching\",\"data\":{\"stream\":{\"quality\":\"abr\",\"protocol\":\"hls\",\"latency\":\"low\",\"chasePlay\":false},\"room\":{\"protocol\":\"webSocket\",\"commentable\":true},\"reconnect\":false}}";
+        private const string message_2 = "{\"type\":\"getAkashic\",\"data\":{\"chasePlay\":false}}";
+        private const string message_pong = "{\"type\":\"pong\"}";
+        private const string message_keepSeat = "{\"type\":\"keepSeat\"}";
         private string message_chat = "";
-        private string message_pong = "{\"type\":\"pong\"}";
-        private string message_keepSeat = "{\"type\":\"keepSeat\"}";
 
         public string Author => "ぽんた";
 
@@ -43,6 +44,8 @@ namespace MCC.NicoLive
 
         public bool Activate()
         {
+            resume = true;
+
             if (!viewingClient.Connected)
             {
                 Task.Run(() => Connect());
@@ -51,37 +54,48 @@ namespace MCC.NicoLive
             return true;
         }
 
-        private void Connect()
+        private async void Connect()
         {
-            var get = Http.Get($"https://live2.nicovideo.jp/watch/{liveId}");
-            var index = get.IndexOf("data-props=\"");
-            var last = get.IndexOf("\">", index);
-            var result = get.Substring(index, last - index).Replace("data-props=\"", "");
-            var decode = HttpUtility.HtmlDecode(result);
-            var json = JsonSerializer.Deserialize<NicoLiveJson>(decode);
-
-            viewingClient.OnLogged += OnLogged;
-            chatClient.OnLogged += OnLogged;
-            viewingClient.URL = new Uri(json.Site.ReLive.WebSocketURL);
-            viewingClient.Start(ViewingProcess);
-
-            Task.Run(() =>
+            while (resume)
             {
-                while (true)
+                if (!viewingClient.Connected)
                 {
-                    if (chatClient.URL is not null)
-                        break;
-                    Task.Delay(1000);
+                    var get = Http.Get($"https://live2.nicovideo.jp/watch/{liveId}");
+                    var index = get.IndexOf("data-props=\"");
+                    var last = get.IndexOf("\">", index);
+                    var result = get.Substring(index, last - index).Replace("data-props=\"", "");
+                    var decode = HttpUtility.HtmlDecode(result);
+                    var json = JsonSerializer.Deserialize<NicoLiveJson>(decode);
+
+                    if (json.Site.ReLive.WebSocketURL is not null && !json.Site.ReLive.WebSocketURL.Equals(""))
+                    {
+                        viewingClient.URL = new Uri(json.Site.ReLive.WebSocketURL);
+                        viewingClient.Start(ViewingProcess);
+
+                        await Task.Run(() =>
+                        {
+                            while (true)
+                            {
+                                if (chatClient.URL is not null)
+                                    break;
+                                Task.Delay(1000);
+                            }
+
+                        }).ContinueWith(t =>
+                        {
+                            chatClient.Start(ChatProcess);
+                        });
+                    }
                 }
 
-            }).ContinueWith(t =>
-            {
-                chatClient.Start(ChatProcess);
-            });
+                await Task.Delay(5000);
+            }
         }
 
         public bool Inactivate()
         {
+            resume = false;
+
             viewingClient.Abort();
             chatClient.Abort();
 
@@ -90,9 +104,12 @@ namespace MCC.NicoLive
 
         public bool IsSupport(string url)
         {
-            liveId = url.RegexString(@"https://live2.nicovideo.jp/watch/(?<value>[\w]+)", "value");
+            var livePage = url.RegexString(@"https://live2.nicovideo.jp/watch/(?<value>[\w]+)", "value");
+            var communityPage = url.RegexString(@"https://com.nicovideo.jp/community/(?<value>[\w]+)", "value");
 
-            if (!liveId.Equals(""))
+            liveId = !livePage.Equals("") ? livePage : communityPage;
+
+            if (!livePage.Equals("") || !communityPage.Equals(""))
                 return true;
 
             return false;
@@ -102,11 +119,17 @@ namespace MCC.NicoLive
         {
             viewingClient.Abort();
             chatClient.Abort();
+
+            viewingClient.OnLogged -= OnLogged;
+            chatClient.OnLogged -= OnLogged;
         }
 
         public void PluginLoad()
         {
             options.Converters.Add(new DateTimeOffsetConverter());
+
+            viewingClient.OnLogged += OnLogged;
+            chatClient.OnLogged += OnLogged;
         }
 
         protected async void ViewingProcess(ClientWebSocket socket)

@@ -9,6 +9,9 @@ using System.Threading;
 
 namespace MCC.Core.Server
 {
+    /// <summary>
+    /// コメント受信サーバー
+    /// </summary>
     public class CommentReceiverServer : WebSocketServer
     {
         #region Singleton
@@ -25,6 +28,9 @@ namespace MCC.Core.Server
 
         public event CommentReceivedEventHandler OnCommentReceived;
 
+        /// <summary>
+        /// コメント受信
+        /// </summary>
         protected override async void Process(WebSocket socket)
         {
             try

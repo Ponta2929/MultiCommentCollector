@@ -110,18 +110,26 @@ namespace MCC.Core.Server
 
             Logged($"サーバーを停止しました。");
         }
+
         private async void Request(HttpListenerContext context)
         {
-            var task = await context.AcceptWebSocketAsync(null);
-
-            Logged($"接続が開始されました。");
-
-            lock (syncObject)
+            try
             {
-                Sockets.Add(task.WebSocket);
-            }
+                var task = await context.AcceptWebSocketAsync(null);
 
-            Process(task.WebSocket);
+                Logged($"接続が開始されました。");
+
+                lock (syncObject)
+                {
+                    Sockets.Add(task.WebSocket);
+                }
+
+                Process(task.WebSocket);
+            }
+            catch (Exception e)
+            {
+                Logged($"{e.Message}");
+            }
         }
 
         protected virtual void Process(WebSocket socket)
@@ -170,6 +178,10 @@ namespace MCC.Core.Server
             }
         }
 
+        /// <summary>
+        /// ログ送信
+        /// </summary>
+        /// <param name="message"></param>
         public void Logged(string message)
         {
             OnLogged?.Invoke(this, new(message));
