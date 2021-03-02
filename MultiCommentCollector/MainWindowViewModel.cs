@@ -80,6 +80,7 @@ namespace MultiCommentCollector
             DeleteCommand = new ReactiveCommand<ConnectionData>().WithSubscribe(x =>
             {
                 MCC.Core.MultiCommentCollector.GetInstance().Inactivate(x);
+                PluginManager.GetInstance().Remove(x.Plugin);
                 ConnectionManager.GetInstance().Remove(x);
             }).AddTo(disposable);
             ToggleCommand = new ReactiveCommand<ConnectionData>().WithSubscribe(x =>

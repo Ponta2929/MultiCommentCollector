@@ -33,7 +33,7 @@ namespace MCC.Core
 
         public MultiCommentCollector()
         {
-            var path ="";
+            var path = "";
 
             if (Environment.OSVersion.Platform == PlatformID.Win32NT)
                 path = $"{Path.GetDirectoryName(Environment.GetCommandLineArgs()[0])}\\plugins";
@@ -162,8 +162,9 @@ namespace MCC.Core
             if (url.Length == 0)
                 return;
 
+            var isSupport = false;
             var plugins = pluginManager.Parent.Where(x => x is IPluginSender).ToArray();
-
+                   
             foreach (var plugin in plugins)
             {
                 var @interface = pluginManager.CreateInstance(plugin) as IPluginSender;
@@ -190,15 +191,18 @@ namespace MCC.Core
 
                     pluginManager.Add(@interface);
 
+                    isSupport = true;
+
                     break;
                 }
                 else
                 {
                     @interface.PluginClose();
-
-                    OnLogged(this, new($"無効なURLが入力されました。[{url}]"));
                 }
             }
+
+            if (!isSupport)
+                OnLogged(this, new($"無効なURLが入力されました。[{url}]"));
         }
         private void OnLogged(object sender, LoggedEventArgs e)
         {
