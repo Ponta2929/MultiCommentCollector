@@ -88,7 +88,7 @@ namespace MCC.NicoLive
                     }
                 }
 
-                await Task.Delay(5000);
+                await Task.Delay(30000);
             }
         }
 
