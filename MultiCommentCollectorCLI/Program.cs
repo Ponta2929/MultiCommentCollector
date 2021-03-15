@@ -1,4 +1,5 @@
 ﻿using MCC.Core;
+using MCC.Core.Manager;
 using MCC.Utility.IO;
 using MCC.Utility.Text;
 using Reactive.Bindings;

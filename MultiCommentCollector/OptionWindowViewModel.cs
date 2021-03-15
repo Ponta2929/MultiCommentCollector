@@ -1,5 +1,6 @@
 ﻿using ControlzEx.Theming;
 using MCC.Core;
+using MCC.Core.Manager;
 using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
 using System;
@@ -10,6 +11,7 @@ using System.Reactive.Disposables;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace MultiCommentCollector

@@ -54,13 +54,14 @@ namespace MCC.Core.Server
                     listener.Prefixes.Clear();
                     listener.Prefixes.Add($"http://{ServerName}:{Port}/");
 
-                    Logged($"サーバーを開始します。[{ServerName}:{Port}]");
+                    Logged(LogLevel.Debug, $"[{ServerName}:{Port}]");
+                    Logged(LogLevel.Info, $"サーバーを開始します。[{ServerName}:{Port}]");
 
                     listener.Start();
 
                     while (listener.IsListening)
                     {
-                        Logged($"接続要求を待機しています。");
+                        Logged(LogLevel.Info, $"接続要求を待機しています。");
 
                         var context = await listener.GetContextAsync();
 
@@ -76,18 +77,18 @@ namespace MCC.Core.Server
                             {
                                 response.StatusCode = 400;
                                 writer.Write("Bad Request");
-                                Logged($"接続要求は破棄されました。");
+                                Logged(LogLevel.Warn, $"接続要求は破棄されました。");
                             }
                         }
                     }
                 }
-                catch (HttpListenerException)
+                catch (HttpListenerException e)
                 {
-                    Logged($"指定のプレフィックスはすでに使用されています。");
+                    Logged(LogLevel.Error, $"[{e.InnerException}] 指定のプレフィックスはすでに使用されています。");
                 }
                 catch (Exception e)
                 {
-                    Logged($"未知のエラーが発生しました。 : {e.Message.ToString()}");
+                    Logged(LogLevel.Error, $"[{e.InnerException}] {e.Message.ToString()}");
                 }
                 finally
                 {
@@ -108,7 +109,7 @@ namespace MCC.Core.Server
                 listener = null;
             }
 
-            Logged($"サーバーを停止しました。");
+            Logged(LogLevel.Info, $"サーバーを停止しました。");
         }
 
         private async void Request(HttpListenerContext context)
@@ -117,7 +118,7 @@ namespace MCC.Core.Server
             {
                 var task = await context.AcceptWebSocketAsync(null);
 
-                Logged($"接続が開始されました。");
+                Logged(LogLevel.Info, $"接続が開始されました。");
 
                 lock (syncObject)
                 {
@@ -128,7 +129,7 @@ namespace MCC.Core.Server
             }
             catch (Exception e)
             {
-                Logged($"{e.Message}");
+                Logged(LogLevel.Error, $"[{e.InnerException}] {e.Message.ToString()}");
             }
         }
 
@@ -157,7 +158,7 @@ namespace MCC.Core.Server
                 Sockets.Clear();
             }
 
-            Logged("すべての接続を閉じました。");
+            Logged(LogLevel.Info, "すべての接続を閉じました。");
         }
 
         /// <summary>
@@ -170,7 +171,7 @@ namespace MCC.Core.Server
 
             socket.Dispose();
 
-            Logged("対象の接続を閉じました。");
+            Logged(LogLevel.Info, "対象の接続を閉じました。");
 
             lock (syncObject)
             {
@@ -182,9 +183,9 @@ namespace MCC.Core.Server
         /// ログ送信
         /// </summary>
         /// <param name="message"></param>
-        public void Logged(string message)
+        public void Logged(LogLevel level, string message)
         {
-            OnLogged?.Invoke(this, new(message));
+            OnLogged?.Invoke(this, new(level, message));
         }
     }
 }

@@ -11,7 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 
-namespace MCC.Core
+namespace MCC.Core.Manager
 {
     /// <summary>
     /// 接続先情報

@@ -18,25 +18,41 @@
         <local:LogWindowViewModel />
     </Window.DataContext>
     <Grid>
-        <ListView x:Name="LogListView" ScrollViewer.HorizontalScrollBarVisibility="Hidden">
-            <i:Interaction.Behaviors>
-                <behavior:ListViewBehavior/>
-            </i:Interaction.Behaviors>
-            <ListView.View>
-                <GridView>
-                    <GridViewColumn Header="発信元" DisplayMemberBinding="{Binding SenderName}" x:Name="ColumnSender"/>
-                    <GridViewColumn Header="時刻" DisplayMemberBinding="{Binding Date, StringFormat=yyyy/MM/dd HH:mm:ss}" x:Name="ColumnDate"/>
-                    <GridViewColumn Header="ログ" DisplayMemberBinding="{Binding Log}">
-                        <GridViewColumn.Width>
-                            <MultiBinding Converter="{StaticResource HeaderWidthConverter}">
-                                <Binding ElementName="LogListView" Path="ActualWidth" />
-                                <Binding ElementName="ColumnSender" Path="ActualWidth" />
-                                <Binding ElementName="ColumnDate" Path="ActualWidth" />
-                            </MultiBinding>
-                        </GridViewColumn.Width>
-                    </GridViewColumn>
-                </GridView>
-            </ListView.View>
-        </ListView>
+        <DockPanel>
+            <StatusBar Height="24" DockPanel.Dock="Bottom">
+                <StatusBarItem Content="▼">
+                    <StatusBarItem.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="Error" IsCheckable="True" IsChecked="{Binding ContextMenuError.Value}"/>
+                            <MenuItem Header="Warn" IsCheckable="True" IsChecked="{Binding ContextMenuWarn.Value}"/>
+                            <MenuItem Header="Info" IsCheckable="True" IsChecked="{Binding ContextMenuInfo.Value}"/>
+                            <MenuItem Header="Debug" IsCheckable="True" IsChecked="{Binding ContextMenuDebug.Value}"/>
+                        </ContextMenu>
+                    </StatusBarItem.ContextMenu>
+                </StatusBarItem>
+            </StatusBar>
+            <ListView x:Name="LogListView" ScrollViewer.HorizontalScrollBarVisibility="Hidden">
+                <i:Interaction.Behaviors>
+                    <behavior:ListViewBehavior/>
+                </i:Interaction.Behaviors>
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="レベル" DisplayMemberBinding="{Binding Level}" x:Name="ColumnLevel"/>
+                        <GridViewColumn Header="発信元" DisplayMemberBinding="{Binding SenderName}" x:Name="ColumnSender"/>
+                        <GridViewColumn Header="時刻" DisplayMemberBinding="{Binding Date, StringFormat=yyyy/MM/dd HH:mm:ss}" x:Name="ColumnDate"/>
+                        <GridViewColumn Header="ログ" DisplayMemberBinding="{Binding Log}">
+                            <GridViewColumn.Width>
+                                <MultiBinding Converter="{StaticResource HeaderWidthConverter}">
+                                    <Binding ElementName="LogListView" Path="ActualWidth" />
+                                    <Binding ElementName="ColumnLevel" Path="ActualWidth" />
+                                    <Binding ElementName="ColumnSender" Path="ActualWidth" />
+                                    <Binding ElementName="ColumnDate" Path="ActualWidth" />
+                                </MultiBinding>
+                            </GridViewColumn.Width>
+                        </GridViewColumn>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+        </DockPanel>
     </Grid>
 </Controls:MetroWindow>

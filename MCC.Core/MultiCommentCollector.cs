@@ -1,4 +1,5 @@
-﻿using MCC.Core.Server;
+﻿using MCC.Core.Manager;
+using MCC.Core.Server;
 using MCC.Plugin;
 using MCC.Utility;
 using MCC.Utility.Reflection;
@@ -136,7 +137,7 @@ namespace MCC.Core
             info.Plugin.OnCommentReceived += OnCommentReceived;
             info.IsActive.Value = info.Plugin.Activate();
 
-            OnLogged(this, new($"プラグインを有効化しました。[{info.Plugin.PluginName}]"));
+            OnLogged(this, new(LogLevel.Info, $"プラグインを有効化しました。[{info.Plugin.PluginName}]"));
         }
 
         /// <summary>
@@ -154,7 +155,7 @@ namespace MCC.Core
 
             info.Plugin.OnCommentReceived -= OnCommentReceived;
 
-            OnLogged(this, new($"プラグインを無効化しました。[{info.Plugin.PluginName}]"));
+            OnLogged(this, new(LogLevel.Info, $"プラグインを無効化しました。[{info.Plugin.PluginName}]"));
         }
 
         public void AddURL(string url, bool isActive = false)
@@ -164,7 +165,7 @@ namespace MCC.Core
 
             var isSupport = false;
             var plugins = pluginManager.Parent.Where(x => x is IPluginSender).ToArray();
-                   
+
             foreach (var plugin in plugins)
             {
                 var @interface = pluginManager.CreateInstance(plugin) as IPluginSender;
@@ -182,7 +183,7 @@ namespace MCC.Core
 
                     ConnectionManager.GetInstance().Add(info);
 
-                    OnLogged(this, new($"URLを追加しました。[{url}]"));
+                    OnLogged(this, new(LogLevel.Info, $"URLを追加しました。[{url}]"));
 
                     if (isActive)
                     {
@@ -202,14 +203,14 @@ namespace MCC.Core
             }
 
             if (!isSupport)
-                OnLogged(this, new($"無効なURLが入力されました。[{url}]"));
+                OnLogged(this, new(LogLevel.Info, $"無効なURLが入力されました。[{url}]"));
         }
         private void OnLogged(object sender, LoggedEventArgs e)
         {
             if (sender is IPluginBase pluginSender)
-                logManager.SyncAdd(new(pluginSender.PluginName, e.Date, e.Log));
+                logManager.SyncAdd(new(pluginSender.PluginName, e.Level, e.Date, e.Log));
             else
-                logManager.SyncAdd(new(sender, e.Date, e.Log));
+                logManager.SyncAdd(new(sender, e.Level, e.Date, e.Log));
         }
 
         private void OnCommentReceived(object sender, CommentReceivedEventArgs e)

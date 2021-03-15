@@ -9,20 +9,24 @@ namespace MCC.Utility
     /// </summary>
     public class LoggedEventArgs : EventArgs
     {
-        public LoggedEventArgs(string log)
-        {
-            Date = DateTime.Now;
-            Log = log;
-        }
+        public LoggedEventArgs(LogLevel level, string log) : this(level, DateTime.Now, log) { }
+
+        public LoggedEventArgs(LogLevel level, DateTime date, string log) =>
+            (Level, Date, Log) = (level, date, log);
 
         /// <summary>
-        /// ログ時間
+        /// レベル
         /// </summary>
-        public DateTime Date { get; private set; }
+        public LogLevel Level { get; set; }
+
+        /// <summary>
+        /// 発信時刻
+        /// </summary>
+        public DateTime Date { get; set; }
 
         /// <summary>
         /// ログ内容
         /// </summary>
-        public string Log { get; private set; }
+        public string Log { get; set; }
     }
 }

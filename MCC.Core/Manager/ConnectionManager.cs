@@ -1,4 +1,4 @@
-﻿namespace MCC.Core
+﻿namespace MCC.Core.Manager
 {
     public class ConnectionManager : ListManagerBase<ConnectionData>
     {

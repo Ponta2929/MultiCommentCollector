@@ -16,6 +16,8 @@ namespace MCC.NicoLive
 {
     public class NicoLive : IPluginSender, ILogged
     {
+        private Dictionary<string, string> header = new Dictionary<string, string>();
+
         private string liveId;
         private bool resume;
         private WebSocketClient viewingClient = new WebSocketClient();
@@ -70,7 +72,7 @@ namespace MCC.NicoLive
                     if (json.Site.ReLive.WebSocketURL is not null && !json.Site.ReLive.WebSocketURL.Equals(""))
                     {
                         viewingClient.URL = new Uri(json.Site.ReLive.WebSocketURL);
-                        viewingClient.Start(ViewingProcess);
+                        viewingClient.Start(ViewingProcess, header);
 
                         await Task.Run(() =>
                         {
@@ -83,7 +85,7 @@ namespace MCC.NicoLive
 
                         }).ContinueWith(t =>
                         {
-                            chatClient.Start(ChatProcess);
+                            chatClient.Start(ChatProcess, header);
                         });
                     }
                 }
@@ -127,6 +129,7 @@ namespace MCC.NicoLive
         public void PluginLoad()
         {
             options.Converters.Add(new DateTimeOffsetConverter());
+            header.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100");
 
             viewingClient.OnLogged += OnLogged;
             chatClient.OnLogged += OnLogged;
@@ -179,21 +182,21 @@ namespace MCC.NicoLive
                     }
                 }
             }
-            catch (WebSocketException)
+            catch (WebSocketException e)
             {
-                Logged($"接続エラーが発生しました。");
+                Logged(LogLevel.Error, $"[{e.InnerException}] 接続エラーが発生しました。");
             }
-            catch (JsonException)
+            catch (JsonException e)
             {
-                Logged($"デコードエラーが発生しました。");
+                Logged(LogLevel.Error, $"[{e.InnerException}] デコードエラーが発生しました。");
             }
-            catch (OperationCanceledException)
+            catch (OperationCanceledException e)
             {
-                Logged($"受信データ待受エラーが発生しました。");
+                Logged(LogLevel.Error, $"[{e.InnerException}] 受信データ待受エラーが発生しました。");
             }
             catch (Exception e)
             {
-                Logged($"未知のエラーが発生しました。 : {e.Message.ToString()}");
+                Logged(LogLevel.Error, $"[{e.InnerException}] {e.Message.ToString()}");
             }
             finally
             {
@@ -209,6 +212,7 @@ namespace MCC.NicoLive
 
             var received = new List<byte>();
             var buffer = new byte[4096];
+
             try
             {
                 while (socket.State == WebSocketState.Open)
@@ -252,21 +256,21 @@ namespace MCC.NicoLive
                     }
                 }
             }
-            catch (WebSocketException)
+            catch (WebSocketException e)
             {
-                Logged($"接続エラーが発生しました。");
+                Logged(LogLevel.Error, $"[{e.InnerException}] 接続エラーが発生しました。");
             }
-            catch (JsonException)
+            catch (JsonException e)
             {
-                Logged($"デコードエラーが発生しました。");
+                Logged(LogLevel.Error, $"[{e.InnerException}] デコードエラーが発生しました。");
             }
-            catch (OperationCanceledException)
+            catch (OperationCanceledException e)
             {
-                Logged($"受信データ待受エラーが発生しました。");
+                Logged(LogLevel.Error, $"[{e.InnerException}] 受信データ待受エラーが発生しました。");
             }
             catch (Exception e)
             {
-                Logged($"未知のエラーが発生しました。 : {e.Message.ToString()}");
+                Logged(LogLevel.Error, $"[{e.InnerException}] {e.Message.ToString()}");
             }
             finally
             {
@@ -274,9 +278,9 @@ namespace MCC.NicoLive
                 chatClient.Abort();
             }
         }
-        public void Logged(string message)
+        public void Logged(LogLevel level, string message)
         {
-            OnLogged?.Invoke(this, new(message));
+            OnLogged?.Invoke(this, new(level, message));
         }
     }
 }

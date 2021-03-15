@@ -1,4 +1,5 @@
 ﻿using MCC.Core;
+using MCC.Core.Manager;
 using MCC.Plugin;
 using Reactive.Bindings;
 using System;

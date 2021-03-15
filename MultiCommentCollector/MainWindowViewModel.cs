@@ -1,5 +1,7 @@
 ﻿using ControlzEx.Theming;
+using MahApps.Metro.Controls;
 using MCC.Core;
+using MCC.Core.Manager;
 using MCC.Plugin.Win;
 using MCC.Utility;
 using MCC.Utility.IO;
@@ -126,7 +128,30 @@ namespace MultiCommentCollector
 
             if (item.Items is not null && item.Items.Count > 0)
             {
-                ((ISetting)item.Items[0]).ShowWindow(new MahApps.Metro.Controls.MetroWindow() { Owner = Application.Current.MainWindow });
+                var window = new MahApps.Metro.Controls.MetroWindow() { Owner = Application.Current.MainWindow };
+
+                ((ISetting)item.Items[0]).ShowWindow(window);
+
+                SetHeaderFontSize(window);
+            }
+        }
+
+        private void SetHeaderFontSize(DependencyObject element)
+        {
+            if (element is null)
+                return;
+
+            foreach (var child in LogicalTreeHelper.GetChildren(element))
+            {
+                if (child is DependencyObject control)
+                {
+                    if (control is TabControl tabControl)
+                    {
+                        HeaderedControlHelper.SetHeaderFontSize(tabControl, 14);
+                    }
+
+                    SetHeaderFontSize(child as DependencyObject);
+                }
             }
         }
 

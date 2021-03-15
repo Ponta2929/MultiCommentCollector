@@ -1,5 +1,6 @@
 ﻿using MahApps.Metro.Controls;
 using MCC.Core;
+using MCC.Core.Manager;
 using MCC.Core.Server;
 using MCC.Utility.IO;
 using MCC.Utility.Text;
@@ -13,19 +14,12 @@ namespace MultiCommentCollector
     {
         public static void ApplicationStart()
         {
-            string te = "${test} ${sxxx} ${dxcxzc}";
-
-            var teee = te.RegexStrings(@"\$\{(?<value>.*?)\}", "value");
-            foreach (var item in teee)
-            {
-                te = te.Replace("${" + item + "}", "TEST");
-            }
             Setting setting = Setting.GetInstance();
 
             Application.Current.MainWindow.Closing += ApplicationClosing;
 
             // 接続リスト
-            foreach (var item in Setting.GetInstance().ConnectionList)
+            foreach (var item in setting.ConnectionList)
                 ConnectionManager.GetInstance().Add(item);
 
             // サーバー開始

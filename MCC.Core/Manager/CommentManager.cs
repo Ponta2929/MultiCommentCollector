@@ -1,6 +1,6 @@
 ﻿using MCC.Utility;
 
-namespace MCC.Core
+namespace MCC.Core.Manager
 {
     public class CommentManager : ListManagerBase<CommentData>
     {

@@ -69,13 +69,13 @@ namespace MCC.Core.Server
                     }
                 }
             }
-            catch (WebSocketException)
+            catch (WebSocketException e)
             {
-                Logged($"接続エラーが発生しました。");
+                Logged(LogLevel.Error, $"[{e.InnerException}] 接続エラーが発生しました。");
             }
             catch (Exception e)
             {
-                Logged($"未知のエラーが発生しました。 : {e.Message.ToString()}");
+                Logged(LogLevel.Error, $"[{e.InnerException}] {e.Message.ToString()}");
             }
             finally
             {

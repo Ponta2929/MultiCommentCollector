@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-namespace MCC.Core
+namespace MCC.Core.Manager
 {
     public class PluginManager : ListManagerBase<IPluginBase>
     {

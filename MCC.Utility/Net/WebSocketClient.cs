@@ -1,5 +1,4 @@
-﻿using MCC.Utility;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.WebSockets;
@@ -7,11 +6,11 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MCC.TwitCasting
+namespace MCC.Utility.Net
 {
     public class WebSocketClient : ILogged
     {
-        private ClientWebSocket client;
+        protected ClientWebSocket client;
 
         /// <summary>
         /// 接続しているかどうか
@@ -25,7 +24,12 @@ namespace MCC.TwitCasting
 
         public event LoggedEventHandler OnLogged;
 
-        public async void Start()
+        public async void Start(Dictionary<string, string> header = null)
+        {
+            Start(v => Process(v), header);
+        }
+
+        public async void Start(Action<ClientWebSocket> action, Dictionary<string, string> header = null)
         {
             if (client is null)
                 client = new();
@@ -34,20 +38,41 @@ namespace MCC.TwitCasting
             {
                 try
                 {
+                    if (header is not null)
+                    {
+                        foreach (var item in header)
+                        {
+                            client.Options.SetRequestHeader(item.Key, item.Value);
+                        }
+                    }
+
                     await client.ConnectAsync(URL, CancellationToken.None);
 
                     Connected = true;
 
-                    Logged($"接続を開始しました。");
+                    Logged(LogLevel.Info, $"接続を開始しました。");
 
                     // 受信開始
-                    Process(client);
+                    action(client);
                 }
                 catch (Exception e)
                 {
-                    Logged($"未知のエラーが発生しました。 : {e.Message.ToString()}");
+                    Logged(LogLevel.Error, $"[{e.InnerException}] {e.Message.ToString()}");
                 }
             }
+        }
+
+        public async void Send(string message)
+        {
+            Send(message, Encoding.UTF8);
+        }
+
+        public async void Send(string message, Encoding encoding)
+        {
+            var buffer = encoding.GetBytes(message);
+            var segment = new ArraySegment<byte>(buffer);
+
+            await client.SendAsync(segment, WebSocketMessageType.Text, true, CancellationToken.None);
         }
 
         protected virtual void Process(ClientWebSocket client)
@@ -70,13 +95,13 @@ namespace MCC.TwitCasting
 
                 Connected = false;
 
-                Logged($"接続を閉じました。");
+                Logged(LogLevel.Info, $"接続を閉じました。");
             }
         }
 
-        public void Logged(string message)
+        public void Logged(LogLevel level, string message)
         {
-            OnLogged?.Invoke(this, new(message));
+            OnLogged?.Invoke(this, new(level, message));
         }
     }
 }

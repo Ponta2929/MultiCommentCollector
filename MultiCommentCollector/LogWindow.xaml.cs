@@ -1,7 +1,10 @@
 ﻿using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Windows;
+using System.Windows.Data;
 using MCC.Core;
+using MCC.Core.Manager;
+using MCC.Utility;
 
 namespace MultiCommentCollector
 {

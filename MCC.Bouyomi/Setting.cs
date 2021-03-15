@@ -11,7 +11,7 @@ namespace MCC.Bouyomi
     public class Setting
     {
         private static string FilePath = $"{Path.GetDirectoryName(Environment.GetCommandLineArgs()[0])}\\plugins\\MCC.Bouyomi.json";
-      
+
         #region Singleton
 
         private static Setting instance;
@@ -22,14 +22,18 @@ namespace MCC.Bouyomi
 
         #endregion
 
-        public string Format  = "${UserName} ${Comment}";
+        public string Format = "${UserName} ${Comment}";
 
         public string ApplicationPath;
 
         public bool Enable;
 
+        public List<BlackListItem> BlackListItems = new List<BlackListItem>();
+
         public void Save()
         {
+            BlackListItems.Clear();
+            BlackListItems.AddRange(BlackList.GetInstance().ToArray());
             JsonSerializer.FileSerialize<Setting>(FilePath, Setting.GetInstance());
         }
     }

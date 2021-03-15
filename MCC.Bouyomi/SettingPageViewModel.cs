@@ -20,7 +20,6 @@ namespace MCC.Bouyomi
             set => Set(ref setting.Format, value);
         } 
 
-
         public string ApplicationPath
         {
             get => setting.ApplicationPath;

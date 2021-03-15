@@ -1,19 +1,26 @@
 ﻿using System;
 
-namespace MCC.Core
+namespace MCC.Utility
 {
+
+    public enum LogLevel
+    {
+        Error,
+        Warn,
+        Info,
+        Debug
+    }
+
     public class LogData
     {
-        public LogData(object sender, DateTime date, string log)
+        public LogData(object sender, LogLevel level, DateTime date, string log) : this(sender.GetType().Name, level, date, log)
         {
-            SenderName = sender.GetType().Name;
-            Date = date;
-            Log = log;
         }
 
-        public LogData(string sender, DateTime date, string log)
+        public LogData(string sender, LogLevel level, DateTime date, string log)
         {
             SenderName = sender;
+            Level = level;
             Date = date;
             Log = log;
         }
@@ -22,6 +29,11 @@ namespace MCC.Core
         /// 発信元
         /// </summary>
         public string SenderName { get; set; }
+
+        /// <summary>
+        /// レベル
+        /// </summary>
+        public LogLevel Level { get; set; }
 
         /// <summary>
         /// 発信時刻

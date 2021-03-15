@@ -24,6 +24,9 @@ namespace MCC.Bouyomi
         public SettingPage()
         {
             InitializeComponent();
+
+            // 配列設定
+            DataGrid_BlackList.ItemsSource = BlackList.GetInstance();
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -35,6 +38,19 @@ namespace MCC.Bouyomi
             {
                 FilePath.Text = Setting.GetInstance().ApplicationPath = dialog.FileName;
             }
+        }
+        private void Delete_Click(object sender, RoutedEventArgs e)
+        {
+            if (DataGrid_BlackList.SelectedItem is BlackListItem item)
+            {
+                BlackList.GetInstance().Remove(item);
+            }
+        }
+
+        private void Page_Unloaded(object sender, RoutedEventArgs e)
+        {
+            // 配列設定
+            DataGrid_BlackList.ItemsSource = null;
         }
     }
 }

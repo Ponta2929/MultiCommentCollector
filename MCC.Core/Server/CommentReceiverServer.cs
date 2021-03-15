@@ -67,17 +67,17 @@ namespace MCC.Core.Server
                         OnCommentReceived?.Invoke(this, new(JsonSerializer.Deserialize<CommentData>(receive)));
                 }
             }
-            catch (WebSocketException)
+            catch (WebSocketException e)
             {
-                Logged($"接続エラーが発生しました。");
+                Logged(LogLevel.Error, $"[{e.InnerException}] 接続エラーが発生しました。");
             }
-            catch (JsonException)
+            catch (JsonException e)
             {
-                Logged($"デコードエラーが発生しました。");
+                Logged(LogLevel.Error, $"[{e.InnerException}] デコードエラーが発生しました。");
             }
             catch (Exception e)
             {
-                Logged($"未知のエラーが発生しました。 : {e.Message.ToString()}");
+                Logged(LogLevel.Error, $"[{e.InnerException}] {e.Message.ToString()}");
             }
             finally
             {

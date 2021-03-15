@@ -1,4 +1,5 @@
 ﻿using MCC.Core;
+using MCC.Core.Manager;
 using System.Windows;
 
 namespace MultiCommentCollector

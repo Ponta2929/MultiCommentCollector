@@ -1,7 +1,7 @@
 ﻿using Reactive.Bindings;
 using System.Collections.Specialized;
 
-namespace MCC.Core
+namespace MCC.Core.Manager
 {
     public class ListManagerBase<T> : ReactiveCollection<T>
     {

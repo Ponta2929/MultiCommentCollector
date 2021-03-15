@@ -1,4 +1,5 @@
-﻿using MCC.Plugin;
+﻿using MCC.Core.Manager;
+using MCC.Plugin;
 using MCC.Plugin.Win;
 using System;
 using System.Linq;
