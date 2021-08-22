@@ -14,7 +14,8 @@
     <Window.Resources>
         <converter:HeaderWidthConverter x:Key="HeaderWidthConverter"/>
         <converter:IsActiveToStringConverter x:Key="IsActiveToStringConverter"/>
-    </Window.Resources>
+        <converter:ColorDataConverter x:Key="ColorDataConverter"/>
+    </Window.Resources>  
     <Window.DataContext>
         <local:MainWindowViewModel />
     </Window.DataContext>
@@ -43,6 +44,16 @@
                     <i:Interaction.Behaviors>
                         <behavior:ListViewBehavior/>
                     </i:Interaction.Behaviors>
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger  EventName="MouseDoubleClick">
+                            <i:InvokeCommandAction Command="{Binding ItemDoubleClickCommand}" CommandParameter="{Binding SelectedItem, ElementName=CommentListView}"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="{x:Type ListViewItem}" BasedOn="{StaticResource MahApps.Styles.ListViewItem}">
+                            <Setter Property="Background" Value="{Binding BackColor, Converter={StaticResource ColorDataConverter}}"/>
+                        </Style>
+                    </ListView.ItemContainerStyle>
                     <ListView.View>
                         <GridView>
                             <GridViewColumn Header="配信サイト" DisplayMemberBinding="{Binding LiveName}" x:Name="ColumnLiveName" />

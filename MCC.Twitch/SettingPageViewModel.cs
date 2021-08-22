@@ -6,36 +6,18 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MCC.Bouyomi
+namespace MCC.Twitch
 {
-    public class SettingPageViewModel : INotifyPropertyChanged
+    internal class SettingPageViewModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
         private Setting setting = Setting.GetInstance();
 
-        public string Format
+        public string Password
         {
-            get => setting.Format;
-            set => Set(ref setting.Format, value);
-        } 
-
-        public string ApplicationPath
-        {
-            get => setting.ApplicationPath;
-            set => Set(ref setting.ApplicationPath, value);
-        }
-
-        public bool Enable
-        {
-            get => setting.Enable;
-            set => Set(ref setting.Enable, value);
-        }
-
-        public bool BlackListEnable
-        {
-            get => setting.BlackListEnable;
-            set => Set(ref setting.BlackListEnable, value);
+            get => setting.Password;
+            set => Set(ref setting.Password, value);
         }
 
         /// <summary>

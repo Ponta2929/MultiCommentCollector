@@ -10,7 +10,7 @@
         xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
         mc:Ignorable="d"
         Title="ログ " Height="{Binding Height.Value, Mode=TwoWay}" Width="{Binding Width.Value, Mode=TwoWay}"
-        Top="{Binding Top.Value, Mode=TwoWay}" Left="{Binding Left.Value, Mode=TwoWay}" Closing="LogWindow_Closing" >
+        Top="{Binding Top.Value, Mode=TwoWay}" Left="{Binding Left.Value, Mode=TwoWay}" WindowStartupLocation="CenterOwner" Closing="LogWindow_Closing" >
     <Window.Resources>
         <converter:HeaderWidthConverter x:Key="HeaderWidthConverter"/>
     </Window.Resources>
@@ -19,25 +19,25 @@
     </Window.DataContext>
     <Grid>
         <DockPanel>
-            <StatusBar Height="24" DockPanel.Dock="Bottom">
-                <StatusBarItem Content="▼">
-                    <StatusBarItem.ContextMenu>
-                        <ContextMenu>
-                            <MenuItem Header="Error" IsCheckable="True" IsChecked="{Binding ContextMenuError.Value}"/>
-                            <MenuItem Header="Warn" IsCheckable="True" IsChecked="{Binding ContextMenuWarn.Value}"/>
-                            <MenuItem Header="Info" IsCheckable="True" IsChecked="{Binding ContextMenuInfo.Value}"/>
-                            <MenuItem Header="Debug" IsCheckable="True" IsChecked="{Binding ContextMenuDebug.Value}"/>
-                        </ContextMenu>
-                    </StatusBarItem.ContextMenu>
-                </StatusBarItem>
-            </StatusBar>
+            <StatusBar Height="24" DockPanel.Dock="Bottom" />
             <ListView x:Name="LogListView" ScrollViewer.HorizontalScrollBarVisibility="Hidden">
                 <i:Interaction.Behaviors>
                     <behavior:ListViewBehavior/>
                 </i:Interaction.Behaviors>
                 <ListView.View>
                     <GridView>
-                        <GridViewColumn Header="レベル" DisplayMemberBinding="{Binding Level}" x:Name="ColumnLevel"/>
+                        <GridViewColumn DisplayMemberBinding="{Binding Level}" x:Name="ColumnLevel">
+                            <GridViewColumnHeader Content="レベル">
+                                <GridViewColumnHeader.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem Header="Error" IsCheckable="True" IsChecked="{Binding ContextMenuError.Value}"/>
+                                        <MenuItem Header="Warn" IsCheckable="True" IsChecked="{Binding ContextMenuWarn.Value}"/>
+                                        <MenuItem Header="Info" IsCheckable="True" IsChecked="{Binding ContextMenuInfo.Value}"/>
+                                        <MenuItem Header="Debug" IsCheckable="True" IsChecked="{Binding ContextMenuDebug.Value}"/>
+                                    </ContextMenu>
+                                </GridViewColumnHeader.ContextMenu>
+                            </GridViewColumnHeader>
+                        </GridViewColumn>
                         <GridViewColumn Header="発信元" DisplayMemberBinding="{Binding SenderName}" x:Name="ColumnSender"/>
                         <GridViewColumn Header="時刻" DisplayMemberBinding="{Binding Date, StringFormat=yyyy/MM/dd HH:mm:ss}" x:Name="ColumnDate"/>
                         <GridViewColumn Header="ログ" DisplayMemberBinding="{Binding Log}">

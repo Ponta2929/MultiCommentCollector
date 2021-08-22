@@ -1,8 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net5.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
     <Platforms>AnyCPU</Platforms>
+  <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -11,12 +13,17 @@
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <OutputPath>..\MultiCommentCollector\bin\Release\net5.0-windows\plugins\</OutputPath>
-    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\MCC.Plugin.Win\MCC.Plugin.Win.csproj" />
     <ProjectReference Include="..\MCC.Plugin\MCC.Plugin.csproj" />
     <ProjectReference Include="..\MCC.Utility\MCC.Utility.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="SettingWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </None>
+  </ItemGroup>
 </Project>

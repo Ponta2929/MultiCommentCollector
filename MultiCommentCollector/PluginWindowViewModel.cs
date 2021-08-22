@@ -45,23 +45,28 @@ namespace MultiCommentCollector
             Version = new ReactiveProperty<string>("").AddTo(disposable);
             SiteName = new ReactiveProperty<string>("").AddTo(disposable);
             Visibility = new ReactiveProperty<bool>(false).AddTo(disposable);
-            SelectedChangedCommand = new ReactiveCommand<IPluginBase>().WithSubscribe(x =>
-            {
-                PluginName.Value = x.PluginName;
-                Author.Value = x.Author;
-                Description.Value = x.Description;
-                Version.Value = x.Version;
+            SelectedChangedCommand = new ReactiveCommand<IPluginBase>().WithSubscribe(SetPluginInfo).AddTo(disposable);
+        }
 
-                if (x is IPluginSender sender)
-                {
-                    Visibility.Value = true;
-                    SiteName.Value = sender.SiteName;
-                }
-                else
-                {
-                    Visibility.Value = false;
-                }
-            }).AddTo(disposable);
+        /// <summary>
+        /// プラグイン情報設定
+        /// </summary>
+        private void SetPluginInfo(IPluginBase plugin)
+        {
+            PluginName.Value = plugin.PluginName;
+            Author.Value = plugin.Author;
+            Description.Value = plugin.Description;
+            Version.Value = plugin.Version;
+
+            if (plugin is IPluginSender sender)
+            {
+                Visibility.Value = true;
+                SiteName.Value = sender.SiteName;
+            }
+            else
+            {
+                Visibility.Value = false;
+            }
         }
     }
 }

@@ -20,8 +20,8 @@ namespace MCC.NicoLive
 
         private string liveId;
         private bool resume;
-        private WebSocketClient viewingClient = new WebSocketClient();
-        private WebSocketClient chatClient = new WebSocketClient();
+        private WebSocketClient viewingClient = new();
+        private WebSocketClient chatClient = new();
 
         private const string message_1 = "{\"type\":\"startWatching\",\"data\":{\"stream\":{\"quality\":\"abr\",\"protocol\":\"hls\",\"latency\":\"low\",\"chasePlay\":false},\"room\":{\"protocol\":\"webSocket\",\"commentable\":true},\"reconnect\":false}}";
         private const string message_2 = "{\"type\":\"getAkashic\",\"data\":{\"chasePlay\":false}}";
@@ -50,48 +50,10 @@ namespace MCC.NicoLive
 
             if (!viewingClient.Connected)
             {
-                Task.Run(() => Connect());
+                Task.Run(Connect);
             }
 
             return true;
-        }
-
-        private async void Connect()
-        {
-            while (resume)
-            {
-                if (!viewingClient.Connected)
-                {
-                    var get = Http.Get($"https://live2.nicovideo.jp/watch/{liveId}");
-                    var index = get.IndexOf("data-props=\"");
-                    var last = get.IndexOf("\">", index);
-                    var result = get.Substring(index, last - index).Replace("data-props=\"", "");
-                    var decode = HttpUtility.HtmlDecode(result);
-                    var json = JsonSerializer.Deserialize<NicoLiveJson>(decode);
-
-                    if (json.Site.ReLive.WebSocketURL is not null && !json.Site.ReLive.WebSocketURL.Equals(""))
-                    {
-                        viewingClient.URL = new Uri(json.Site.ReLive.WebSocketURL);
-                        viewingClient.Start(ViewingProcess, header);
-
-                        await Task.Run(() =>
-                        {
-                            while (true)
-                            {
-                                if (chatClient.URL is not null)
-                                    break;
-                                Task.Delay(1000);
-                            }
-
-                        }).ContinueWith(t =>
-                        {
-                            chatClient.Start(ChatProcess, header);
-                        });
-                    }
-                }
-
-                await Task.Delay(30000);
-            }
         }
 
         public bool Inactivate()
@@ -122,8 +84,7 @@ namespace MCC.NicoLive
             viewingClient.Abort();
             chatClient.Abort();
 
-            viewingClient.OnLogged -= OnLogged;
-            chatClient.OnLogged -= OnLogged;
+            chatClient.OnLogged -= Client_OnLogged;
         }
 
         public void PluginLoad()
@@ -131,8 +92,45 @@ namespace MCC.NicoLive
             options.Converters.Add(new DateTimeOffsetConverter());
             header.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100");
 
-            viewingClient.OnLogged += OnLogged;
-            chatClient.OnLogged += OnLogged;
+            chatClient.OnLogged += Client_OnLogged;
+        }
+
+        private async void Connect()
+        {
+            while (resume)
+            {
+                if (!viewingClient.Connected)
+                {
+                    var get = Http.Get($"https://live2.nicovideo.jp/watch/{liveId}");
+                    var index = get.IndexOf("data-props=\"");
+                    var last = get.IndexOf("\">", index);
+                    var result = get.Substring(index, last - index).Replace("data-props=\"", "");
+                    var decode = HttpUtility.HtmlDecode(result);
+                    var json = JsonSerializer.Deserialize<NicoLiveJson>(decode);
+
+                    if (json.Site.ReLive.WebSocketURL is not null && !json.Site.ReLive.WebSocketURL.Equals(""))
+                    {
+                        viewingClient.URL = new(json.Site.ReLive.WebSocketURL);
+                        viewingClient.Start(ViewingProcess, header);
+
+                        await Task.Run(() =>
+                        {
+                            while (true)
+                            {
+                                if (chatClient.URL is not null)
+                                    break;
+                                Task.Delay(1000);
+                            }
+
+                        }).ContinueWith(t =>
+                        {
+                            chatClient.Start(ChatProcess, header);
+                        });
+                    }
+                }
+
+                await Task.Delay(60000);
+            }
         }
 
         protected async void ViewingProcess(ClientWebSocket socket)
@@ -278,6 +276,12 @@ namespace MCC.NicoLive
                 chatClient.Abort();
             }
         }
+       
+        private void Client_OnLogged(object sender, LoggedEventArgs e)
+        {
+            OnLogged?.Invoke(this, e);
+        }
+
         public void Logged(LogLevel level, string message)
         {
             OnLogged?.Invoke(this, new(level, message));

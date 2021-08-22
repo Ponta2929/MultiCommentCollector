@@ -27,6 +27,7 @@ namespace MCC.Bouyomi
         public string ApplicationPath;
 
         public bool Enable;
+        public bool BlackListEnable;
 
         public List<BlackListItem> BlackListItems = new List<BlackListItem>();
 

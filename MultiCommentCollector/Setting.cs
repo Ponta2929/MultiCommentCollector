@@ -1,5 +1,6 @@
 ﻿using MCC.Core;
 using MCC.Core.Manager;
+using MCC.Utility;
 using MCC.Utility.IO;
 using Reactive.Bindings;
 using System;
@@ -13,13 +14,13 @@ using System.Threading.Tasks;
 
 namespace MultiCommentCollector
 {
+    [Serializable]
     public class Setting
     {
         #region Singleton
 
         private static Setting instance;
-        public static Setting GetInstance() => instance ??=
-            XmlSerializer.FileDeserialize<Setting>($"{Path.GetDirectoryName(Environment.GetCommandLineArgs()[0])}\\setting.xml");
+        public static Setting GetInstance() => instance ??= Utility.LoadToXml<Setting>("setting.xml");
 
         public static void SetInstance(Setting inst) => instance = inst;
 
@@ -68,6 +69,24 @@ namespace MultiCommentCollector
         /// <summary>
         /// ConnectionList
         /// </summary>
-        public ReactiveCollection<ConnectionData> ConnectionList { get; set; } = new();
+      public ReactiveCollection<ConnectionData> ConnectionList { get; set; } = new();
+    }
+
+    [Serializable]
+    public class UserSetting
+    {
+        #region Singleton
+
+        private static UserSetting instance;
+        public static UserSetting GetInstance() => instance ??= Utility.LoadToXml<UserSetting>("users.xml");
+
+        public static void SetInstance(UserSetting inst) => instance = inst;
+
+        #endregion
+
+        /// <summary>
+        /// ConnectionList
+        /// </summary>
+        public ReactiveCollection<UserData> UserDataList { get; set; } = new();
     }
 }

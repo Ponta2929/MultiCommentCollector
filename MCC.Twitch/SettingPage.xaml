@@ -1,0 +1,29 @@
+﻿<Page x:Class="MCC.Twitch.SettingPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:MCC.Twitch"
+      mc:Ignorable="d" 
+      Title="Twitch" MinHeight="262" MinWidth="350" d:DesignHeight="262" d:DesignWidth="350" Unloaded="Page_Unloaded" >
+
+    <Page.DataContext>
+        <local:SettingPageViewModel />
+    </Page.DataContext>
+
+    <Grid>
+        <TabControl Margin="10">
+            <TabItem Header="設定">
+                <StackPanel>
+                    <GroupBox Header="ログイン" Margin="0,10,0,0">
+                        <StackPanel Orientation="Vertical" Margin="10">
+                            <TextBlock Text="チャット認証パスワード"/>
+                            <TextBox Text="{Binding Password}" Margin="0,5,0,0" />
+                        </StackPanel>
+                    </GroupBox>
+
+                </StackPanel>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</Page>

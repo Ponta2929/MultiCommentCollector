@@ -12,22 +12,9 @@ namespace MCC.Core.Win
         #region Singleton
 
         private static MultiCommentCollector instance;
-        public static new MultiCommentCollector GetInstance() => instance ?? (instance = new MultiCommentCollector());
+        public static MultiCommentCollector GetInstance() => instance ??= new();
         public static void SetInstance(MultiCommentCollector inst) => instance = inst;
 
         #endregion
-
-        public void TestA(Window window)
-        {
-            var i = PluginManager.GetInstance().Where(x => x is IPluginReceiver).ToArray();
-
-            foreach (var item in i)
-            {
-                if (item is ISetting setting)
-                {
-                    setting.ShowWindow(window);
-                }
-            }
-        }
     }
 }

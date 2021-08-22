@@ -19,6 +19,7 @@ namespace MCC.TwitCasting
         private string userId;
         private LatestMovie latest;
         private bool resume;
+        private bool called;
 
         public string Author => "ぽんた";
 
@@ -40,9 +41,10 @@ namespace MCC.TwitCasting
 
             if (!Connected)
             {
-                Task.Run(() => Connect());
-                Task.Run(() => CheckMovieId());
+                Task.Run(Connect);
+                Task.Run(CheckMovieId);
             }
+
             return true;
         }
 
@@ -72,12 +74,25 @@ namespace MCC.TwitCasting
 
             while (resume)
             {
-                if (latest.Movie.IsOnLive)
+                if (latest?.Movie.IsOnLive == true)
                 {
-                    URL = new(GetChatWebSocket(latest.Movie.ID));
+                    var chatUrl = GetChatWebSocket(latest.Movie.ID);
 
-                    // 開始
-                    Start();
+                    if (!chatUrl.Equals(string.Empty))
+                    {
+                        called = false;
+
+                        URL = new(chatUrl);
+
+                        // 開始
+                        Start();
+                    }
+                }
+                else if (latest?.Movie.IsOnLive == false && !called)
+                {
+                    called = true;
+
+                    Logged(LogLevel.Info, "現在配信を行っていません。");
                 }
 
                 await Task.Delay(5000);
@@ -169,7 +184,7 @@ namespace MCC.TwitCasting
 
                 var movie = GetLatestMovie(userId);
 
-                if (latest.Movie.ID != movie.Movie.ID)
+                if (latest?.Movie.ID != movie?.Movie.ID)
                 {
                     Abort();
 
@@ -185,12 +200,31 @@ namespace MCC.TwitCasting
             var postData = new Hashtable();
             postData["movie_id"] = movieId;
 
-            return JsonSerializer.Deserialize<EventPubSubURL>(Http.Post($"https://twitcasting.tv/eventpubsuburl.php", postData)).URL;
+            var result = Http.Post($"https://twitcasting.tv/eventpubsuburl.php", postData);
+
+            if (result.Equals(""))
+            {
+                Logged(LogLevel.Info, "チャット接続先情報を取得できませんでした。");
+
+                return string.Empty;
+            }
+
+            return JsonSerializer.Deserialize<EventPubSubURL>(result).URL;
         }
 
         private LatestMovie GetLatestMovie(string userId)
-            => JsonSerializer.Deserialize<LatestMovie>(Http.Get($"https://frontendapi.twitcasting.tv/users/{userId}/latest-movie"));
+        {
+            var result = Http.Get($"https://frontendapi.twitcasting.tv/users/{userId}/latest-movie");
 
+            if (result.Equals(string.Empty))
+            {
+                Logged(LogLevel.Info, "配信情報を取得できませんでした。");
+
+                return null;
+            }
+
+            return JsonSerializer.Deserialize<LatestMovie>(result);
+        }
         public bool IsSupport(string url)
         {
             userId = url.RegexString(@"https://twitcasting.tv/(?<value>[\w]+)", "value");

@@ -2,8 +2,10 @@
 using MCC.Core;
 using MCC.Core.Manager;
 using MCC.Core.Server;
+using MCC.Utility;
 using MCC.Utility.IO;
 using MCC.Utility.Text;
+using Reactive.Bindings.Notifiers;
 using System;
 using System.IO;
 using System.Windows;
@@ -14,13 +16,16 @@ namespace MultiCommentCollector
     {
         public static void ApplicationStart()
         {
-            Setting setting = Setting.GetInstance();
+            var setting = Setting.GetInstance();
 
             Application.Current.MainWindow.Closing += ApplicationClosing;
 
             // 接続リスト
             foreach (var item in setting.ConnectionList)
                 ConnectionManager.GetInstance().Add(item);
+
+            foreach (var item in UserSetting.GetInstance().UserDataList)
+                UserDataManager.GetInstance().Add(item);
 
             // サーバー開始
             CommentGeneratorServer.GetInstance().Port = setting.Servers.CommentGeneratorServerPort.Value;
@@ -38,20 +43,17 @@ namespace MultiCommentCollector
             foreach (var item in PluginManager.GetInstance())
                 item.PluginClose();
 
-            try
-            {
-                XmlSerializer.FileSerialize<Setting>($"{Path.GetDirectoryName(Environment.GetCommandLineArgs()[0])}\\setting.xml", Setting.GetInstance());
-            }
-            catch
-            {
-
-            }
+            Utility.SaveToXml<Setting>("setting.xml", Setting.GetInstance());
 
             LogWindow.GetInstance().IsOwnerClose = true;
         }
 
         public static void ShowLogWindow()
-            => LogWindow.GetInstance().Show();
+        {
+            LogWindow.GetInstance().Owner = Application.Current.MainWindow;
+            LogWindow.GetInstance().Show();
+            LogWindow.GetInstance().Activate();
+        }
 
         public static void ShowPluginWindow()
         {
@@ -65,6 +67,28 @@ namespace MultiCommentCollector
             var option = new OptionWindow();
             option.Owner = Application.Current.MainWindow;
             option.ShowDialog();
+        }
+
+        public static void ShowUserDataWindow(UserData user)
+        {
+            var userData = new UserDataWindow();
+            MessageBroker.Default.Publish<UserData>(user);
+            userData.Owner = Application.Current.MainWindow;
+            userData.ShowDialog();
+        }
+
+        public static void CloseWindow<T>() where T : Window
+        {
+            foreach (var window in Application.Current.Windows)
+                if (window is T t)
+                    t.Close();
+        }
+
+        public static void CloseWindow(object viewModel)
+        {
+            foreach (var window in Application.Current.Windows)
+                if (((Window)window).DataContext is not null && ((Window)window).DataContext.Equals(viewModel))
+                    ((Window)window).Close();
         }
 
         public static void ApplicationShutdown()

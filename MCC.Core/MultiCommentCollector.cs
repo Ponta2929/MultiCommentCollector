@@ -18,7 +18,7 @@ namespace MCC.Core
         #region Singleton
 
         private static MultiCommentCollector instance;
-        public static MultiCommentCollector GetInstance() => instance ?? (instance = new MultiCommentCollector());
+        public static MultiCommentCollector GetInstance() => instance ??= new();
         public static void SetInstance(MultiCommentCollector inst) => instance = inst;
 
         #endregion
@@ -30,6 +30,7 @@ namespace MCC.Core
         private CommentManager commentManager = CommentManager.GetInstance();
         private PluginManager pluginManager = PluginManager.GetInstance();
         private LogManager logManager = LogManager.GetInstance();
+        private UserDataManager userDataManager = UserDataManager.GetInstance();
         // ------------------------------------------------------------------------------------ //
 
         public MultiCommentCollector()
@@ -43,6 +44,15 @@ namespace MCC.Core
 
             // プラグイン
             pluginManager.Load(path);
+
+            // プラグインで送信
+            foreach (var item in pluginManager)
+            {
+                if (item is IPluginReceiver receiver && item is ILogged log)
+                {
+                    log.OnLogged += OnLogged;
+                }
+            }
         }
 
         /// <summary>
@@ -181,7 +191,7 @@ namespace MCC.Core
                         URL = url
                     };
 
-                    ConnectionManager.GetInstance().Add(info);
+                    connectionManager.Add(info);
 
                     OnLogged(this, new(LogLevel.Info, $"URLを追加しました。[{url}]"));
 
@@ -205,6 +215,7 @@ namespace MCC.Core
             if (!isSupport)
                 OnLogged(this, new(LogLevel.Info, $"無効なURLが入力されました。[{url}]"));
         }
+
         private void OnLogged(object sender, LoggedEventArgs e)
         {
             if (sender is IPluginBase pluginSender)
@@ -215,18 +226,25 @@ namespace MCC.Core
 
         private void OnCommentReceived(object sender, CommentReceivedEventArgs e)
         {
+
+            // ユーザー設定があるか
+            var data = new CommentDataEx(e.CommentData);
+            var userData = userDataManager.Where(x => x.LiveName.Equals(data.LiveName) && x.UserID.Equals(data.UserID)).ToArray();
+
+            if (userData.Length > 0)
+                data.SetUserData(userData[0]);
+
             // コメントジェネレーターで送信
-            generatorServer.SendData<CommentData>(e.CommentData);
+            generatorServer.SendData<CommentDataEx>(data);
+
 
             // プラグインで送信
-            foreach (var item in PluginManager.GetInstance())
-            {
+            foreach (var item in pluginManager)
                 if (item is IPluginReceiver receiver)
-                    receiver.Receive(e.CommentData);
-            }
+                    receiver.Receive(data);
 
             // コメント追加
-            commentManager.SyncAdd(e.CommentData);
+            commentManager.SyncAdd(data);
         }
     }
 }

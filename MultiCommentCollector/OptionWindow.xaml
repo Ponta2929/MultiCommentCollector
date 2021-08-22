@@ -8,14 +8,14 @@
         xmlns:behavior="clr-namespace:MultiCommentCollector.Behavior"
         xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
         mc:Ignorable="d"
-        Title="オプション" Height="280" Width="400" ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
+        Title="オプション" Height="300" Width="400" ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
     <Window.DataContext>
         <local:OptionWindowViewModel />
     </Window.DataContext>
     <Grid>
         <TabControl x:Name="tabControl" Controls:HeaderedControlHelper.HeaderFontSize="16">
             <TabItem Header="接続">
-                <StackPanel Margin="10,10,10,0" VerticalAlignment="Center">
+                <StackPanel Margin="10" >
                     <GroupBox Header="コメントデーター受信サーバー" Height="87" VerticalAlignment="Top">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                             <Label Content="待受ポート" Height="26" Width="60"/>
@@ -40,7 +40,7 @@
                 </StackPanel>
             </TabItem>
             <TabItem Header="リスト">
-                <StackPanel Margin="10,0,10,0" VerticalAlignment="Center">
+                <StackPanel Margin="10" >
                     <GroupBox Header="コメント" Height="87" VerticalAlignment="Top">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                             <Label Content="保持数" Height="26" Width="50" />

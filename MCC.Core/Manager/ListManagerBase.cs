@@ -53,6 +53,7 @@ namespace MCC.Core.Manager
                 ClearOnScheduler();
             }
         }
+
         public void SyncAddRange(params T[] items)
         {
             lock (syncObject)
@@ -60,6 +61,7 @@ namespace MCC.Core.Manager
                 AddRangeOnScheduler(items);
             }
         }
+
         public void AddRange(params T[] items)
         {
             lock (syncObject)

@@ -7,10 +7,12 @@ using MCC.Utility;
 using MCC.Utility.IO;
 using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
+using Reactive.Bindings.Notifiers;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Runtime.CompilerServices;
@@ -58,6 +60,7 @@ namespace MultiCommentCollector
         public ReactiveCommand<ConnectionData> DeleteCommand { get; }
         public ReactiveCommand<ConnectionData> ToggleCommand { get; }
         public ReactiveCommand<RoutedEventArgs> ColumnHeaderClickCommand { get; }
+        public ReactiveCommand<CommentDataEx> ItemDoubleClickCommand { get; }
 
         public ReactiveCollection<MenuItem> ParentMenu { get; }
 
@@ -81,7 +84,7 @@ namespace MultiCommentCollector
             InactivateCommand = new ReactiveCommand<ConnectionData>().WithSubscribe(x => MCC.Core.Win.MultiCommentCollector.GetInstance().Inactivate(x)).AddTo(disposable);
             DeleteCommand = new ReactiveCommand<ConnectionData>().WithSubscribe(x =>
             {
-                MCC.Core.MultiCommentCollector.GetInstance().Inactivate(x);
+                MCC.Core.Win.MultiCommentCollector.GetInstance().Inactivate(x);
                 PluginManager.GetInstance().Remove(x.Plugin);
                 ConnectionManager.GetInstance().Remove(x);
             }).AddTo(disposable);
@@ -93,8 +96,10 @@ namespace MultiCommentCollector
                     MCC.Core.Win.MultiCommentCollector.GetInstance().Inactivate(x);
                 else
                     MCC.Core.Win.MultiCommentCollector.GetInstance().Activate(x);
+
             }).AddTo(disposable);
             ColumnHeaderClickCommand = new ReactiveCommand<RoutedEventArgs>().WithSubscribe(x => UserHeaderClick(x)).AddTo(disposable);
+            ItemDoubleClickCommand = new ReactiveCommand<CommentDataEx>().WithSubscribe(x => ItemDoubleClick(x)).AddTo(disposable);
             ParentMenu = new ReactiveCollection<MenuItem>().AddTo(disposable);
             AddMenuItem();
 
@@ -162,13 +167,26 @@ namespace MultiCommentCollector
 
             foreach (var item in parent)
             {
-                item.ItemsSource = pluginManager.Where(x => x.PluginName.Equals(item.Header) && x is ISetting);
+                item.ItemsSource = pluginManager.Parent.Where(x => x.PluginName.Equals(item.Header) && x is ISetting);
                 item.DisplayMemberPath = "MenuItemName";
                 item.Click += MeunItemClick;
 
                 // 追加
                 ParentMenu.Add(item);
             }
+        }
+
+        private void ItemDoubleClick(CommentDataEx e)
+        {
+            if (e is null)
+                return;
+
+            var userDataManager = UserDataManager.GetInstance();
+            var usersData = userDataManager.Where(x => x.LiveName.Equals(e.LiveName) && x.UserID.Equals(e.UserID)).ToArray();
+
+            // ウィンドウ表示
+            WindowManager.ShowUserDataWindow(usersData.Length > 0 ? usersData[0] : new UserData(e));
+
         }
     }
 }

@@ -3,6 +3,7 @@ using MCC.Plugin.Win;
 using MCC.Utility;
 using MCC.Utility.Net;
 using MCC.Utility.Text;
+using System.Collections;
 using System.Diagnostics;
 using System.IO;
 using System.Text.RegularExpressions;
@@ -44,12 +45,71 @@ namespace MCC.Bouyomi
                 {
                     ExecuteProcess();
 
-                    if (IsRead(comment))
-                        // 読ませる
+                    if (setting.BlackListEnable)
+                    {
+                        if (IsRead(comment))
+                        {
+                            Http.Get($"http://localhost:50080/Talk?text=\"{DataFormat(comment)}\"");
+                        }
+                    }
+                    else
+                    {
                         Http.Get($"http://localhost:50080/Talk?text=\"{DataFormat(comment)}\"");
+                    }
                 });
             }
         }
+        
+        public void ShowWindow(Window window)
+        {
+            window.Title = "棒読みちゃん設定";
+            window.Closed += (_, _) => setting.Save();
+            window.Content = new SettingPage();
+            window.SizeToContent = SizeToContent.WidthAndHeight;
+            window.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            window.Show();
+        }
+
+        //public bool IsRead(CommentData comment)
+        //{
+        //    var blackList = BlackList.GetInstance();
+
+        //    foreach (var item in blackList)
+        //    {
+        //        var isHit = true;
+        //        var table = new Hashtable();
+
+        //        if (item.LiveName.Equals("*") && item.UserName.Equals("*") && item.UserID.Equals("*") && item.Comment.Equals("*"))
+        //            continue;
+
+        //        foreach (var p_comment in comment.GetType().GetProperties())
+        //        {
+        //            foreach (var p_item in item.GetType().GetProperties())
+        //            {
+        //                if (p_comment.Name.Equals(p_item.Name))
+        //                {
+        //                    var v_comment = p_comment.GetValue(comment) as string;
+        //                    var v_item = p_item.GetValue(item) as string;
+
+        //                    if (IsRegex(v_item))
+        //                        table[p_comment.Name] = Regex(v_comment, v_item);
+        //                    else if (v_item.Equals("*"))
+        //                        table[p_comment.Name] = true;
+        //                    else
+        //                        table[p_comment.Name] = v_comment.Equals(v_item);
+        //                }
+        //            }
+        //        }
+
+        //        foreach (var hit in table.Values)
+        //            isHit &= (bool)hit;
+
+        //        if (isHit)
+        //            return false;
+        //    }
+
+        //    return true;
+        //}
 
         public bool IsRead(CommentData comment)
         {
@@ -57,10 +117,7 @@ namespace MCC.Bouyomi
 
             foreach (var item in blackList)
             {
-                var userName = false;
-                var userId = false;
-                var liveName = false;
-                var commente = false;
+                var (userName, userId, liveName, commente) = (false, false, false, false);
 
                 if (item.LiveName.Equals("*") && item.UserName.Equals("*") && item.UserID.Equals("*") && item.Comment.Equals("*"))
                     continue;
@@ -100,6 +157,11 @@ namespace MCC.Bouyomi
             return true;
         }
 
+        /// <summary>
+        /// 正規表現文字列かどうか。
+        /// </summary>
+        /// <param name="target">チェックするテキスト</param>
+        /// <returns></returns>
         public bool IsRegex(string target)
         {
             var index = target.IndexOf("Regex(");
@@ -111,6 +173,12 @@ namespace MCC.Bouyomi
             return false;
         }
 
+        /// <summary>
+        /// 正規表現処理を行う。
+        /// </summary>
+        /// <param name="target">正規表現文字列</param>
+        /// <param name="message">正規表現の対象</param>
+        /// <returns></returns>
         public bool Regex(string target, string message)
         {
             var index = target.IndexOf("Regex(");
@@ -122,9 +190,7 @@ namespace MCC.Bouyomi
 
                 try
                 {
-                    var r = new Regex(regex);
-
-                    return r.IsMatch(message);
+                    return new Regex(regex).IsMatch(message);
                 }
                 catch
                 {
@@ -170,16 +236,6 @@ namespace MCC.Bouyomi
             }
 
             return format;
-        }
-
-        public void ShowWindow(Window window)
-        {
-            window.Title = "棒読みちゃん設定";
-            window.Closed += (_, _) => setting.Save();
-            window.Content = new SettingPage();
-            window.SizeToContent = SizeToContent.WidthAndHeight;
-            window.WindowStartupLocation = WindowStartupLocation.CenterOwner;
-            window.Show();
         }
     }
 }

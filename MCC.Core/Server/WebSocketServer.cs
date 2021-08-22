@@ -33,7 +33,7 @@ namespace MCC.Core.Server
 
         public void Start()
         {
-            Task.Run(() => StartListen());
+            Task.Run(StartListen);
         }
 
         public void Stop()
@@ -118,6 +118,7 @@ namespace MCC.Core.Server
             {
                 var task = await context.AcceptWebSocketAsync(null);
 
+                Logged(LogLevel.Debug, $"[{context.Request.LocalEndPoint}/{context.Request.RequestTraceIdentifier}]");
                 Logged(LogLevel.Info, $"接続が開始されました。");
 
                 lock (syncObject)
@@ -171,7 +172,7 @@ namespace MCC.Core.Server
 
             socket.Dispose();
 
-            Logged(LogLevel.Info, "対象の接続を閉じました。");
+            Logged(LogLevel.Info, $"対象の接続を閉じました。");
 
             lock (syncObject)
             {

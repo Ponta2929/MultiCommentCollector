@@ -9,6 +9,9 @@ namespace MCC.Core.Manager
 {
     public class PluginManager : ListManagerBase<IPluginBase>
     {
+        /// <summary>
+        /// 読み込まれた基礎プラグイン
+        /// </summary>
         public ListManagerBase<IPluginBase> Parent = new();
 
         #region Singleton
@@ -25,6 +28,10 @@ namespace MCC.Core.Manager
             IsLimit.Value = false;
         }
 
+        /// <summary>
+        /// プラグインを基礎プラグインとして読み込みます。
+        /// </summary>
+        /// <param name="folderPath"></param>
         public void Load(string folderPath)
         {
             if (!Directory.Exists(folderPath))

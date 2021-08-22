@@ -56,21 +56,7 @@ namespace MultiCommentCollector
             ContextMenuDebug.Subscribe(x => Filtering()).AddTo(disposable);
 
             var view = CollectionViewSource.GetDefaultView(LogManager.GetInstance());
-            view.Filter = new Predicate<object>((x) =>
-            {
-                var item = x as LogData;
-
-                if (item.Level == LogLevel.Debug && ContextMenuDebug.Value)
-                    return true;
-                if (item.Level == LogLevel.Info && ContextMenuInfo.Value)
-                    return true;
-                if (item.Level == LogLevel.Warn && ContextMenuWarn.Value)
-                    return true;
-                if (item.Level == LogLevel.Error && ContextMenuError.Value)
-                    return true;
-
-                return false;
-            });
+            view.Filter = new Predicate<object>(FilterPredicate);
 
             var liveShaping = view as ICollectionViewLiveShaping;
 
@@ -79,6 +65,22 @@ namespace MultiCommentCollector
                 liveShaping.LiveFilteringProperties.Add("Level");
                 liveShaping.IsLiveFiltering = true;
             }
+        }
+
+        private bool FilterPredicate(object @object)
+        {
+            var item = @object as LogData;
+
+            if (item.Level == LogLevel.Debug && ContextMenuDebug.Value)
+                return true;
+            if (item.Level == LogLevel.Info && ContextMenuInfo.Value)
+                return true;
+            if (item.Level == LogLevel.Warn && ContextMenuWarn.Value)
+                return true;
+            if (item.Level == LogLevel.Error && ContextMenuError.Value)
+                return true;
+
+            return false;
         }
 
         private void Filtering()

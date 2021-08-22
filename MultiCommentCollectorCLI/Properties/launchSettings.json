@@ -1,8 +1,7 @@
 {
   "profiles": {
     "MultiCommentCollectorCLI": {
-      "commandName": "Project",
-      "commandLineArgs": "-s comment"
+      "commandName": "Project"
     }
   }
 }

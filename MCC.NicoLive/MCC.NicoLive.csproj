@@ -8,6 +8,10 @@
     <OutputPath>..\MultiCommentCollector\bin\Debug\net5.0-windows\plugins\</OutputPath>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <OutputPath>..\MultiCommentCollector\bin\Release\net5.0-windows\plugins\</OutputPath>
+  </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\MCC.Plugin\MCC.Plugin.csproj" />
     <ProjectReference Include="..\MCC.Utility\MCC.Utility.csproj" />
