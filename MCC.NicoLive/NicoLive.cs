@@ -8,6 +8,7 @@ using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
@@ -68,7 +69,7 @@ namespace MCC.NicoLive
 
         public bool IsSupport(string url)
         {
-            var livePage = url.RegexString(@"https://live2.nicovideo.jp/watch/(?<value>[\w]+)", "value");
+            var livePage = url.RegexString(@"https://live[\d]*.nicovideo.jp/watch/(?<value>[\w]+)", "value");
             var communityPage = url.RegexString(@"https://com.nicovideo.jp/community/(?<value>[\w]+)", "value");
 
             liveId = !livePage.Equals("") ? livePage : communityPage;
@@ -244,7 +245,7 @@ namespace MCC.NicoLive
                         {
                             LiveName = "NicoLive",
                             PostType = PostType.Comment,
-                            Comment = data.Chat.Content,
+                            Comment = ConvertHTMLCode(data.Chat.Content),
                             UserID = data.Chat.UserId,
                             PostTime = data.Chat.Date.LocalDateTime,
                             UserName = ""
@@ -276,7 +277,7 @@ namespace MCC.NicoLive
                 chatClient.Abort();
             }
         }
-       
+
         private void Client_OnLogged(object sender, LoggedEventArgs e)
         {
             OnLogged?.Invoke(this, e);
@@ -285,6 +286,21 @@ namespace MCC.NicoLive
         public void Logged(LogLevel level, string message)
         {
             OnLogged?.Invoke(this, new(level, message));
+        }
+
+        public string ConvertHTMLCode(string message)
+        {
+            var reg = @"<a\s+[^>]*href\s*=\s*[""'](?<href>[^""']*)[""'][^>]*>(?<text>[^<]*)</a>";
+            var r = new Regex(reg, RegexOptions.IgnoreCase);
+            var collection = r.Matches(message);
+
+            foreach (Match m in collection)
+            {
+                if (m.Success)
+                    return m.Groups["text"].Value.Trim();
+            }
+
+            return message;
         }
     }
 }

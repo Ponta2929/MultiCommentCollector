@@ -15,7 +15,7 @@
         <converter:HeaderWidthConverter x:Key="HeaderWidthConverter"/>
         <converter:IsActiveToStringConverter x:Key="IsActiveToStringConverter"/>
         <converter:ColorDataConverter x:Key="ColorDataConverter"/>
-    </Window.Resources>  
+    </Window.Resources>
     <Window.DataContext>
         <local:MainWindowViewModel />
     </Window.DataContext>
@@ -24,7 +24,7 @@
             <MenuItem Header="ファイル(_F)">
                 <MenuItem Header="終了(_X)" Command="{Binding ApplicationShutdownCommand}"/>
             </MenuItem>
-            <MenuItem Header="プラグイン(_P)" ItemsSource="{Binding ParentMenu}"/>
+            <MenuItem Header="プラグイン(_P)" ItemsSource="{Binding ParentMenuPlugins}"/>
             <MenuItem Header="ウィンドウ(_W)">
                 <MenuItem Header="接続(_C)" IsChecked="{Binding IsPaneOpen.Value}" IsCheckable="True"/>
                 <Separator />
@@ -45,7 +45,10 @@
                         <behavior:ListViewBehavior/>
                     </i:Interaction.Behaviors>
                     <i:Interaction.Triggers>
-                        <i:EventTrigger  EventName="MouseDoubleClick">
+                        <i:EventTrigger EventName="PreviewMouseRightButtonDown">
+                            <i:InvokeCommandAction Command="{Binding ItemRightClickCommand}" CommandParameter="{Binding SelectedItem, ElementName=CommentListView}"/>
+                        </i:EventTrigger>
+                        <i:EventTrigger EventName="MouseDoubleClick">
                             <i:InvokeCommandAction Command="{Binding ItemDoubleClickCommand}" CommandParameter="{Binding SelectedItem, ElementName=CommentListView}"/>
                         </i:EventTrigger>
                     </i:Interaction.Triggers>

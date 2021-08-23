@@ -18,6 +18,7 @@ using System.Reactive.Disposables;
 using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -61,8 +62,11 @@ namespace MultiCommentCollector
         public ReactiveCommand<ConnectionData> ToggleCommand { get; }
         public ReactiveCommand<RoutedEventArgs> ColumnHeaderClickCommand { get; }
         public ReactiveCommand<CommentDataEx> ItemDoubleClickCommand { get; }
+        public ReactiveCommand<CommentDataEx> ItemRightClickCommand { get; }
+        public ReactiveCollection<MenuItem> ParentMenuPlugins { get; }
 
-        public ReactiveCollection<MenuItem> ParentMenu { get; }
+        private ContextMenu contextMenu;
+        private MenuItem menuItem_Copy;
 
         public MainWindowViewModel()
         {
@@ -100,7 +104,9 @@ namespace MultiCommentCollector
             }).AddTo(disposable);
             ColumnHeaderClickCommand = new ReactiveCommand<RoutedEventArgs>().WithSubscribe(x => UserHeaderClick(x)).AddTo(disposable);
             ItemDoubleClickCommand = new ReactiveCommand<CommentDataEx>().WithSubscribe(x => ItemDoubleClick(x)).AddTo(disposable);
-            ParentMenu = new ReactiveCollection<MenuItem>().AddTo(disposable);
+            ItemRightClickCommand = new ReactiveCommand<CommentDataEx>().WithSubscribe(x => ItemRightClick(x)).AddTo(disposable);
+            ParentMenuPlugins = new ReactiveCollection<MenuItem>().AddTo(disposable);
+
             AddMenuItem();
 
             // Theme
@@ -109,6 +115,53 @@ namespace MultiCommentCollector
 
             disposable.Add(setting.Theme.IsDarkMode);
             disposable.Add(setting.Theme.ThemeColor);
+
+            // ContextMenu
+            contextMenu = new ContextMenu();
+            menuItem_Copy = new MenuItem();
+            contextMenu.Items.Add(menuItem_Copy);
+            menuItem_Copy.Header = "コピー(_C)";
+        }
+
+        private void ItemRightClick(CommentDataEx x)
+        {
+            if (x is not null)
+            {
+                menuItem_Copy.Items.Clear();
+
+                var item = new MenuItem();
+                item.Header = x.Comment;
+                item.Click += Item_Click;
+
+                // コンテキストメニュー設定
+                menuItem_Copy.Items.Add(item);
+
+                var separator = false;
+                var reg = @"http(s)?://([\w-]+\.)+[\w-]+(/[\w- ./?%&=]*)?";
+                var r = new Regex(reg, RegexOptions.IgnoreCase);
+                var collection = r.Matches(x.Comment);
+
+                foreach (Match m in collection)
+                {
+                    if (m.Success)
+                    {
+                        if (!separator)
+                        {
+                            menuItem_Copy.Items.Add(new Separator());
+                            separator = true;
+                        }
+
+                        var url = new MenuItem();
+                        url.Header = m.Value;
+                        url.Click += Item_Click;
+
+                        // コンテキストメニュー設定
+                        menuItem_Copy.Items.Add(url);
+                    }
+                }
+
+                contextMenu.IsOpen = true;
+            }
         }
 
         private void UserHeaderClick(RoutedEventArgs e)
@@ -172,7 +225,7 @@ namespace MultiCommentCollector
                 item.Click += MeunItemClick;
 
                 // 追加
-                ParentMenu.Add(item);
+                ParentMenuPlugins.Add(item);
             }
         }
 
@@ -186,7 +239,11 @@ namespace MultiCommentCollector
 
             // ウィンドウ表示
             WindowManager.ShowUserDataWindow(usersData.Length > 0 ? usersData[0] : new UserData(e));
+        }
 
+        private void Item_Click(object sender, RoutedEventArgs e)
+        {
+            Clipboard.SetData(DataFormats.Text, ((MenuItem)sender).Header);
         }
     }
 }

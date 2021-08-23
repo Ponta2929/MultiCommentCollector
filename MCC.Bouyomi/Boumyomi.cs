@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Web;
 using System.Windows;
 
 namespace MCC.Bouyomi
@@ -49,17 +50,18 @@ namespace MCC.Bouyomi
                     {
                         if (IsRead(comment))
                         {
-                            Http.Get($"http://localhost:50080/Talk?text=\"{DataFormat(comment)}\"");
+
+                            Http.Get($"http://localhost:50080/Talk?text={HttpUtility.UrlEncode(DataFormat(comment))}");
                         }
                     }
                     else
                     {
-                        Http.Get($"http://localhost:50080/Talk?text=\"{DataFormat(comment)}\"");
+                        Http.Get($"http://localhost:50080/Talk?text={HttpUtility.UrlEncode(DataFormat(comment))}");
                     }
                 });
             }
         }
-        
+
         public void ShowWindow(Window window)
         {
             window.Title = "棒読みちゃん設定";
