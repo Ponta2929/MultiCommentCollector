@@ -7,8 +7,9 @@
         xmlns:local="clr-namespace:MultiCommentCollector"
         xmlns:converter="clr-namespace:MultiCommentCollector.Converter"
         xmlns:behavior="clr-namespace:MultiCommentCollector.Behavior"
-        xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro" 
-        mc:Ignorable="d"
+        xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+        xmlns:converter_m="http://metro.mahapps.com/winfx/xaml/shared"
+                      mc:Ignorable="d"
         Title="ユーザー設定一覧" Height="350" Width="600" Closing="UsersSettingWindow_Closing">
     <Window.Resources>
         <converter:HeaderWidthConverter x:Key="HeaderWidthConverter"/>
@@ -47,8 +48,8 @@
                         <GridViewColumnHeader x:Name="ColumnBackColor" Content="背景色" Width="80" IsEnabled="False" />
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <Border Background="{Binding BackColor, Converter={StaticResource ColorDataConverter}}" CornerRadius="5">
-                                    <TextBlock Text="{Binding BackColor}" TextAlignment="Center"/>
+                                <Border x:Name="border" Background="{Binding BackColor, Converter={StaticResource ColorDataConverter}}" CornerRadius="5">
+                                    <TextBlock Text="{Binding BackColor}" Foreground="{Binding ElementName=border, Path=Background, Converter={x:Static converter_m:BackgroundToForegroundConverter.Instance}}" TextAlignment="Center"/>
                                 </Border>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>

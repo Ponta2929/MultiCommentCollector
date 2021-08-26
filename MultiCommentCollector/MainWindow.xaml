@@ -28,9 +28,10 @@
             <MenuItem Header="ウィンドウ(_W)">
                 <MenuItem Header="接続(_C)" IsChecked="{Binding IsPaneOpen.Value}" IsCheckable="True"/>
                 <Separator />
+                <MenuItem Header="ユーザー設定一覧(_U)..." Command="{Binding ShowUsersSettingWindowCommand}"/>
+                <Separator />
                 <MenuItem Header="プラグイン(_P)..." Command="{Binding ShowPluginWindowCommand}" />
                 <MenuItem Header="ログ(_L)..." Command="{Binding ShowLogWindowCommand}"/>
-                <MenuItem Header="ユーザー設定一覧(_U)..." Command="{Binding ShowUsersSettingWindowCommand}"/>
             </MenuItem>
             <MenuItem Header="ツール(_T)">
                 <MenuItem Header="オプション(_O)..." Command="{Binding ShowOptionWindowCommand}"/>
