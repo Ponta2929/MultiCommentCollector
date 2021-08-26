@@ -41,15 +41,6 @@ namespace MultiCommentCollector
             LogListView.ItemsSource = LogManager.GetInstance();
         }
 
-
-        private void LogWindow_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            if (e.Action == NotifyCollectionChangedAction.Add)
-            {
-                LogListView.ScrollIntoView(LogListView.Items[e.NewStartingIndex]);
-            }
-        }
-
         private void LogWindow_Closing(object sender, CancelEventArgs e)
         {
             e.Cancel = !IsOwnerClose;

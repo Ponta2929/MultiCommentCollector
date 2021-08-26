@@ -77,6 +77,14 @@ namespace MultiCommentCollector
             userData.ShowDialog();
         }
 
+        public static void ShowUsersSettingWindow()
+        {
+            UsersSettingWindow.GetInstance().Owner = Application.Current.MainWindow;
+            UsersSettingWindow.GetInstance().Show();
+            UsersSettingWindow.GetInstance().Activate();
+        }
+        
+
         public static void CloseWindow<T>() where T : Window
         {
             foreach (var window in Application.Current.Windows)

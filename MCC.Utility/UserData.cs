@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
@@ -8,7 +10,7 @@ using System.Threading.Tasks;
 namespace MCC.Utility
 {
     [Serializable]
-    public class UserData
+    public class UserData: INotifyPropertyChanged
     {
         /// <summary>
         /// 配信サイト名
@@ -16,11 +18,12 @@ namespace MCC.Utility
         [JsonPropertyName("LiveName")]
         public string LiveName { get; set; }
 
+        private string userName;
         /// <summary>
         /// ユーザー名
         /// </summary>
         [JsonPropertyName("UserName")]
-        public string UserName { get; set; }
+        public string UserName { get => userName; set => Set(ref userName, value); }
 
         /// <summary>
         /// ユーザーID
@@ -28,11 +31,12 @@ namespace MCC.Utility
         [JsonPropertyName("UserID")]
         public string UserID { get; set; }
 
+        private ColorData backColor;
         /// <summary>
         /// 背景色
         /// </summary>
         [JsonPropertyName("BackColor")]
-        public ColorData BackColor { get; set; }
+        public ColorData BackColor { get => backColor; set => Set(ref backColor, value); }
 
         public UserData() { }
 
@@ -42,6 +46,28 @@ namespace MCC.Utility
             this.UserID = data.UserID;
             this.UserName = data.UserName;
             this.BackColor = data.BackColor;
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        /// <summary>
+        /// プロパティの値が変更されたことを通知します。
+        /// </summary>
+        /// <param name="propertyName"></param>
+        protected virtual void OnPropertyChanged(string propertyName) =>
+            PropertyChanged?.Invoke(this, new(propertyName));
+
+        protected void Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
+        {
+            if (Equals(storage, value))
+            {
+                return;
+            }
+
+            storage = value;
+
+            // イベント
+            OnPropertyChanged(propertyName);
         }
     }
 }

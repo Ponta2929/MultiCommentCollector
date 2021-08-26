@@ -5,6 +5,7 @@ using MCC.Core.Manager;
 using MCC.Plugin.Win;
 using MCC.Utility;
 using MCC.Utility.IO;
+using MultiCommentCollector.Helper;
 using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
 using Reactive.Bindings.Notifiers;
@@ -54,6 +55,7 @@ namespace MultiCommentCollector
         public ReactiveCommand ShowLogWindowCommand { get; }
         public ReactiveCommand ShowPluginWindowCommand { get; }
         public ReactiveCommand ShowOptionWindowCommand { get; }
+        public ReactiveCommand ShowUsersSettingWindowCommand { get; }        
         public ReactiveCommand ApplicationShutdownCommand { get; }
         public ReactiveCommand<string> EnterCommand { get; }
         public ReactiveCommand<ConnectionData> ActivateCommand { get; }
@@ -61,12 +63,9 @@ namespace MultiCommentCollector
         public ReactiveCommand<ConnectionData> DeleteCommand { get; }
         public ReactiveCommand<ConnectionData> ToggleCommand { get; }
         public ReactiveCommand<RoutedEventArgs> ColumnHeaderClickCommand { get; }
-        public ReactiveCommand<CommentDataEx> ItemDoubleClickCommand { get; }
-        public ReactiveCommand<CommentDataEx> ItemRightClickCommand { get; }
+        public ReactiveCommand<CommentDataEx> ShowUserSettingCommand { get; }
         public ReactiveCollection<MenuItem> ParentMenuPlugins { get; }
-
-        private ContextMenu contextMenu;
-        private MenuItem menuItem_Copy;
+        public ReactiveCommand<MenuItem> MenuItemOpenedCommand { get; }
 
         public MainWindowViewModel()
         {
@@ -82,6 +81,7 @@ namespace MultiCommentCollector
             ShowLogWindowCommand = new ReactiveCommand().WithSubscribe(WindowManager.ShowLogWindow).AddTo(disposable);
             ShowPluginWindowCommand = new ReactiveCommand().WithSubscribe(WindowManager.ShowPluginWindow).AddTo(disposable);
             ShowOptionWindowCommand = new ReactiveCommand().WithSubscribe(WindowManager.ShowOptionWindow).AddTo(disposable);
+            ShowUsersSettingWindowCommand = new ReactiveCommand().WithSubscribe(WindowManager.ShowUsersSettingWindow).AddTo(disposable);
             ApplicationShutdownCommand = new ReactiveCommand().WithSubscribe(WindowManager.ApplicationShutdown).AddTo(disposable);
             EnterCommand = new ReactiveCommand<string>().WithSubscribe(x => MCC.Core.Win.MultiCommentCollector.GetInstance().AddURL(x)).AddTo(disposable);
             ActivateCommand = new ReactiveCommand<ConnectionData>().WithSubscribe(x => MCC.Core.Win.MultiCommentCollector.GetInstance().Activate(x)).AddTo(disposable);
@@ -103,8 +103,7 @@ namespace MultiCommentCollector
 
             }).AddTo(disposable);
             ColumnHeaderClickCommand = new ReactiveCommand<RoutedEventArgs>().WithSubscribe(x => UserHeaderClick(x)).AddTo(disposable);
-            ItemDoubleClickCommand = new ReactiveCommand<CommentDataEx>().WithSubscribe(x => ItemDoubleClick(x)).AddTo(disposable);
-            ItemRightClickCommand = new ReactiveCommand<CommentDataEx>().WithSubscribe(x => ItemRightClick(x)).AddTo(disposable);
+            ShowUserSettingCommand = new ReactiveCommand<CommentDataEx>().WithSubscribe(x => ShowUserSetting(x)).AddTo(disposable);
             ParentMenuPlugins = new ReactiveCollection<MenuItem>().AddTo(disposable);
 
             AddMenuItem();
@@ -117,51 +116,7 @@ namespace MultiCommentCollector
             disposable.Add(setting.Theme.ThemeColor);
 
             // ContextMenu
-            contextMenu = new ContextMenu();
-            menuItem_Copy = new MenuItem();
-            contextMenu.Items.Add(menuItem_Copy);
-            menuItem_Copy.Header = "コピー(_C)";
-        }
-
-        private void ItemRightClick(CommentDataEx x)
-        {
-            if (x is not null)
-            {
-                menuItem_Copy.Items.Clear();
-
-                var item = new MenuItem();
-                item.Header = x.Comment;
-                item.Click += Item_Click;
-
-                // コンテキストメニュー設定
-                menuItem_Copy.Items.Add(item);
-
-                var separator = false;
-                var reg = @"http(s)?://([\w-]+\.)+[\w-]+(/[\w- ./?%&=]*)?";
-                var r = new Regex(reg, RegexOptions.IgnoreCase);
-                var collection = r.Matches(x.Comment);
-
-                foreach (Match m in collection)
-                {
-                    if (m.Success)
-                    {
-                        if (!separator)
-                        {
-                            menuItem_Copy.Items.Add(new Separator());
-                            separator = true;
-                        }
-
-                        var url = new MenuItem();
-                        url.Header = m.Value;
-                        url.Click += Item_Click;
-
-                        // コンテキストメニュー設定
-                        menuItem_Copy.Items.Add(url);
-                    }
-                }
-
-                contextMenu.IsOpen = true;
-            }
+            MenuItemOpenedCommand = new ReactiveCommand<MenuItem>().WithSubscribe(x => MenuItemCopyOpened(x)).AddTo(disposable);
         }
 
         private void UserHeaderClick(RoutedEventArgs e)
@@ -229,19 +184,61 @@ namespace MultiCommentCollector
             }
         }
 
-        private void ItemDoubleClick(CommentDataEx e)
+        private void ShowUserSetting(CommentDataEx commentData)
         {
-            if (e is null)
+            if (commentData is null)
                 return;
 
             var userDataManager = UserDataManager.GetInstance();
-            var usersData = userDataManager.Where(x => x.LiveName.Equals(e.LiveName) && x.UserID.Equals(e.UserID)).ToArray();
+            var usersData = userDataManager.Where(x => x.LiveName.Equals(commentData.LiveName) && x.UserID.Equals(commentData.UserID)).ToArray();
 
             // ウィンドウ表示
-            WindowManager.ShowUserDataWindow(usersData.Length > 0 ? usersData[0] : new UserData(e));
+            WindowManager.ShowUserDataWindow(usersData.Length > 0 ? usersData[0] : new(commentData));
         }
 
-        private void Item_Click(object sender, RoutedEventArgs e)
+        private void MenuItemCopyOpened(MenuItem menu)
+        {
+            var owner = menu.GetParentObject().FindAncestor<ContextMenu>();
+            var commentData = ((ListViewItem)owner.PlacementTarget).Content as CommentDataEx;
+
+            if (commentData is not null)
+            {
+                menu.Items.Clear();
+
+                var mainContent = new MenuItem();
+                mainContent.Header = commentData.Comment;
+                mainContent.Click += CopyItem_Click;
+
+                // コンテキストメニュー設定
+                menu.Items.Add(mainContent);
+
+                var separator = false;
+                var reg = @"http(s)?://([\w-]+\.)+[\w-]+(/[\w- ./?%&=]*)?";
+                var r = new Regex(reg, RegexOptions.IgnoreCase);
+                var collection = r.Matches(commentData.Comment);
+
+                foreach (Match m in collection)
+                {
+                    if (m.Success)
+                    {
+                        if (!separator)
+                        {
+                            menu.Items.Add(new Separator());
+                            separator = true;
+                        }
+
+                        var url = new MenuItem();
+                        url.Header = m.Value;
+                        url.Click += CopyItem_Click;
+
+                        // コンテキストメニュー設定
+                        menu.Items.Add(url);
+                    }
+                }
+            }
+        }
+
+        private void CopyItem_Click(object sender, RoutedEventArgs e)
         {
             Clipboard.SetData(DataFormats.Text, ((MenuItem)sender).Header);
         }

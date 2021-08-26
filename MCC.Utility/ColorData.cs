@@ -40,6 +40,8 @@ namespace MCC.Utility
 
         public override int GetHashCode() =>
             A ^ R ^ G ^ B;
+
+        public override string ToString() => string.Format("#{0:X2}{1:X2}{2:X2}{3:X2}", A, R, G, B);
     }
 
     public class ColorDataJsonConverter : JsonConverter<ColorData>

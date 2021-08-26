@@ -30,6 +30,7 @@
                 <Separator />
                 <MenuItem Header="プラグイン(_P)..." Command="{Binding ShowPluginWindowCommand}" />
                 <MenuItem Header="ログ(_L)..." Command="{Binding ShowLogWindowCommand}"/>
+                <MenuItem Header="ユーザー設定一覧(_U)..." Command="{Binding ShowUsersSettingWindowCommand}"/>
             </MenuItem>
             <MenuItem Header="ツール(_T)">
                 <MenuItem Header="オプション(_O)..." Command="{Binding ShowOptionWindowCommand}"/>
@@ -45,16 +46,29 @@
                         <behavior:ListViewBehavior/>
                     </i:Interaction.Behaviors>
                     <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="PreviewMouseRightButtonDown">
-                            <i:InvokeCommandAction Command="{Binding ItemRightClickCommand}" CommandParameter="{Binding SelectedItem, ElementName=CommentListView}"/>
-                        </i:EventTrigger>
                         <i:EventTrigger EventName="MouseDoubleClick">
-                            <i:InvokeCommandAction Command="{Binding ItemDoubleClickCommand}" CommandParameter="{Binding SelectedItem, ElementName=CommentListView}"/>
+                            <i:InvokeCommandAction Command="{Binding ShowUserSettingCommand}" CommandParameter="{Binding SelectedItem, ElementName=CommentListView}"/>
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
                     <ListView.ItemContainerStyle>
                         <Style TargetType="{x:Type ListViewItem}" BasedOn="{StaticResource MahApps.Styles.ListViewItem}">
                             <Setter Property="Background" Value="{Binding BackColor, Converter={StaticResource ColorDataConverter}}"/>
+                            <Setter Property="Tag" Value="{Binding DataContext, RelativeSource={RelativeSource AncestorType=ListView}}" />
+                            <Setter Property="ContextMenu">
+                                <Setter.Value>
+                                    <ContextMenu DataContext="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource Self}}">
+                                        <MenuItem Header="ユーザー設定を開く(_O)" Command="{Binding ShowUserSettingCommand}" CommandParameter="{Binding PlacementTarget.Content, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                                        <Separator />
+                                        <MenuItem Header="コピー(_C)" >
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="Loaded">
+                                                    <i:InvokeCommandAction Command="{Binding MenuItemOpenedCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=MenuItem}}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </MenuItem>
+                                    </ContextMenu>
+                                </Setter.Value>
+                            </Setter>
                         </Style>
                     </ListView.ItemContainerStyle>
                     <ListView.View>

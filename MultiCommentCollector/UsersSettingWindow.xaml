@@ -1,0 +1,60 @@
+﻿<Controls:MetroWindow x:Class="MultiCommentCollector.UsersSettingWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MultiCommentCollector"
+        xmlns:converter="clr-namespace:MultiCommentCollector.Converter"
+        xmlns:behavior="clr-namespace:MultiCommentCollector.Behavior"
+        xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro" 
+        mc:Ignorable="d"
+        Title="ユーザー設定一覧" Height="350" Width="600" Closing="UsersSettingWindow_Closing">
+    <Window.Resources>
+        <converter:HeaderWidthConverter x:Key="HeaderWidthConverter"/>
+        <converter:ColorDataConverter x:Key="ColorDataConverter"/>
+    </Window.Resources>
+    <Window.DataContext>
+        <local:UsersSettingWindowViewModel />
+    </Window.DataContext>
+    <Grid>
+        <ListView x:Name="UsersListView" ScrollViewer.HorizontalScrollBarVisibility="Hidden" GridViewColumnHeader.Click="GridViewColumnHeaderClickedHandler">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="MouseDoubleClick">
+                    <i:InvokeCommandAction Command="{Binding ShowUserSettingCommand}" CommandParameter="{Binding SelectedItem, ElementName=UsersListView}"/>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+            <ListView.ItemContainerStyle>
+                <Style TargetType="{x:Type ListViewItem}" BasedOn="{StaticResource MahApps.Styles.ListViewItem}">
+                    <Setter Property="Tag" Value="{Binding DataContext, RelativeSource={RelativeSource AncestorType=ListView}}" />
+                    <Setter Property="ContextMenu">
+                        <Setter.Value>
+                            <ContextMenu DataContext="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource Self}}">
+                                <MenuItem Header="ユーザー設定を開く(_O)" Command="{Binding ShowUserSettingCommand}" CommandParameter="{Binding PlacementTarget.Content, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                                <Separator />
+                                <MenuItem Header="削除(_D)" Command="{Binding DeleteUserSettingCommand}" CommandParameter="{Binding PlacementTarget.Content, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                            </ContextMenu>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </ListView.ItemContainerStyle>
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="配信サイト" DisplayMemberBinding="{Binding LiveName}" x:Name="ColumnLiveName" />
+                    <GridViewColumn Header="ユーザーID" DisplayMemberBinding="{Binding UserID}" x:Name="ColumnUserID" Width="75" />
+                    <GridViewColumn Header="ユーザー名" DisplayMemberBinding="{Binding UserName}" x:Name="ColumnUserName" Width="75" />
+                    <GridViewColumn>
+                        <GridViewColumnHeader x:Name="ColumnBackColor" Content="背景色" Width="80" IsEnabled="False" />
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Border Background="{Binding BackColor, Converter={StaticResource ColorDataConverter}}" CornerRadius="5">
+                                    <TextBlock Text="{Binding BackColor}" TextAlignment="Center"/>
+                                </Border>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
+    </Grid>
+</Controls:MetroWindow>
