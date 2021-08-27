@@ -46,8 +46,8 @@ namespace MCC.Utility
         /// プロパティの値が変更されたことを通知します。
         /// </summary>
         /// <param name="propertyName"></param>
-        protected virtual void OnPropertyChanged(string propertyName) =>
-            PropertyChanged?.Invoke(this, new(propertyName));
+        protected virtual void OnPropertyChanged(string propertyName)
+            => PropertyChanged?.Invoke(this, new(propertyName));
 
         protected void Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
         {

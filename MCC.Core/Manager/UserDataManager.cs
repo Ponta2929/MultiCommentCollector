@@ -12,8 +12,7 @@ namespace MCC.Core.Manager
         #region Singleton
 
         private static UserDataManager instance;
-        public static UserDataManager GetInstance() => instance ?? (instance = new());
-        public static void SetInstance(UserDataManager inst) => instance = inst;
+        public static UserDataManager Instance => instance ??= new();
 
         #endregion
 

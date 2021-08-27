@@ -39,9 +39,7 @@ namespace MCC.Core.Server
         #region Singleton
 
         private static CommentGeneratorServer instance;
-        public static CommentGeneratorServer GetInstance() => instance ?? (instance = new());
-        public static void SetInstance(CommentGeneratorServer inst) => instance = inst;
-
+        public static CommentGeneratorServer Instance => instance ??= new();
         #endregion
 
         public CommentGeneratorServer() : this("localhost", 29292) { }

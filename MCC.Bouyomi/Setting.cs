@@ -15,10 +15,7 @@ namespace MCC.Bouyomi
         #region Singleton
 
         private static Setting instance;
-        public static Setting GetInstance() => instance ??=
-            JsonSerializer.FileDeserialize<Setting>(FilePath);
-
-        public static void SetInstance(Setting inst) => instance = inst;
+        public static Setting Instance => instance ??= JsonSerializer.FileDeserialize<Setting>(FilePath);
 
         #endregion
 
@@ -34,8 +31,8 @@ namespace MCC.Bouyomi
         public void Save()
         {
             BlackListItems.Clear();
-            BlackListItems.AddRange(BlackList.GetInstance().ToArray());
-            JsonSerializer.FileSerialize<Setting>(FilePath, Setting.GetInstance());
+            BlackListItems.AddRange(BlackList.Instance.ToArray());
+            JsonSerializer.FileSerialize<Setting>(FilePath, Setting.Instance);
         }
     }
 }

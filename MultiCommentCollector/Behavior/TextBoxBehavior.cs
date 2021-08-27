@@ -27,8 +27,7 @@ namespace MultiCommentCollector.Behavior
             AssociatedObject.PreviewTextInput += PreviewTextInput;
 
             if (handler is not null)
-            CommandManager.AddPreviewExecutedHandler(AssociatedObject, handler);
-
+                CommandManager.AddPreviewExecutedHandler(AssociatedObject, handler);
         }
 
         protected override void OnDetaching()

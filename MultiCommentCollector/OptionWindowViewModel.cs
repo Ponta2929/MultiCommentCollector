@@ -30,7 +30,7 @@ namespace MultiCommentCollector
             disposable.Dispose();
         }
 
-        private Setting setting = Setting.GetInstance();
+        private Setting setting = Setting.Instance;
 
         public ReactiveProperty<int> CommentReceiverServerPort { get; init; }
         public ReactiveProperty<int> CommentGeneratorServerPort { get; init; }
@@ -50,8 +50,8 @@ namespace MultiCommentCollector
 
             IsDarkMode.Subscribe(x => ThemeManager.Current.ChangeTheme(Application.Current, $"{(x ? "Dark" : "Light")}.{ThemeColor.Value}")).AddTo(disposable);
             ThemeColor.Subscribe(x => ThemeManager.Current.ChangeTheme(Application.Current, $"{(IsDarkMode.Value ? "Dark" : "Light")}.{x}")).AddTo(disposable);
-            MaxComments.Subscribe(x => CommentManager.GetInstance().MaxSize.Value = x);
-            MaxLogs.Subscribe(x => LogManager.GetInstance().MaxSize.Value = x);
+            MaxComments.Subscribe(x => CommentManager.Instance.MaxSize.Value = x);
+            MaxLogs.Subscribe(x => LogManager.Instance.MaxSize.Value = x);
         }
     }
 }

@@ -45,7 +45,7 @@ namespace MultiCommentCollector
             UserName = new ReactiveProperty<string>("").AddTo(disposable);
             BackgroundColor = new ReactiveProperty<Color>(Color.FromArgb(0, 0, 0, 0)).AddTo(disposable);
 
-            // 購読
+            // Commands
             OkClickCommand = new ReactiveCommand().WithSubscribe(OkButtonClick).AddTo(disposable);
             CloseWindowCommand = new ReactiveCommand().WithSubscribe(() => WindowManager.CloseWindow(this)).AddTo(disposable);
 
@@ -54,7 +54,8 @@ namespace MultiCommentCollector
 
         private void OkButtonClick()
         {
-            var userDataManager = UserDataManager.GetInstance();
+            var userDataManager = UserDataManager.Instance;
+            var commentManager = CommentManager.Instance;
             var user = new UserData()
             {
                 UserID = UserID.Value,
@@ -65,10 +66,10 @@ namespace MultiCommentCollector
 
             // コメント更新
             userDataManager.Update(user);
-            CommentManager.GetInstance().Apply(user);
+            commentManager.Update(user);
 
             // ユーザー設定保存
-            var userSetting = UserSetting.GetInstance();
+            var userSetting = UserSetting.Instance;
             userSetting.UserDataList = userDataManager;
 
             Utility.SaveToXml<UserSetting>("users.xml", userSetting);

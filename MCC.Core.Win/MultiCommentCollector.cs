@@ -12,8 +12,7 @@ namespace MCC.Core.Win
         #region Singleton
 
         private static MultiCommentCollector instance;
-        public static MultiCommentCollector GetInstance() => instance ??= new();
-        public static void SetInstance(MultiCommentCollector inst) => instance = inst;
+        public static MultiCommentCollector Instance => instance ??= new();
 
         #endregion
     }

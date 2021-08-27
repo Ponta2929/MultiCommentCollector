@@ -24,8 +24,7 @@ namespace MultiCommentCollector
         #region Singleton
 
         private static UsersSettingWindow instance;
-        public static UsersSettingWindow GetInstance() => instance ??= new();
-        public static void SetInstance(UsersSettingWindow inst) => instance = inst;
+        public static UsersSettingWindow Instance => instance ??= new();
 
         #endregion
 
@@ -46,7 +45,7 @@ namespace MultiCommentCollector
             InitializeComponent();
 
             // バインド
-            UsersListView.ItemsSource = UserDataManager.GetInstance();
+            UsersListView.ItemsSource = UserDataManager.Instance;
         }
 
         private GridViewColumnHeader _lastHeaderClicked = null;

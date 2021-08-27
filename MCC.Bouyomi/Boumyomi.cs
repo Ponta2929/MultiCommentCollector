@@ -15,7 +15,7 @@ namespace MCC.Bouyomi
 {
     public class Boumyomi : IPluginReceiver, ISetting
     {
-        private Setting setting = Setting.GetInstance();
+        private Setting setting = Setting.Instance;
 
         public string Author => "ぽんた";
 
@@ -34,8 +34,8 @@ namespace MCC.Bouyomi
 
         public void PluginLoad()
         {
-            foreach (var item in Setting.GetInstance().BlackListItems)
-                BlackList.GetInstance().Add(item);
+            foreach (var item in Setting.Instance.BlackListItems)
+                BlackList.Instance.Add(item);
         }
 
         public void Receive(CommentData comment)
@@ -50,7 +50,6 @@ namespace MCC.Bouyomi
                     {
                         if (IsRead(comment))
                         {
-
                             Http.Get($"http://localhost:50080/Talk?text={HttpUtility.UrlEncode(DataFormat(comment))}");
                         }
                     }
@@ -70,52 +69,11 @@ namespace MCC.Bouyomi
             window.SizeToContent = SizeToContent.WidthAndHeight;
             window.WindowStartupLocation = WindowStartupLocation.CenterOwner;
             window.Show();
-        }
-
-        //public bool IsRead(CommentData comment)
-        //{
-        //    var blackList = BlackList.GetInstance();
-
-        //    foreach (var item in blackList)
-        //    {
-        //        var isHit = true;
-        //        var table = new Hashtable();
-
-        //        if (item.LiveName.Equals("*") && item.UserName.Equals("*") && item.UserID.Equals("*") && item.Comment.Equals("*"))
-        //            continue;
-
-        //        foreach (var p_comment in comment.GetType().GetProperties())
-        //        {
-        //            foreach (var p_item in item.GetType().GetProperties())
-        //            {
-        //                if (p_comment.Name.Equals(p_item.Name))
-        //                {
-        //                    var v_comment = p_comment.GetValue(comment) as string;
-        //                    var v_item = p_item.GetValue(item) as string;
-
-        //                    if (IsRegex(v_item))
-        //                        table[p_comment.Name] = Regex(v_comment, v_item);
-        //                    else if (v_item.Equals("*"))
-        //                        table[p_comment.Name] = true;
-        //                    else
-        //                        table[p_comment.Name] = v_comment.Equals(v_item);
-        //                }
-        //            }
-        //        }
-
-        //        foreach (var hit in table.Values)
-        //            isHit &= (bool)hit;
-
-        //        if (isHit)
-        //            return false;
-        //    }
-
-        //    return true;
-        //}
+        }     
 
         public bool IsRead(CommentData comment)
         {
-            var blackList = BlackList.GetInstance();
+            var blackList = BlackList.Instance;
 
             foreach (var item in blackList)
             {

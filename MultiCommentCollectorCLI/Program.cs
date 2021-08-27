@@ -61,43 +61,43 @@ namespace MultiCommentCollectorCLI
             {
                 Console.WriteLine($"接続リスト一覧");
 
-                if (ConnectionManager.GetInstance().Count == 0)
+                if (ConnectionManager.Instance.Count == 0)
                     Console.WriteLine($"    なし");
                 else
-                    for (var i = 0; i < ConnectionManager.GetInstance().Count; i++)
+                    for (var i = 0; i < ConnectionManager.Instance.Count; i++)
                     {
-                        var item = ConnectionManager.GetInstance()[i];
+                        var item = ConnectionManager.Instance[i];
                         Console.WriteLine($"{i} - {item.Plugin.PluginName}　URL:{item.URL}　状態:{(item.IsActive.Value ? "有効" : "無効")}");
                     }
             }
 
             if (commands.TryGetValue("-add", out var url))
-                MultiCommentCollector.GetInstance().AddURL(url, true);
+                MultiCommentCollector.Instance.AddURL(url, true);
 
 
             if (commands.TryGetValue("-remove", out var remove))
             {
-                if (int.TryParse(remove, out var result) && result < ConnectionManager.GetInstance().Count)
+                if (int.TryParse(remove, out var result) && result < ConnectionManager.Instance.Count)
                 {
-                    var item = ConnectionManager.GetInstance()[result];
-                    MultiCommentCollector.GetInstance().Inactivate(item);
-                    ConnectionManager.GetInstance().Remove(item);
+                    var item = ConnectionManager.Instance[result];
+                    MultiCommentCollector.Instance.Inactivate(item);
+                    ConnectionManager.Instance.Remove(item);
                 }
             }
             if (commands.TryGetValue("-activate", out var activate))
             {
-                if (int.TryParse(activate, out var result) && result < ConnectionManager.GetInstance().Count)
+                if (int.TryParse(activate, out var result) && result < ConnectionManager.Instance.Count)
                 {
-                    var item = ConnectionManager.GetInstance()[result];
-                    MultiCommentCollector.GetInstance().Activate(item);
+                    var item = ConnectionManager.Instance[result];
+                    MultiCommentCollector.Instance.Activate(item);
                 }
             }
             if (commands.TryGetValue("-inactivate", out var inactivate))
             {
-                if (int.TryParse(inactivate, out var result) && result < ConnectionManager.GetInstance().Count)
+                if (int.TryParse(inactivate, out var result) && result < ConnectionManager.Instance.Count)
                 {
-                    var item = ConnectionManager.GetInstance()[result];
-                    MultiCommentCollector.GetInstance().Inactivate(item);
+                    var item = ConnectionManager.Instance[result];
+                    MultiCommentCollector.Instance.Inactivate(item);
                 }
             }
 
@@ -126,7 +126,7 @@ namespace MultiCommentCollectorCLI
 
         static void Log_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            var item = LogManager.GetInstance()[e.NewStartingIndex];
+            var item = LogManager.Instance[e.NewStartingIndex];
             Console.WriteLine($"[{item.Date}] {item.SenderName} * {item.Log}");
         }
 
@@ -134,7 +134,7 @@ namespace MultiCommentCollectorCLI
         {
             if (IsComment)
             {
-                var item = CommentManager.GetInstance()[e.NewStartingIndex];
+                var item = CommentManager.Instance[e.NewStartingIndex];
                 Console.WriteLine($"[{item.PostTime}] {item.LiveName} * {item.UserName} - {item.Comment}");
             }
         }
@@ -142,29 +142,29 @@ namespace MultiCommentCollectorCLI
         static void ApplicationStart()
         {
             AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
-            Setting setting = Setting.GetInstance();
-            LogManager.GetInstance().CollectionChanged += Log_CollectionChanged;
-            CommentManager.GetInstance().CollectionChanged += Comment_CollectionChanged;
+            Setting setting = Setting.Instance;
+            LogManager.Instance.CollectionChanged += Log_CollectionChanged;
+            CommentManager.Instance.CollectionChanged += Comment_CollectionChanged;
 
-            foreach (var item in Setting.GetInstance().ConnectionList)
-                ConnectionManager.GetInstance().Add(item);
+            foreach (var item in Setting.Instance.ConnectionList)
+                ConnectionManager.Instance.Add(item);
 
-            MultiCommentCollector.GetInstance().Apply();
-            MultiCommentCollector.GetInstance().ServerStart();
+            MultiCommentCollector.Instance.Apply();
+            MultiCommentCollector.Instance.ServerStart();
         }
 
         static void ApplicationExit()
         {
-            MCC.Core.MultiCommentCollector.GetInstance().ServerStop();
+            MCC.Core.MultiCommentCollector.Instance.ServerStop();
 
-            Setting.GetInstance().ConnectionList = ConnectionManager.GetInstance();
+            Setting.Instance.ConnectionList = ConnectionManager.Instance;
 
-            foreach (var item in PluginManager.GetInstance())
+            foreach (var item in PluginManager.Instance)
                 item.PluginClose();
 
             try
             {
-                XmlSerializer.FileSerialize<Setting>($"{Path.GetDirectoryName(Environment.GetCommandLineArgs()[0])}\\setting.xml", Setting.GetInstance());
+                XmlSerializer.FileSerialize<Setting>($"{Path.GetDirectoryName(Environment.GetCommandLineArgs()[0])}\\setting.xml", Setting.Instance);
             }
             catch
             {

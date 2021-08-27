@@ -12,8 +12,7 @@ namespace MCC.Bouyomi
         #region Singleton
 
         private static BlackList instance;
-        public static BlackList GetInstance() => instance ?? (instance = new());
-        public static void SetInstance(BlackList inst) => instance = inst;
+        public static BlackList Instance => instance ??= new();
 
         #endregion
     }

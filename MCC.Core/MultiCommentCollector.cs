@@ -18,19 +18,18 @@ namespace MCC.Core
         #region Singleton
 
         private static MultiCommentCollector instance;
-        public static MultiCommentCollector GetInstance() => instance ??= new();
-        public static void SetInstance(MultiCommentCollector inst) => instance = inst;
+        public static MultiCommentCollector Instance => instance ??= new();
 
         #endregion
 
         // ------------------------------------------------------------------------------------ //
-        private CommentReceiverServer receiverServer = CommentReceiverServer.GetInstance();
-        private CommentGeneratorServer generatorServer = CommentGeneratorServer.GetInstance();
-        private ConnectionManager connectionManager = ConnectionManager.GetInstance();
-        private CommentManager commentManager = CommentManager.GetInstance();
-        private PluginManager pluginManager = PluginManager.GetInstance();
-        private LogManager logManager = LogManager.GetInstance();
-        private UserDataManager userDataManager = UserDataManager.GetInstance();
+        private CommentReceiverServer receiverServer = CommentReceiverServer.Instance;
+        private CommentGeneratorServer generatorServer = CommentGeneratorServer.Instance;
+        private ConnectionManager connectionManager = ConnectionManager.Instance;
+        private CommentManager commentManager = CommentManager.Instance;
+        private PluginManager pluginManager = PluginManager.Instance;
+        private LogManager logManager = LogManager.Instance;
+        private UserDataManager userDataManager = UserDataManager.Instance;
         // ------------------------------------------------------------------------------------ //
 
         public MultiCommentCollector()

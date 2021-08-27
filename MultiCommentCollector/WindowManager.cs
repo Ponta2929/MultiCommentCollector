@@ -16,43 +16,43 @@ namespace MultiCommentCollector
     {
         public static void ApplicationStart()
         {
-            var setting = Setting.GetInstance();
+            var setting = Setting.Instance;
 
             Application.Current.MainWindow.Closing += ApplicationClosing;
 
             // 接続リスト
             foreach (var item in setting.ConnectionList)
-                ConnectionManager.GetInstance().Add(item);
+                ConnectionManager.Instance.Add(item);
 
-            foreach (var item in UserSetting.GetInstance().UserDataList)
-                UserDataManager.GetInstance().Add(item);
+            foreach (var item in UserSetting.Instance.UserDataList)
+                UserDataManager.Instance.Add(item);
 
             // サーバー開始
-            CommentGeneratorServer.GetInstance().Port = setting.Servers.CommentGeneratorServerPort.Value;
-            CommentReceiverServer.GetInstance().Port = setting.Servers.CommentReceiverServerPort.Value;
-            MCC.Core.Win.MultiCommentCollector.GetInstance().Apply();
-            MCC.Core.Win.MultiCommentCollector.GetInstance().ServerStart();
+            CommentGeneratorServer.Instance.Port = setting.Servers.CommentGeneratorServerPort.Value;
+            CommentReceiverServer.Instance.Port = setting.Servers.CommentReceiverServerPort.Value;
+            MCC.Core.Win.MultiCommentCollector.Instance.Apply();
+            MCC.Core.Win.MultiCommentCollector.Instance.ServerStart();
         }
 
         private static void ApplicationClosing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            MCC.Core.Win.MultiCommentCollector.GetInstance().ServerStop();
+            MCC.Core.Win.MultiCommentCollector.Instance.ServerStop();
 
-            Setting.GetInstance().ConnectionList = ConnectionManager.GetInstance();
+            Setting.Instance.ConnectionList = ConnectionManager.Instance;
 
-            foreach (var item in PluginManager.GetInstance())
+            foreach (var item in PluginManager.Instance)
                 item.PluginClose();
 
-            Utility.SaveToXml<Setting>("setting.xml", Setting.GetInstance());
+            Utility.SaveToXml<Setting>("setting.xml", Setting.Instance);
 
-            LogWindow.GetInstance().IsOwnerClose = true;
+            LogWindow.Instance.IsOwnerClose = true;
         }
 
         public static void ShowLogWindow()
         {
-            LogWindow.GetInstance().Owner = Application.Current.MainWindow;
-            LogWindow.GetInstance().Show();
-            LogWindow.GetInstance().Activate();
+            LogWindow.Instance.Owner = Application.Current.MainWindow;
+            LogWindow.Instance.Show();
+            LogWindow.Instance.Activate();
         }
 
         public static void ShowPluginWindow()
@@ -79,11 +79,11 @@ namespace MultiCommentCollector
 
         public static void ShowUsersSettingWindow()
         {
-            UsersSettingWindow.GetInstance().Owner = Application.Current.MainWindow;
-            UsersSettingWindow.GetInstance().Show();
-            UsersSettingWindow.GetInstance().Activate();
+            UsersSettingWindow.Instance.Owner = Application.Current.MainWindow;
+            UsersSettingWindow.Instance.Show();
+            UsersSettingWindow.Instance.Activate();
         }
-        
+
 
         public static void CloseWindow<T>() where T : Window
         {
@@ -95,8 +95,12 @@ namespace MultiCommentCollector
         public static void CloseWindow(object viewModel)
         {
             foreach (var window in Application.Current.Windows)
-                if (((Window)window).DataContext is not null && ((Window)window).DataContext.Equals(viewModel))
-                    ((Window)window).Close();
+            {
+                var target = window as Window;
+
+                if (target.DataContext is not null && target.DataContext.Equals(viewModel))
+                    target.Close();
+            }
         }
 
         public static void ApplicationShutdown()

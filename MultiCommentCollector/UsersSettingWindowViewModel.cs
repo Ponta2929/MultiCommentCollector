@@ -1,5 +1,6 @@
 ﻿using MCC.Core.Manager;
 using MCC.Utility;
+using MultiCommentCollector.Extensions;
 using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
 using System;
@@ -48,17 +49,32 @@ namespace MultiCommentCollector
             if (user is null)
                 return;
 
-            var userDataManager = UserDataManager.GetInstance();
+            var userDataManager = UserDataManager.Instance;
 
             // 削除
-            if (userDataManager.Remove(user))
+            if (userDataManager.Remove(CommentManager.Instance, user))
             {
                 // ユーザー設定保存
-                var userSetting = UserSetting.GetInstance();
+                var userSetting = UserSetting.Instance;
                 userSetting.UserDataList = userDataManager;
 
                 Utility.SaveToXml<UserSetting>("users.xml", userSetting);
             }
+
+            //if (user is null)
+            //    return;
+
+            //var userDataManager = UserDataManager.Instance;
+
+            //// 削除
+            //if (userDataManager.Remove(user))
+            //{
+            //    // ユーザー設定保存
+            //    var userSetting = UserSetting.Instance;
+            //    userSetting.UserDataList = userDataManager;
+
+            //    Utility.SaveToXml<UserSetting>("users.xml", userSetting);
+            //}
         }
     }
 }

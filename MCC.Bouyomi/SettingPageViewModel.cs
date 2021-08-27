@@ -12,13 +12,13 @@ namespace MCC.Bouyomi
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private Setting setting = Setting.GetInstance();
+        private Setting setting = Setting.Instance;
 
         public string Format
         {
             get => setting.Format;
             set => Set(ref setting.Format, value);
-        } 
+        }
 
         public string ApplicationPath
         {
@@ -42,8 +42,8 @@ namespace MCC.Bouyomi
         /// プロパティの値が変更されたことを通知します。
         /// </summary>
         /// <param name="propertyName"></param>
-        protected virtual void OnPropertyChanged(string propertyName) =>
-            PropertyChanged?.Invoke(this, new(propertyName));
+        protected virtual void OnPropertyChanged(string propertyName)
+            => PropertyChanged?.Invoke(this, new(propertyName));
 
         protected void Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
         {

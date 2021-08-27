@@ -6,7 +6,7 @@ namespace MCC.Utility.Reflection
 {
     public static class PluginLoader
     {
-        public static T[] Load<T>(string fileName)
+        public static T[] Load<T>(string fileName) where T : class
         {
             if (!File.Exists(fileName))
                 throw new FileNotFoundException();
@@ -22,7 +22,7 @@ namespace MCC.Utility.Reflection
                 {
                     if (type.IsClass && type.IsPublic && !type.IsAbstract && type.GetInterface(interfaceName) != null)
                     {
-                        interfaces.Add((T)assembly.CreateInstance(type.FullName));
+                        interfaces.Add(assembly.CreateInstance(type.FullName) as T);
                     }
                 }
             }

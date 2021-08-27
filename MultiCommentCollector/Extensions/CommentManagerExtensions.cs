@@ -10,14 +10,14 @@ namespace MultiCommentCollector.Extensions
 {
     public static class CommentManagerExtensions
     {
-        public static void Apply(this CommentManager manager, UserData user)
+        public static void Update(this CommentManager manager, UserData user)
         {
             var source = manager.Where(x => x.LiveName.Equals(user.LiveName) && x.UserID.Equals(user.UserID)).ToArray();
 
-            if (source.Length > 0)
+            foreach (var item in source)
             {
-                source[0].BackColor = user.BackColor;
-                source[0].UserName = user.UserName;
+                item.BackColor = user.BackColor;
+                item.UserName = user.UserName;
             }
         }
     }

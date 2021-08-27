@@ -17,8 +17,7 @@ namespace MCC.Core.Server
         #region Singleton
 
         private static CommentReceiverServer instance;
-        public static CommentReceiverServer GetInstance() => instance ?? (instance = new());
-        public static void SetInstance(CommentReceiverServer inst) => instance = inst;
+        public static CommentReceiverServer Instance => instance ??= new();
 
         #endregion
 

@@ -18,10 +18,8 @@ namespace MultiCommentCollectorCLI
         #region Singleton
 
         private static Setting instance;
-        public static Setting GetInstance() => instance ??=
+        public static Setting Instance => instance ??=
             XmlSerializer.FileDeserialize<Setting>($"{Path.GetDirectoryName(Environment.GetCommandLineArgs()[0])}\\setting.xml");
-
-        public static void SetInstance(Setting inst) => instance = inst;
 
         #endregion
        

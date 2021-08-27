@@ -29,24 +29,26 @@ namespace MCC.Utility
         /// </summary>
         public int B { get; set; }
 
-        public static ColorData FromArgb(int a, int r, int g, int b) =>
-            new() { A = a, R = r, G = g, B = b };
+        public static ColorData FromArgb(int a, int r, int g, int b)
+            => new() { A = a, R = r, G = g, B = b };
 
-        public ColorData ToRgb() =>
-            new() { A = 255, R = R, G = G, B = B };
+        public ColorData ToRgb()
+            => new() { A = 255, R = R, G = G, B = B };
 
-        public override bool Equals(object obj) =>
-            base.Equals(obj);
+        public override bool Equals(object obj)
+            => base.Equals(obj);
 
-        public override int GetHashCode() =>
-            A ^ R ^ G ^ B;
+        public override int GetHashCode()
+            => A ^ R ^ G ^ B;
 
-        public override string ToString() => string.Format("#{0:X2}{1:X2}{2:X2}{3:X2}", A, R, G, B);
+        public override string ToString()
+            => string.Format("#{0:X2}{1:X2}{2:X2}{3:X2}", A, R, G, B);
     }
 
     public class ColorDataJsonConverter : JsonConverter<ColorData>
     {
-        public override ColorData Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) => ColorData.FromArgb(0, 0, 0, 0);
+        public override ColorData Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+            => ColorData.FromArgb(0, 0, 0, 0);
 
         public override void Write(Utf8JsonWriter writer, ColorData value, JsonSerializerOptions options)
         {

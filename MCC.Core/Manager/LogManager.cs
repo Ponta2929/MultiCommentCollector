@@ -7,8 +7,7 @@ namespace MCC.Core.Manager
         #region Singleton
 
         private static LogManager instance;
-        public static LogManager GetInstance() => instance ?? (instance = new());
-        public static void SetInstance(LogManager inst) => instance = inst;
+        public static LogManager Instance => instance ??= new();
 
         #endregion
     }

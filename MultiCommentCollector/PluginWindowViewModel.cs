@@ -45,6 +45,7 @@ namespace MultiCommentCollector
             Version = new ReactiveProperty<string>("").AddTo(disposable);
             SiteName = new ReactiveProperty<string>("").AddTo(disposable);
             Visibility = new ReactiveProperty<bool>(false).AddTo(disposable);
+
             SelectedChangedCommand = new ReactiveCommand<IPluginBase>().WithSubscribe(SetPluginInfo).AddTo(disposable);
         }
 

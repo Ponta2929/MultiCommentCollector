@@ -20,23 +20,23 @@ namespace MCC.Utility.Net
             try
             {
                 // ウェブリクエストを作成
-                var request = (HttpWebRequest)HttpWebRequest.Create(url);
+                var request = HttpWebRequest.Create(url) as HttpWebRequest;
                 request.Method = "GET";
 
                 // レスポンスの取得
-                using (var response = (HttpWebResponse)request.GetResponse())
+                using (var response = request.GetResponse() as HttpWebResponse)
                 using (var stream = response.GetResponseStream())
                 {
                     // ストリームの取得
                     if (stream != null)
                     {
-                        return (new StreamReader(stream, Encoding.UTF8)).ReadToEnd();
+                        return new StreamReader(stream, Encoding.UTF8).ReadToEnd();
                     }
                 }
             }
             catch
-            { 
-            
+            {
+
             }
             // なし
             return string.Empty;
@@ -53,12 +53,12 @@ namespace MCC.Utility.Net
             try
             {
                 // ウェブリクエストを作成
-                var request = (HttpWebRequest)WebRequest.Create(url);
+                var request = WebRequest.Create(url) as HttpWebRequest;
                 request.Method = "POST";
                 request.ContentType = "application/x-www-form-urlencoded";
 
                 // レスポンスの取得
-                using (var response = (HttpWebResponse)request.GetResponse())
+                using (var response = request.GetResponse() as HttpWebResponse)
                 {
                     // ストリームの取得
                     using (var stream = response.GetResponseStream())
@@ -75,6 +75,7 @@ namespace MCC.Utility.Net
             // なし
             return string.Empty;
         }
+
         /// <summary>
         /// Http:Postコマンドを実行します。
         /// </summary>
@@ -86,7 +87,7 @@ namespace MCC.Utility.Net
                 var boundary = System.Environment.TickCount.ToString();
 
                 // ウェブリクエストを作成
-                var request = (HttpWebRequest)WebRequest.Create(url);
+                var request = WebRequest.Create(url) as HttpWebRequest;
                 request.Method = "POST";
                 request.ContentType = $"multipart/form-data; boundary={boundary}";
 
@@ -99,8 +100,9 @@ namespace MCC.Utility.Net
                 {
                     requestStream.Write(encoded, 0, encoded.Length);
                 }
+
                 // レスポンスの取得
-                using (var response = (HttpWebResponse)request.GetResponse())
+                using (var response = request.GetResponse() as HttpWebResponse)
                 {
                     // ストリームの取得
                     using (var stream = response.GetResponseStream())
@@ -111,8 +113,8 @@ namespace MCC.Utility.Net
                 }
             }
             catch
-            { 
-            
+            {
+
             }
             return string.Empty;
         }

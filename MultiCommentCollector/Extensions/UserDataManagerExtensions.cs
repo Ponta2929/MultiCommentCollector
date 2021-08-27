@@ -29,5 +29,18 @@ namespace MultiCommentCollector.Extensions
                 manager.Add(user);
             }
         }
+
+        public static bool Remove(this UserDataManager manager, CommentManager commentManager, UserData user)
+        {
+            var source = commentManager.Where(x => x.LiveName.Equals(user.LiveName) && x.UserID.Equals(user.UserID)).ToArray();
+
+            foreach (var item in source)
+            {
+                item.BackColor = user.BeforeBackColor;
+                item.UserName = user.BeforeUserName;
+            }
+
+            return manager.Remove(user);
+        }
     }
 }

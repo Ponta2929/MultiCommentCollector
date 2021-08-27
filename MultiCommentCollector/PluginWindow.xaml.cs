@@ -11,8 +11,7 @@ namespace MultiCommentCollector
         #region Singleton
 
         private static PluginWindow instance;
-        public static PluginWindow GetInstance() => instance ??= new();
-        public static void SetInstance(PluginWindow inst) => instance = inst;
+        public static PluginWindow Instance => instance ??= new();
 
         #endregion
 
@@ -21,7 +20,7 @@ namespace MultiCommentCollector
             InitializeComponent();
 
             // バインド
-            PluginList.ItemsSource = PluginManager.GetInstance().Parent;
+            PluginList.ItemsSource = PluginManager.Instance.Parent;
         }
     }
 }

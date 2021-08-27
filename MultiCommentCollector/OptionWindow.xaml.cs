@@ -26,7 +26,7 @@ namespace MultiCommentCollector
             InitializeComponent();
 
             // バインド
-            ColorList.ItemsSource = Setting.GetInstance().Theme.Colors;
+            ColorList.ItemsSource = Setting.Instance.Theme.Colors;
         }
     }
 }

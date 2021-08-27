@@ -16,8 +16,7 @@ namespace MultiCommentCollector
         #region Singleton
 
         private static LogWindow instance;
-        public static LogWindow GetInstance() => instance ?? (instance = new());
-        public static void SetInstance(LogWindow inst) => instance = inst;
+        public static LogWindow Instance => instance ??= new();
 
         #endregion
 
@@ -38,7 +37,7 @@ namespace MultiCommentCollector
             InitializeComponent();
 
             // バインド
-            LogListView.ItemsSource = LogManager.GetInstance();
+            LogListView.ItemsSource = LogManager.Instance;
         }
 
         private void LogWindow_Closing(object sender, CancelEventArgs e)

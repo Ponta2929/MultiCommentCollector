@@ -20,9 +20,7 @@ namespace MultiCommentCollector
         #region Singleton
 
         private static Setting instance;
-        public static Setting GetInstance() => instance ??= Utility.LoadToXml<Setting>("setting.xml");
-
-        public static void SetInstance(Setting inst) => instance = inst;
+        public static Setting Instance => instance ??= Utility.LoadToXml<Setting>("setting.xml");
 
         #endregion
 
@@ -69,7 +67,7 @@ namespace MultiCommentCollector
         /// <summary>
         /// ConnectionList
         /// </summary>
-      public ReactiveCollection<ConnectionData> ConnectionList { get; set; } = new();
+        public ReactiveCollection<ConnectionData> ConnectionList { get; set; } = new();
     }
 
     [Serializable]
@@ -78,9 +76,7 @@ namespace MultiCommentCollector
         #region Singleton
 
         private static UserSetting instance;
-        public static UserSetting GetInstance() => instance ??= Utility.LoadToXml<UserSetting>("users.xml");
-
-        public static void SetInstance(UserSetting inst) => instance = inst;
+        public static UserSetting Instance => instance ??= Utility.LoadToXml<UserSetting>("users.xml");
 
         #endregion
 

@@ -27,7 +27,7 @@ namespace MultiCommentCollector
             disposable.Dispose();
         }
 
-        private Setting setting = Setting.GetInstance();
+        private Setting setting = Setting.Instance;
 
         public ReactiveProperty<double> Width { get; }
         public ReactiveProperty<double> Height { get; }
@@ -55,7 +55,12 @@ namespace MultiCommentCollector
             ContextMenuInfo.Subscribe(x => Filtering()).AddTo(disposable);
             ContextMenuDebug.Subscribe(x => Filtering()).AddTo(disposable);
 
-            var view = CollectionViewSource.GetDefaultView(LogManager.GetInstance());
+            CreateFilter();
+        }
+
+        private void CreateFilter()
+        {
+            var view = CollectionViewSource.GetDefaultView(LogManager.Instance);
             view.Filter = new Predicate<object>(FilterPredicate);
 
             var liveShaping = view as ICollectionViewLiveShaping;
@@ -84,6 +89,6 @@ namespace MultiCommentCollector
         }
 
         private void Filtering()
-            => CollectionViewSource.GetDefaultView(LogManager.GetInstance()).Refresh();
+            => CollectionViewSource.GetDefaultView(LogManager.Instance).Refresh();
     }
 }

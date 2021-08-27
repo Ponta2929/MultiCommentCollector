@@ -22,7 +22,7 @@ namespace MultiCommentCollector
         {
             this.Key = key;
 
-            SubItem = PluginManager.GetInstance().ToReadOnlyReactiveCollection(x => x.PluginName == key ? x : null);
+            SubItem = PluginManager.Instance.ToReadOnlyReactiveCollection(x => x.PluginName == key ? x : null);
         }
     }
 }

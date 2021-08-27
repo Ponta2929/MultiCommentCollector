@@ -11,8 +11,8 @@ namespace MCC.Utility
     {
         public LoggedEventArgs(LogLevel level, string log) : this(level, DateTime.Now, log) { }
 
-        public LoggedEventArgs(LogLevel level, DateTime date, string log) =>
-            (Level, Date, Log) = (level, date, log);
+        public LoggedEventArgs(LogLevel level, DateTime date, string log)
+            => (Level, Date, Log) = (level, date, log);
 
         /// <summary>
         /// レベル

@@ -11,10 +11,7 @@ namespace MCC.Twitch
         #region Singleton
 
         private static Setting instance;
-        public static Setting GetInstance() => instance ??=
-            JsonSerializer.FileDeserialize<Setting>(FilePath);
-
-        public static void SetInstance(Setting inst) => instance = inst;
+        public static Setting Instance => instance ??= JsonSerializer.FileDeserialize<Setting>(FilePath);
 
         #endregion
 
@@ -22,7 +19,7 @@ namespace MCC.Twitch
 
         public void Save()
         {
-            JsonSerializer.FileSerialize<Setting>(FilePath, Setting.GetInstance());
+            JsonSerializer.FileSerialize<Setting>(FilePath, Setting.Instance);
         }
     }
 }

@@ -17,8 +17,7 @@ namespace MCC.Core.Manager
         #region Singleton
 
         private static PluginManager instance;
-        public static PluginManager GetInstance() => instance ??= new();
-        public static void SetInstance(PluginManager inst) => instance = inst;
+        public static PluginManager Instance => instance ??= new();
 
         #endregion
 

@@ -11,7 +11,7 @@ namespace MCC.Twitch
 {
     public class Twitch : IrcClient, IPluginSender, ISetting
     {
-        private Setting setting = Setting.GetInstance();
+        private Setting setting = Setting.Instance;
 
         public string SiteName => "Twitch";
 

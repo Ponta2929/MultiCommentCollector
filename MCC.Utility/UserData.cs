@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace MCC.Utility
 {
     [Serializable]
-    public class UserData: INotifyPropertyChanged
+    public class UserData : INotifyPropertyChanged
     {
         /// <summary>
         /// 配信サイト名
@@ -38,6 +38,15 @@ namespace MCC.Utility
         [JsonPropertyName("BackColor")]
         public ColorData BackColor { get => backColor; set => Set(ref backColor, value); }
 
+        private string beforeUserName;
+
+        public string BeforeUserName { get => beforeUserName; set => Set(ref beforeUserName, value); }
+
+        private ColorData beforeBackColor;
+
+        public ColorData BeforeBackColor { get => beforeBackColor; set => Set(ref beforeBackColor, value); }
+
+
         public UserData() { }
 
         public UserData(CommentDataEx data)
@@ -46,6 +55,10 @@ namespace MCC.Utility
             this.UserID = data.UserID;
             this.UserName = data.UserName;
             this.BackColor = data.BackColor;
+
+            // 保存用
+            this.BeforeUserName = data.UserName;
+            this.BeforeBackColor = data.BackColor;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -54,8 +67,8 @@ namespace MCC.Utility
         /// プロパティの値が変更されたことを通知します。
         /// </summary>
         /// <param name="propertyName"></param>
-        protected virtual void OnPropertyChanged(string propertyName) =>
-            PropertyChanged?.Invoke(this, new(propertyName));
+        protected virtual void OnPropertyChanged(string propertyName)
+            => PropertyChanged?.Invoke(this, new(propertyName));
 
         protected void Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
         {
