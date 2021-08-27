@@ -42,7 +42,7 @@ namespace MultiCommentCollector
                 return;
 
             // ウィンドウ表示
-            WindowManager.ShowUserDataWindow(userData);
+            WindowManager.ShowUserSettingWindow(userData);
         }
         private void DeleteUserSetting(UserData user)
         {

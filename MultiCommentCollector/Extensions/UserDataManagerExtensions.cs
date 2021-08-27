@@ -17,12 +17,12 @@ namespace MultiCommentCollector.Extensions
         /// <param name="user"></param>
         public static void Update(this UserDataManager manager, UserData user)
         {
-            var userData = manager.Where(x => x.LiveName.Equals(user.LiveName) && x.UserID.Equals(user.UserID)).ToArray();
+            var userData = manager.FirstOrDefault(x => x.LiveName.Equals(user.LiveName) && x.UserID.Equals(user.UserID));
 
-            if (userData.Length > 0)
+            if (userData is not null)
             {
-                userData[0].UserName = user.UserName;
-                userData[0].BackColor = user.BackColor;
+                userData.UserName = user.UserName;
+                userData.BackColor = user.BackColor;
             }
             else
             {

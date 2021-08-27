@@ -1,5 +1,6 @@
 ﻿using MCC.Core.Manager;
 using MCC.Utility;
+using MCC.Utility.IO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,17 +20,11 @@ namespace MultiCommentCollector
     /// <summary>
     /// UserDataWindow.xaml の相互作用ロジック
     /// </summary>
-    public partial class UserDataWindow : MahApps.Metro.Controls.MetroWindow
+    public partial class UserSettingWindow : MahApps.Metro.Controls.MetroWindow
     {
-        public UserDataWindow()
+        public UserSettingWindow()
         {
             InitializeComponent();
-        }
-
-        public void CreateViewModel(CommentDataEx user)
-        {
-            this.Title = $"{user.LiveName} - " + (user.UserName is null || user.UserName.Equals("") ? user.UserID : user.UserName);
-            this.DataContext = new UserDataWindowViewModel(user);
         }
     }
 }

@@ -69,9 +69,9 @@ namespace MultiCommentCollector
             option.ShowDialog();
         }
 
-        public static void ShowUserDataWindow(UserData user)
+        public static void ShowUserSettingWindow(UserData user)
         {
-            var userData = new UserDataWindow();
+            var userData = new UserSettingWindow();
             MessageBroker.Default.Publish<UserData>(user);
             userData.Owner = Application.Current.MainWindow;
             userData.ShowDialog();
@@ -84,6 +84,13 @@ namespace MultiCommentCollector
             UsersSettingWindow.Instance.Activate();
         }
 
+        public static void ShowUserDataWindow(CommentDataEx user)
+        {
+            var userData = new UserDataWindow();
+            userData.CreateViewModel(user);
+            userData.Owner = Application.Current.MainWindow;
+            userData.Show();
+        }
 
         public static void CloseWindow<T>() where T : Window
         {

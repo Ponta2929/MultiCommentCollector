@@ -59,6 +59,7 @@
                                 <Setter.Value>
                                     <ContextMenu DataContext="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource Self}}">
                                         <MenuItem Header="ユーザー設定を開く(_O)" Command="{Binding ShowUserSettingCommand}" CommandParameter="{Binding PlacementTarget.Content, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                                        <MenuItem Header="コメント一覧を開く(_L)" Command="{Binding ShowUserDataCommand}" CommandParameter="{Binding PlacementTarget.Content, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
                                         <Separator />
                                         <MenuItem Header="コピー(_C)" >
                                             <i:Interaction.Triggers>

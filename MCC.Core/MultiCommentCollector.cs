@@ -228,10 +228,10 @@ namespace MCC.Core
 
             // ユーザー設定があるか
             var data = new CommentDataEx(e.CommentData);
-            var userData = userDataManager.Where(x => x.LiveName.Equals(data.LiveName) && x.UserID.Equals(data.UserID)).ToArray();
+            var userData = userDataManager.FirstOrDefault(x => x.LiveName.Equals(data.LiveName) && x.UserID.Equals(data.UserID));
 
-            if (userData.Length > 0)
-                data.SetUserData(userData[0]);
+            if (userData is not null)
+                data.SetUserData(userData);
 
             // コメントジェネレーターで送信
             generatorServer.SendData<CommentDataEx>(data);

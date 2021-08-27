@@ -1,19 +1,16 @@
-﻿using MCC.Core.Manager;
+﻿using MahApps.Metro.Controls;
+using MCC.Core.Manager;
 using MCC.Utility;
-using MCC.Utility.IO;
-using MultiCommentCollector.Extensions;
+using MultiCommentCollector.Helper;
 using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
-using Reactive.Bindings.Notifiers;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Reactive.Disposables;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Media;
+using System.Text.RegularExpressions;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
 
 namespace MultiCommentCollector
 {
@@ -31,64 +28,106 @@ namespace MultiCommentCollector
             disposable.Dispose();
         }
 
-        public ReactiveProperty<string> LiveName { get; }
-        public ReactiveProperty<string> UserID { get; }
-        public ReactiveProperty<string> UserName { get; }
-        public ReactiveProperty<Color> BackgroundColor { get; }
-        public ReactiveCommand CloseWindowCommand { get; }
-        public ReactiveCommand OkClickCommand { get; }
+        private string liveName, userId;
+        public ReactiveCommand<MenuItem> MenuItemOpenedCommand { get; }
 
-        public UserDataWindowViewModel()
+
+        public CollectionViewSource Filterd { get; }
+
+        public UserDataWindowViewModel(CommentDataEx user)
         {
-            LiveName = new ReactiveProperty<string>("").AddTo(disposable);
-            UserID = new ReactiveProperty<string>("").AddTo(disposable);
-            UserName = new ReactiveProperty<string>("").AddTo(disposable);
-            BackgroundColor = new ReactiveProperty<Color>(Color.FromArgb(0, 0, 0, 0)).AddTo(disposable);
+            MenuItemOpenedCommand = new ReactiveCommand<MenuItem>().WithSubscribe(MenuItemCopyOpened).AddTo(disposable);
 
-            // Commands
-            OkClickCommand = new ReactiveCommand().WithSubscribe(OkButtonClick).AddTo(disposable);
-            CloseWindowCommand = new ReactiveCommand().WithSubscribe(() => WindowManager.CloseWindow(this)).AddTo(disposable);
+            this.liveName = user.LiveName;
+            this.userId = user.UserID;
 
-            MessageBroker.Default.Subscribe<UserData>(SetUserData).AddTo(disposable);
+            Filterd = new CollectionViewSource()
+            {
+                Source = CommentManager.Instance
+            };
+            Filterd.Filter += Filterd_Filter;
         }
 
-        private void OkButtonClick()
+        private void Filterd_Filter(object sender, FilterEventArgs e)
         {
-            var userDataManager = UserDataManager.Instance;
-            var commentManager = CommentManager.Instance;
-            var user = new UserData()
-            {
-                UserID = UserID.Value,
-                UserName = UserName.Value,
-                LiveName = LiveName.Value,
-                BackColor = ColorData.FromArgb(BackgroundColor.Value.A, BackgroundColor.Value.R, BackgroundColor.Value.G, BackgroundColor.Value.B)
-            };
+            var item = e.Item as CommentDataEx;
 
-            // コメント更新
-            userDataManager.Update(user);
-            commentManager.Update(user);
-
-            // ユーザー設定保存
-            var userSetting = UserSetting.Instance;
-            userSetting.UserDataList = userDataManager;
-
-            Utility.SaveToXml<UserSetting>("users.xml", userSetting);
-
-            WindowManager.CloseWindow(this);
+            if (item is not null && liveName == item.LiveName && userId == item.UserID)
+                e.Accepted = true;
+            else
+                e.Accepted = false;
         }
 
         /// <summary>
-        /// ユーザーデータ設定
+        /// 項目右クリック時の子メニューを作成
         /// </summary>
-        private void SetUserData(UserData user)
+        private void MenuItemCopyOpened(MenuItem menu)
         {
-            if (user is null)
-                return;
+            var owner = menu.GetParentObject().FindAncestor<ContextMenu>();
+            var commentData = (owner.PlacementTarget as ListViewItem).Content as CommentDataEx;
 
-            LiveName.Value = user.LiveName;
-            UserID.Value = user.UserID;
-            UserName.Value = user.UserName;
-            BackgroundColor.Value = Color.FromArgb((byte)user.BackColor.A, (byte)user.BackColor.R, (byte)user.BackColor.G, (byte)user.BackColor.B);
+            if (commentData is not null)
+            {
+                menu.Items.Clear();
+
+                // コンテキストメニュー設定
+                CreateMenuItemToCopy(menu, commentData.LiveName);
+                CreateMenuItemToCopy(menu, commentData.PostTime.ToString("HH:mm:ss"));
+                CreateMenuItemToCopy(menu, commentData.UserID);
+                CreateMenuItemToCopy(menu, commentData.UserName);
+                CreateMenuItemToCopy(menu, commentData.Comment);
+
+                // コメントデータからURL検出
+                CreateMenuItemToURL(menu, commentData.Comment);
+            }
         }
+
+        /// <summary>
+        /// コピー用メニューを作成
+        /// </summary>
+        private bool CreateMenuItemToCopy(MenuItem owner, string header)
+        {
+            if (header == null || header.Equals(""))
+                return false;
+
+            var content = new MenuItem();
+            content.Header = header;
+            content.Click += MenuItemCopy_Click;
+
+            owner.Items.Add(content);
+
+            return true;
+        }
+
+        /// <summary>
+        /// コピー用メニューを作成(URL)
+        /// </summary>
+        private bool CreateMenuItemToURL(MenuItem owner, string header)
+        {
+            var separator = false;
+            var reg = @"http(s)?://([\w-]+\.)+[\w-]+(/[\w- ./?%&=]*)?";
+            var r = new Regex(reg, RegexOptions.IgnoreCase);
+            var collection = r.Matches(header);
+
+            foreach (Match m in collection)
+            {
+                if (m.Success)
+                {
+                    if (!separator)
+                    {
+                        owner.Items.Add(new Separator());
+                        separator = true;
+                    }
+
+                    // コンテキストメニュー設定
+                    CreateMenuItemToCopy(owner, m.Value);
+                }
+            }
+
+            return separator;
+        }
+
+        private void MenuItemCopy_Click(object sender, RoutedEventArgs _)
+            => Clipboard.SetData(DataFormats.Text, (sender as MenuItem).Header);
     }
 }

@@ -84,7 +84,7 @@ namespace MCC.Core.Manager
                 {
                     if (Items.Count > MaxSize.Value)
                     {
-                        RemoveAt(0);
+                        SyncRemoveAt(0);
                     }
                 }
             }

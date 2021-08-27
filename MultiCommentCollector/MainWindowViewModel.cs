@@ -51,7 +51,8 @@ namespace MultiCommentCollector
         public ReactiveCommand<ConnectionData> DeleteCommand { get; }
         public ReactiveCommand<ConnectionData> ToggleCommand { get; }
         public ReactiveCommand<RoutedEventArgs> ColumnHeaderClickCommand { get; }
-        public ReactiveCommand<CommentDataEx> ShowUserSettingCommand { get; }
+        public ReactiveCommand<object> ShowUserSettingCommand { get; }
+        public ReactiveCommand<object> ShowUserDataCommand { get; }
         public ReactiveCommand<MenuItem> MenuItemOpenedCommand { get; }
         public ReactiveCollection<MenuItem> ParentMenuPlugins { get; }
 
@@ -79,8 +80,9 @@ namespace MultiCommentCollector
             DeleteCommand = new ReactiveCommand<ConnectionData>().WithSubscribe(RemoveConnection).AddTo(disposable);
             ToggleCommand = new ReactiveCommand<ConnectionData>().WithSubscribe(ToggleConnection).AddTo(disposable);
             ColumnHeaderClickCommand = new ReactiveCommand<RoutedEventArgs>().WithSubscribe(UserHeader_Click).AddTo(disposable);
-            ShowUserSettingCommand = new ReactiveCommand<CommentDataEx>().WithSubscribe(ShowUserSetting).AddTo(disposable);
-            MenuItemOpenedCommand = new ReactiveCommand<MenuItem>().WithSubscribe(x => MenuItemCopyOpened(x)).AddTo(disposable);
+            ShowUserSettingCommand = new ReactiveCommand<object>().WithSubscribe(ShowUserSetting).AddTo(disposable);
+            ShowUserDataCommand = new ReactiveCommand<object>().WithSubscribe(x => { if (x is CommentDataEx commentData) WindowManager.ShowUserDataWindow(commentData); }).AddTo(disposable);
+            MenuItemOpenedCommand = new ReactiveCommand<MenuItem>().WithSubscribe(MenuItemCopyOpened).AddTo(disposable);
 
             // Theme
             setting.Theme.IsDarkMode.Subscribe(x => ThemeManager.Current.ChangeTheme(Application.Current, $"{(x ? "Dark" : "Light")}.{setting.Theme.ThemeColor.Value}")).AddTo(disposable);
@@ -196,16 +198,17 @@ namespace MultiCommentCollector
         /// ユーザー設定ウィンドウを表示
         /// </summary>
         /// <param name="commentData"></param>
-        private void ShowUserSetting(CommentDataEx commentData)
+        private void ShowUserSetting(object data)
         {
-            if (commentData is null)
-                return;
+            if (data is CommentDataEx commentData)
+            {
 
-            var userDataManager = UserDataManager.Instance;
-            var usersData = userDataManager.Where(x => x.LiveName.Equals(commentData.LiveName) && x.UserID.Equals(commentData.UserID)).ToArray();
+                var userDataManager = UserDataManager.Instance;
+                var usersData = userDataManager.FirstOrDefault(x => x.LiveName.Equals(commentData.LiveName) && x.UserID.Equals(commentData.UserID));
 
-            // ウィンドウ表示
-            WindowManager.ShowUserDataWindow(usersData.Length > 0 ? usersData[0] : new(commentData));
+                // ウィンドウ表示
+                WindowManager.ShowUserSettingWindow(usersData ?? new(commentData));
+            }
         }
 
         /// <summary>
