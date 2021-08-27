@@ -7,7 +7,7 @@ namespace MCC.Utility
     [Serializable]
     public class CommentDataEx : CommentData
     {
-        private ColorData backColor = new ColorData();
+        private ColorData backColor;
 
         [JsonPropertyName("BackColor")]
         public ColorData BackColor { get => backColor; set => Set(ref backColor, value); }
@@ -22,6 +22,7 @@ namespace MCC.Utility
             this.PostType = data.PostType;
             this.UserID = data.UserID;
             this.UserName = data.UserName;
+            this.BackColor = ColorData.FromArgb(0, 255, 255, 255);
         }
 
         public void SetUserData(UserData userData)

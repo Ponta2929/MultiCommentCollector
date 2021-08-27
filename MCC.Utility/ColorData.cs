@@ -48,7 +48,7 @@ namespace MCC.Utility
     public class ColorDataJsonConverter : JsonConverter<ColorData>
     {
         public override ColorData Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-            => ColorData.FromArgb(0, 0, 0, 0);
+            => ColorData.FromArgb(0, 255, 255, 255);
 
         public override void Write(Utf8JsonWriter writer, ColorData value, JsonSerializerOptions options)
         {

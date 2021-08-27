@@ -60,21 +60,6 @@ namespace MultiCommentCollector
 
                 Utility.SaveToXml<UserSetting>("users.xml", userSetting);
             }
-
-            //if (user is null)
-            //    return;
-
-            //var userDataManager = UserDataManager.Instance;
-
-            //// 削除
-            //if (userDataManager.Remove(user))
-            //{
-            //    // ユーザー設定保存
-            //    var userSetting = UserSetting.Instance;
-            //    userSetting.UserDataList = userDataManager;
-
-            //    Utility.SaveToXml<UserSetting>("users.xml", userSetting);
-            //}
         }
     }
 }

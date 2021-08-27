@@ -1,6 +1,4 @@
-﻿using MCC.Core;
-using MCC.Core.Manager;
-using System.Windows;
+﻿using MCC.Core.Manager;
 
 namespace MultiCommentCollector
 {

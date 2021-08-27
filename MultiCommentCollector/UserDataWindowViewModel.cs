@@ -71,63 +71,15 @@ namespace MultiCommentCollector
                 menu.Items.Clear();
 
                 // コンテキストメニュー設定
-                CreateMenuItemToCopy(menu, commentData.LiveName);
-                CreateMenuItemToCopy(menu, commentData.PostTime.ToString("HH:mm:ss"));
-                CreateMenuItemToCopy(menu, commentData.UserID);
-                CreateMenuItemToCopy(menu, commentData.UserName);
-                CreateMenuItemToCopy(menu, commentData.Comment);
+                Utility.CreateMenuItemToCopy(menu, commentData.LiveName);
+                Utility.CreateMenuItemToCopy(menu, commentData.PostTime.ToString("HH:mm:ss"));
+                Utility.CreateMenuItemToCopy(menu, commentData.UserID);
+                Utility.CreateMenuItemToCopy(menu, commentData.UserName);
+                Utility.CreateMenuItemToCopy(menu, commentData.Comment);
 
                 // コメントデータからURL検出
-                CreateMenuItemToURL(menu, commentData.Comment);
+                Utility.CreateMenuItemToURL(menu, commentData.Comment);
             }
         }
-
-        /// <summary>
-        /// コピー用メニューを作成
-        /// </summary>
-        private bool CreateMenuItemToCopy(MenuItem owner, string header)
-        {
-            if (header == null || header.Equals(""))
-                return false;
-
-            var content = new MenuItem();
-            content.Header = header;
-            content.Click += MenuItemCopy_Click;
-
-            owner.Items.Add(content);
-
-            return true;
-        }
-
-        /// <summary>
-        /// コピー用メニューを作成(URL)
-        /// </summary>
-        private bool CreateMenuItemToURL(MenuItem owner, string header)
-        {
-            var separator = false;
-            var reg = @"http(s)?://([\w-]+\.)+[\w-]+(/[\w- ./?%&=]*)?";
-            var r = new Regex(reg, RegexOptions.IgnoreCase);
-            var collection = r.Matches(header);
-
-            foreach (Match m in collection)
-            {
-                if (m.Success)
-                {
-                    if (!separator)
-                    {
-                        owner.Items.Add(new Separator());
-                        separator = true;
-                    }
-
-                    // コンテキストメニュー設定
-                    CreateMenuItemToCopy(owner, m.Value);
-                }
-            }
-
-            return separator;
-        }
-
-        private void MenuItemCopy_Click(object sender, RoutedEventArgs _)
-            => Clipboard.SetData(DataFormats.Text, (sender as MenuItem).Header);
     }
 }

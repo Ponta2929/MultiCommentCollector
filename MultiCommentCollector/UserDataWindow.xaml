@@ -8,7 +8,7 @@
         xmlns:local="clr-namespace:MultiCommentCollector"
         xmlns:behavior="clr-namespace:MultiCommentCollector.Behavior"
         xmlns:converter="clr-namespace:MultiCommentCollector.Converter"
-        mc:Ignorable="d" Title="ユーザーデータ" Height="400" Width="600">
+        mc:Ignorable="d" Title="ユーザーデータ" Height="400" Width="600" TitleCharacterCasing="Normal">
     <Window.Resources>
         <converter:HeaderWidthConverter x:Key="HeaderWidthConverter"/>
     </Window.Resources>

@@ -6,6 +6,7 @@
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:local="clr-namespace:MultiCommentCollector"
         xmlns:converter="clr-namespace:MultiCommentCollector.Converter"
+        xmlns:converter_m="http://metro.mahapps.com/winfx/xaml/shared"
         xmlns:behavior="clr-namespace:MultiCommentCollector.Behavior"
         xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
         mc:Ignorable="d"
@@ -54,6 +55,7 @@
                     <ListView.ItemContainerStyle>
                         <Style TargetType="{x:Type ListViewItem}" BasedOn="{StaticResource MahApps.Styles.ListViewItem}">
                             <Setter Property="Background" Value="{Binding BackColor, Converter={StaticResource ColorDataConverter}}"/>
+                            <Setter Property="Foreground" Value="{Binding Background, RelativeSource={RelativeSource Self}, Converter={x:Static converter_m:BackgroundToForegroundConverter.Instance}}"/>
                             <Setter Property="Tag" Value="{Binding DataContext, RelativeSource={RelativeSource AncestorType=ListView}}" />
                             <Setter Property="ContextMenu">
                                 <Setter.Value>
