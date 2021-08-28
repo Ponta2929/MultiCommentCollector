@@ -10,7 +10,6 @@ using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Reactive.Disposables;
-using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -32,7 +31,7 @@ namespace MultiCommentCollector
         }
 
         private Setting setting = Setting.Instance;
-
+        private MCC.Core.Win.MultiCommentCollector mcc = MCC.Core.Win.MultiCommentCollector.Instance;
         public ReactiveProperty<double> Width { get; }
         public ReactiveProperty<double> Height { get; }
         public ReactiveProperty<double> Left { get; }
@@ -74,15 +73,15 @@ namespace MultiCommentCollector
             ShowOptionWindowCommand = new ReactiveCommand().WithSubscribe(WindowManager.ShowOptionWindow).AddTo(disposable);
             ShowUsersSettingWindowCommand = new ReactiveCommand().WithSubscribe(WindowManager.ShowUsersSettingWindow).AddTo(disposable);
             ApplicationShutdownCommand = new ReactiveCommand().WithSubscribe(WindowManager.ApplicationShutdown).AddTo(disposable);
-            EnterCommand = new ReactiveCommand<string>().WithSubscribe(x => MCC.Core.Win.MultiCommentCollector.Instance.AddURL(x)).AddTo(disposable);
-            ActivateCommand = new ReactiveCommand<ConnectionData>().WithSubscribe(x => MCC.Core.Win.MultiCommentCollector.Instance.Activate(x)).AddTo(disposable);
-            InactivateCommand = new ReactiveCommand<ConnectionData>().WithSubscribe(MCC.Core.Win.MultiCommentCollector.Instance.Inactivate).AddTo(disposable);
-            DeleteCommand = new ReactiveCommand<ConnectionData>().WithSubscribe(RemoveConnection).AddTo(disposable);
-            ToggleCommand = new ReactiveCommand<ConnectionData>().WithSubscribe(ToggleConnection).AddTo(disposable);
+            EnterCommand = new ReactiveCommand<string>().WithSubscribe(x => mcc.AddURL(x)).AddTo(disposable);
+            ActivateCommand = new ReactiveCommand<ConnectionData>().WithSubscribe(x => mcc.Activate(x)).AddTo(disposable);
+            InactivateCommand = new ReactiveCommand<ConnectionData>().WithSubscribe(mcc.Inactivate).AddTo(disposable);
+            DeleteCommand = new ReactiveCommand<ConnectionData>().WithSubscribe(mcc.RemoveConnection).AddTo(disposable);
+            ToggleCommand = new ReactiveCommand<ConnectionData>().WithSubscribe(mcc.ToggleConnection).AddTo(disposable);
             ColumnHeaderClickCommand = new ReactiveCommand<RoutedEventArgs>().WithSubscribe(UserHeader_Click).AddTo(disposable);
-            ShowUserSettingCommand = new ReactiveCommand<object>().WithSubscribe(ShowUserSetting).AddTo(disposable);
+            ShowUserSettingCommand = new ReactiveCommand<object>().WithSubscribe(x => WindowManager.ShowUserSettingWindow(x as CommentDataEx)).AddTo(disposable);
             ShowUserDataCommand = new ReactiveCommand<object>().WithSubscribe(x => { if (x is CommentDataEx commentData) WindowManager.ShowUserDataWindow(commentData); }).AddTo(disposable);
-            MenuItemOpenedCommand = new ReactiveCommand<MenuItem>().WithSubscribe(MenuItemCopyOpened).AddTo(disposable);
+            MenuItemOpenedCommand = new ReactiveCommand<MenuItem>().WithSubscribe(MenuItemCopy_Opened).AddTo(disposable);
 
             // Theme
             setting.Theme.IsDarkMode.Subscribe(x => ThemeManager.Current.ChangeTheme(Application.Current, $"{(x ? "Dark" : "Light")}.{setting.Theme.ThemeColor.Value}")).AddTo(disposable);
@@ -90,38 +89,12 @@ namespace MultiCommentCollector
 
             // プラグインメニュー作成
             ParentMenuPlugins = new ReactiveCollection<MenuItem>().AddTo(disposable);
-            AddMenuItemPlugins(); 
-        }
-
-        /// <summary>
-        /// 接続状況を切り替え
-        /// </summary>
-        private void ToggleConnection(ConnectionData connection)
-        {
-            if (connection is null)
-                return;
-
-            if (connection.IsActive.Value)
-                MCC.Core.Win.MultiCommentCollector.Instance.Inactivate(connection);
-            else
-                MCC.Core.Win.MultiCommentCollector.Instance.Activate(connection);
-        }
-
-        /// <summary>
-        /// 接続を削除
-        /// </summary>
-        /// <param name="connection"></param>
-        private void RemoveConnection(ConnectionData connection)
-        {
-            MCC.Core.Win.MultiCommentCollector.Instance.Inactivate(connection);
-            PluginManager.Instance.Remove(connection.Plugin);
-            ConnectionManager.Instance.Remove(connection);
+            AddMenuItemPlugins();
         }
 
         /// <summary>
         /// ユーザーID/ユーザー名ヘッダークリック
         /// </summary>
-        /// <param name="e"></param>
         private void UserHeader_Click(RoutedEventArgs e)
         {
             if (e.OriginalSource is GridViewColumnHeader header)
@@ -135,42 +108,6 @@ namespace MultiCommentCollector
                 {
                     header.Content = "ユーザー名";
                     header.Column.DisplayMemberBinding = new Binding("UserName");
-                }
-            }
-        }
-
-        private void MeunItemSetting_Click(object sender, RoutedEventArgs e)
-        {
-            var item = sender as MenuItem;
-
-            if (item.Items is not null && item.Items.Count > 0)
-            {
-                var window = new MetroWindow() { Owner = Application.Current.MainWindow };
-
-                (item.Items[0] as ISetting).ShowWindow(window);
-
-                SetHeaderFontSize(window);
-            }
-        }
-
-        /// <summary>
-        /// 子ウィンドウのヘッダーサイズを設定
-        /// </summary>
-        private void SetHeaderFontSize(DependencyObject element)
-        {
-            if (element is null)
-                return;
-
-            foreach (var child in LogicalTreeHelper.GetChildren(element))
-            {
-                if (child is DependencyObject control)
-                {
-                    if (control is TabControl tabControl)
-                    {
-                        HeaderedControlHelper.SetHeaderFontSize(tabControl, 14);
-                    }
-
-                    SetHeaderFontSize(child as DependencyObject);
                 }
             }
         }
@@ -194,44 +131,41 @@ namespace MultiCommentCollector
             }
         }
 
-        /// <summary>
-        /// ユーザー設定ウィンドウを表示
-        /// </summary>
-        /// <param name="commentData"></param>
-        private void ShowUserSetting(object data)
+        private void MeunItemSetting_Click(object sender, RoutedEventArgs e)
         {
-            if (data is CommentDataEx commentData)
+            var item = sender as MenuItem;
+
+            if (item.Items is not null && item.Items.Count > 0)
             {
+                var window = new MetroWindow() { Owner = Application.Current.MainWindow };
 
-                var userDataManager = UserDataManager.Instance;
-                var usersData = userDataManager.FirstOrDefault(x => x.LiveName.Equals(commentData.LiveName) && x.UserID.Equals(commentData.UserID));
+                (item.Items[0] as ISetting).ShowWindow(window);
 
-                // ウィンドウ表示
-                WindowManager.ShowUserSettingWindow(usersData ?? new(commentData));
+                Helper.TabControlHelper.SetHeaderFontSize(window, 14);
             }
         }
 
         /// <summary>
         /// 項目右クリック時の子メニューを作成
         /// </summary>
-        private void MenuItemCopyOpened(MenuItem menu)
+        private void MenuItemCopy_Opened(MenuItem menuItem)
         {
-            var owner = menu.GetParentObject().FindAncestor<ContextMenu>();
+            var owner = menuItem.GetParentObject().FindAncestor<ContextMenu>();
             var commentData = (owner.PlacementTarget as ListViewItem).Content as CommentDataEx;
 
             if (commentData is not null)
             {
-                menu.Items.Clear();
+                menuItem.Items.Clear();
 
-                // コンテキストメニュー設定
-                Utility.CreateMenuItemToCopy(menu, commentData.LiveName);
-                Utility.CreateMenuItemToCopy(menu, commentData.PostTime.ToString("HH:mm:ss"));
-                Utility.CreateMenuItemToCopy(menu, commentData.UserID);
-                Utility.CreateMenuItemToCopy(menu, commentData.UserName);
-                Utility.CreateMenuItemToCopy(menu, commentData.Comment);
+                // コピー項目設定
+                MenuItemHelper.CreateMenuItemToCopy(menuItem, commentData.LiveName);
+                MenuItemHelper.CreateMenuItemToCopy(menuItem, commentData.PostTime.ToString("HH:mm:ss"));
+                MenuItemHelper.CreateMenuItemToCopy(menuItem, commentData.UserID);
+                MenuItemHelper.CreateMenuItemToCopy(menuItem, commentData.UserName);
+                MenuItemHelper.CreateMenuItemToCopy(menuItem, commentData.Comment);
 
-                // コメントデータからURL検出
-                Utility.CreateMenuItemToURL(menu, commentData.Comment);
+                // コメントデータからURL抽出
+                MenuItemHelper.CreateMenuItemToCopyURL(menuItem, commentData.Comment);
             }
         }
     }

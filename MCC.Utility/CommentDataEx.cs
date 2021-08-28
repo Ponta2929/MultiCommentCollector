@@ -22,7 +22,6 @@ namespace MCC.Utility
             this.PostType = data.PostType;
             this.UserID = data.UserID;
             this.UserName = data.UserName;
-            this.BackColor = ColorData.FromArgb(0, 255, 255, 255);
         }
 
         public void SetUserData(UserData userData)

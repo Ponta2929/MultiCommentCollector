@@ -2,14 +2,9 @@
 using MCC.Core.Server;
 using MCC.Plugin;
 using MCC.Utility;
-using MCC.Utility.Reflection;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MCC.Core
 {
@@ -215,6 +210,33 @@ namespace MCC.Core
                 OnLogged(this, new(LogLevel.Info, $"無効なURLが入力されました。[{url}]"));
         }
 
+        /// <summary>
+        /// 接続状況を切り替え
+        /// </summary>
+        public void ToggleConnection(ConnectionData connection)
+        {
+            if (connection is null)
+                return;
+
+            if (connection.IsActive.Value)
+                Inactivate(connection);
+            else
+                Activate(connection);
+        }
+
+        /// <summary>
+        /// 接続を削除
+        /// </summary>
+        /// <param name="connection"></param>
+        public void RemoveConnection(ConnectionData connection)
+        {
+            Inactivate(connection);
+
+            // 削除
+            pluginManager.Remove(connection.Plugin);
+            connectionManager.Remove(connection);
+        }
+
         private void OnLogged(object sender, LoggedEventArgs e)
         {
             if (sender is IPluginBase pluginSender)
@@ -234,8 +256,7 @@ namespace MCC.Core
                 data.SetUserData(userData);
 
             // コメントジェネレーターで送信
-            generatorServer.SendData<CommentDataEx>(data);
-
+            generatorServer.SendData(data);
 
             // プラグインで送信
             foreach (var item in pluginManager)

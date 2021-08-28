@@ -84,7 +84,7 @@ namespace MCC.Core.Server
         /// <summary>
         /// データ送信
         /// </summary>
-        public void SendData<T>(T data, DataType type = DataType.Json)
+        public void SendData<T>(T data, DataType type = DataType.Json) where T : class
         {
             lock (syncObject)
             {
@@ -96,7 +96,7 @@ namespace MCC.Core.Server
                         var response = string.Empty;
 
                         if (type == DataType.Json)
-                            response = System.Text.Json.JsonSerializer.Serialize<T>((T)converted);
+                            response = System.Text.Json.JsonSerializer.Serialize<T>(converted as T);
                         else if (type == DataType.Xml)
                             response = XmlSerializer.Serialize<T>(converted);
 
@@ -116,11 +116,11 @@ namespace MCC.Core.Server
         {
             foreach (var info in data.GetType().GetFields())
                 if (info.FieldType == typeof(string))
-                    info.SetValue(data, XSSFilter((string)info.GetValue(data)));
+                    info.SetValue(data, XSSFilter(info.GetValue(data) as string));
 
             foreach (var info in data.GetType().GetProperties())
                 if (info.PropertyType == typeof(string))
-                    info.SetValue(data, XSSFilter((string)info.GetValue(data)));
+                    info.SetValue(data, XSSFilter(info.GetValue(data) as string));
 
             return data;
         }

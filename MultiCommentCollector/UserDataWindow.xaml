@@ -13,7 +13,7 @@
         <converter:HeaderWidthConverter x:Key="HeaderWidthConverter"/>
     </Window.Resources>
     <Grid>
-        <ListView x:Name="UserDataListView" ScrollViewer.HorizontalScrollBarVisibility="Hidden" ItemsSource="{Binding Path=Filterd.View}">
+        <ListView x:Name="UserDataListView" ScrollViewer.HorizontalScrollBarVisibility="Hidden" ItemsSource="{Binding Path=CommentFilter.View}">
             <i:Interaction.Behaviors>
                 <behavior:ListViewBehavior/>
             </i:Interaction.Behaviors>

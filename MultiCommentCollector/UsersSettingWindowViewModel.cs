@@ -1,6 +1,7 @@
 ﻿using MCC.Core.Manager;
 using MCC.Utility;
 using MultiCommentCollector.Extensions;
+using MultiCommentCollector.Helper;
 using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
 using System;
@@ -26,39 +27,31 @@ namespace MultiCommentCollector
             disposable.Clear();
             disposable.Dispose();
         }
+        private UserDataManager userDataManager = UserDataManager.Instance;
+        private CommentManager commentManager = CommentManager.Instance;
+        private UserSetting userSetting = UserSetting.Instance;
 
         public ReactiveCommand<UserData> ShowUserSettingCommand { get; }
         public ReactiveCommand<UserData> DeleteUserSettingCommand { get; }
 
         public UsersSettingWindowViewModel()
         {
-            ShowUserSettingCommand = new ReactiveCommand<UserData>().WithSubscribe(ShowUserSetting).AddTo(disposable);
+            ShowUserSettingCommand = new ReactiveCommand<UserData>().WithSubscribe(WindowManager.ShowUserSettingWindow).AddTo(disposable);
             DeleteUserSettingCommand = new ReactiveCommand<UserData>().WithSubscribe(DeleteUserSetting).AddTo(disposable);
         }
 
-        private void ShowUserSetting(UserData userData)
-        {
-            if (userData is null)
-                return;
-
-            // ウィンドウ表示
-            WindowManager.ShowUserSettingWindow(userData);
-        }
         private void DeleteUserSetting(UserData user)
         {
             if (user is null)
                 return;
 
-            var userDataManager = UserDataManager.Instance;
-
             // 削除
-            if (userDataManager.Remove(CommentManager.Instance, user))
+            if (userDataManager.Remove(commentManager, user))
             {
                 // ユーザー設定保存
-                var userSetting = UserSetting.Instance;
                 userSetting.UserDataList = userDataManager;
 
-                Utility.SaveToXml<UserSetting>("users.xml", userSetting);
+                SerializeHelper.SaveToXml<UserSetting>("users.xml", userSetting);
             }
         }
     }

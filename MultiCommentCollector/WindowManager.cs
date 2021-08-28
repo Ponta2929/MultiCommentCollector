@@ -5,54 +5,67 @@ using MCC.Core.Server;
 using MCC.Utility;
 using MCC.Utility.IO;
 using MCC.Utility.Text;
+using MultiCommentCollector.Helper;
 using Reactive.Bindings.Notifiers;
 using System;
 using System.IO;
+using System.Linq;
 using System.Windows;
 
 namespace MultiCommentCollector
 {
     public static class WindowManager
     {
+        private static MCC.Core.Win.MultiCommentCollector mcc = MCC.Core.Win.MultiCommentCollector.Instance;
+        private static CommentReceiverServer receiverServer = CommentReceiverServer.Instance;
+        private static CommentGeneratorServer generatorServer = CommentGeneratorServer.Instance;
+        private static ConnectionManager connectionManager = ConnectionManager.Instance;
+        private static CommentManager commentManager = CommentManager.Instance;
+        private static PluginManager pluginManager = PluginManager.Instance;
+        private static LogManager logManager = LogManager.Instance;
+        private static UserDataManager userDataManager = UserDataManager.Instance;
+        private static UserSetting userSetting = UserSetting.Instance;
+        private static Setting setting = Setting.Instance;
+        private static LogWindow logWindow = LogWindow.Instance;
+        private static UsersSettingWindow usersSettingWindow = UsersSettingWindow.Instance;
+
         public static void ApplicationStart()
         {
-            var setting = Setting.Instance;
-
             Application.Current.MainWindow.Closing += ApplicationClosing;
 
             // 接続リスト
             foreach (var item in setting.ConnectionList)
-                ConnectionManager.Instance.Add(item);
+                connectionManager.Add(item);
 
-            foreach (var item in UserSetting.Instance.UserDataList)
-                UserDataManager.Instance.Add(item);
+            foreach (var item in userSetting.UserDataList)
+                userDataManager.Add(item);
 
             // サーバー開始
-            CommentGeneratorServer.Instance.Port = setting.Servers.CommentGeneratorServerPort.Value;
-            CommentReceiverServer.Instance.Port = setting.Servers.CommentReceiverServerPort.Value;
-            MCC.Core.Win.MultiCommentCollector.Instance.Apply();
-            MCC.Core.Win.MultiCommentCollector.Instance.ServerStart();
+            generatorServer.Port = setting.Servers.CommentGeneratorServerPort.Value;
+            receiverServer.Port = setting.Servers.CommentReceiverServerPort.Value;
+            mcc.Apply();
+            mcc.ServerStart();
         }
 
         private static void ApplicationClosing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            MCC.Core.Win.MultiCommentCollector.Instance.ServerStop();
+            mcc.ServerStop();
 
-            Setting.Instance.ConnectionList = ConnectionManager.Instance;
+            setting.ConnectionList = connectionManager;
 
-            foreach (var item in PluginManager.Instance)
+            foreach (var item in pluginManager)
                 item.PluginClose();
 
-            Utility.SaveToXml<Setting>("setting.xml", Setting.Instance);
+            SerializeHelper.SaveToXml<Setting>("setting.xml", Setting.Instance);
 
-            LogWindow.Instance.IsOwnerClose = true;
+            logWindow.IsOwnerClose = true;
         }
 
         public static void ShowLogWindow()
         {
-            LogWindow.Instance.Owner = Application.Current.MainWindow;
-            LogWindow.Instance.Show();
-            LogWindow.Instance.Activate();
+            logWindow.Owner = Application.Current.MainWindow;
+            logWindow.Show();
+            logWindow.Activate();
         }
 
         public static void ShowPluginWindow()
@@ -69,23 +82,40 @@ namespace MultiCommentCollector
             option.ShowDialog();
         }
 
+        public static void ShowUserSettingWindow(CommentDataEx commentData)
+        {
+            if (commentData is not null)
+            {
+                var usersData = userDataManager.FirstOrDefault(x => x.LiveName.Equals(commentData.LiveName) && x.UserID.Equals(commentData.UserID));
+
+                // ウィンドウ表示
+                ShowUserSettingWindow(usersData ?? new(commentData));
+            }
+        }
+
         public static void ShowUserSettingWindow(UserData user)
         {
+            if (user is null)
+                return;
+
             var userData = new UserSettingWindow();
-            MessageBroker.Default.Publish<UserData>(user);
+            userData.CreateViewModel(user);
             userData.Owner = Application.Current.MainWindow;
             userData.ShowDialog();
         }
 
         public static void ShowUsersSettingWindow()
         {
-            UsersSettingWindow.Instance.Owner = Application.Current.MainWindow;
-            UsersSettingWindow.Instance.Show();
-            UsersSettingWindow.Instance.Activate();
+            usersSettingWindow.Owner = Application.Current.MainWindow;
+            usersSettingWindow.Show();
+            usersSettingWindow.Activate();
         }
 
         public static void ShowUserDataWindow(CommentDataEx user)
         {
+            if (user is null)
+                return;
+
             var userData = new UserDataWindow();
             userData.CreateViewModel(user);
             userData.Owner = Application.Current.MainWindow;

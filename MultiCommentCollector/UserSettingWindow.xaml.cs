@@ -26,5 +26,10 @@ namespace MultiCommentCollector
         {
             InitializeComponent();
         }
+
+        public void CreateViewModel(UserData user)
+        {
+            this.DataContext = new UserSettingWindowViewModel (user);
+        }
     }
 }

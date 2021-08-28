@@ -2,6 +2,7 @@
 using MCC.Utility;
 using MCC.Utility.IO;
 using MultiCommentCollector.Extensions;
+using MultiCommentCollector.Helper;
 using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
 using Reactive.Bindings.Notifiers;
@@ -38,18 +39,16 @@ namespace MultiCommentCollector
         public ReactiveCommand CloseWindowCommand { get; }
         public ReactiveCommand OkClickCommand { get; }
 
-        public UserSettingWindowViewModel()
+        public UserSettingWindowViewModel(UserData user)
         {
-            LiveName = new ReactiveProperty<string>("").AddTo(disposable);
-            UserID = new ReactiveProperty<string>("").AddTo(disposable);
-            UserName = new ReactiveProperty<string>("").AddTo(disposable);
-            BackgroundColor = new ReactiveProperty<Color>(Color.FromArgb(0, 0, 0, 0)).AddTo(disposable);
+            LiveName = new ReactiveProperty<string>(user.LiveName).AddTo(disposable);
+            UserID = new ReactiveProperty<string>(user.UserID).AddTo(disposable);
+            UserName = new ReactiveProperty<string>(user.UserName).AddTo(disposable);
+            BackgroundColor = new ReactiveProperty<Color>(Color.FromArgb((byte)user.BackColor.A, (byte)user.BackColor.R, (byte)user.BackColor.G, (byte)user.BackColor.B)).AddTo(disposable);
 
             // Commands
             OkClickCommand = new ReactiveCommand().WithSubscribe(OkButtonClick).AddTo(disposable);
             CloseWindowCommand = new ReactiveCommand().WithSubscribe(() => WindowManager.CloseWindow(this)).AddTo(disposable);
-
-            MessageBroker.Default.Subscribe<UserData>(SetUserData).AddTo(disposable);
         }
 
         private void OkButtonClick()
@@ -72,23 +71,9 @@ namespace MultiCommentCollector
             var userSetting = UserSetting.Instance;
             userSetting.UserDataList = userDataManager;
 
-            Utility.SaveToXml<UserSetting>("users.xml", userSetting);
+            SerializeHelper.SaveToXml<UserSetting>("users.xml", userSetting);
 
             WindowManager.CloseWindow(this);
-        }
-
-        /// <summary>
-        /// ユーザーデータ設定
-        /// </summary>
-        private void SetUserData(UserData user)
-        {
-            if (user is null)
-                return;
-
-            LiveName.Value = user.LiveName;
-            UserID.Value = user.UserID;
-            UserName.Value = user.UserName;
-            BackgroundColor.Value = Color.FromArgb((byte)user.BackColor.A, (byte)user.BackColor.R, (byte)user.BackColor.G, (byte)user.BackColor.B);
         }
     }
 }

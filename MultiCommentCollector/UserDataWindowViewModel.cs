@@ -31,8 +31,7 @@ namespace MultiCommentCollector
         private string liveName, userId;
         public ReactiveCommand<MenuItem> MenuItemOpenedCommand { get; }
 
-
-        public CollectionViewSource Filterd { get; }
+        public CollectionViewSource CommentFilter { get; }
 
         public UserDataWindowViewModel(CommentDataEx user)
         {
@@ -41,14 +40,14 @@ namespace MultiCommentCollector
             this.liveName = user.LiveName;
             this.userId = user.UserID;
 
-            Filterd = new CollectionViewSource()
+            CommentFilter = new CollectionViewSource()
             {
                 Source = CommentManager.Instance
             };
-            Filterd.Filter += Filterd_Filter;
+            CommentFilter.Filter += CommentFilter_Filter;
         }
 
-        private void Filterd_Filter(object sender, FilterEventArgs e)
+        private void CommentFilter_Filter(object sender, FilterEventArgs e)
         {
             var item = e.Item as CommentDataEx;
 
@@ -61,24 +60,24 @@ namespace MultiCommentCollector
         /// <summary>
         /// 項目右クリック時の子メニューを作成
         /// </summary>
-        private void MenuItemCopyOpened(MenuItem menu)
+        private void MenuItemCopyOpened(MenuItem menuItem)
         {
-            var owner = menu.GetParentObject().FindAncestor<ContextMenu>();
+            var owner = menuItem.GetParentObject().FindAncestor<ContextMenu>();
             var commentData = (owner.PlacementTarget as ListViewItem).Content as CommentDataEx;
 
             if (commentData is not null)
             {
-                menu.Items.Clear();
+                menuItem.Items.Clear();
 
-                // コンテキストメニュー設定
-                Utility.CreateMenuItemToCopy(menu, commentData.LiveName);
-                Utility.CreateMenuItemToCopy(menu, commentData.PostTime.ToString("HH:mm:ss"));
-                Utility.CreateMenuItemToCopy(menu, commentData.UserID);
-                Utility.CreateMenuItemToCopy(menu, commentData.UserName);
-                Utility.CreateMenuItemToCopy(menu, commentData.Comment);
+                // コピー項目設定
+                MenuItemHelper.CreateMenuItemToCopy(menuItem, commentData.LiveName);
+                MenuItemHelper.CreateMenuItemToCopy(menuItem, commentData.PostTime.ToString("HH:mm:ss"));
+                MenuItemHelper.CreateMenuItemToCopy(menuItem, commentData.UserID);
+                MenuItemHelper.CreateMenuItemToCopy(menuItem, commentData.UserName);
+                MenuItemHelper.CreateMenuItemToCopy(menuItem, commentData.Comment);
 
-                // コメントデータからURL検出
-                Utility.CreateMenuItemToURL(menu, commentData.Comment);
+                // コメントデータからURL抽出
+                MenuItemHelper.CreateMenuItemToCopyURL(menuItem, commentData.Comment);
             }
         }
     }

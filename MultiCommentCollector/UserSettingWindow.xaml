@@ -9,9 +9,6 @@
         xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
         mc:Ignorable="d"
         Title="ユーザー設定" Height="220" Width="330" WindowStartupLocation="CenterOwner">
-    <Window.DataContext>
-        <local:UserSettingWindowViewModel />
-    </Window.DataContext>
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="30" />

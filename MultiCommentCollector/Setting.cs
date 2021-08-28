@@ -2,6 +2,7 @@
 using MCC.Core.Manager;
 using MCC.Utility;
 using MCC.Utility.IO;
+using MultiCommentCollector.Helper;
 using Reactive.Bindings;
 using System;
 using System.Collections.Generic;
@@ -20,7 +21,7 @@ namespace MultiCommentCollector
         #region Singleton
 
         private static Setting instance;
-        public static Setting Instance => instance ??= Utility.LoadToXml<Setting>("setting.xml");
+        public static Setting Instance => instance ??= SerializeHelper.LoadToXml<Setting>("setting.xml");
 
         #endregion
 
@@ -76,7 +77,7 @@ namespace MultiCommentCollector
         #region Singleton
 
         private static UserSetting instance;
-        public static UserSetting Instance => instance ??= Utility.LoadToXml<UserSetting>("users.xml");
+        public static UserSetting Instance => instance ??= SerializeHelper.LoadToXml<UserSetting>("users.xml");
 
         #endregion
 
