@@ -3,9 +3,11 @@ using MahApps.Metro.Controls;
 using MCC.Core.Manager;
 using MCC.Plugin.Win;
 using MCC.Utility;
+using MultiCommentCollector.Extensions;
 using MultiCommentCollector.Helper;
 using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
+using Reactive.Bindings.Notifiers;
 using System;
 using System.ComponentModel;
 using System.Linq;
@@ -32,6 +34,8 @@ namespace MultiCommentCollector
 
         private Setting setting = Setting.Instance;
         private MCC.Core.Win.MultiCommentCollector mcc = MCC.Core.Win.MultiCommentCollector.Instance;
+        private PluginManager pluginManager = PluginManager.Instance;
+
         public ReactiveProperty<double> Width { get; }
         public ReactiveProperty<double> Height { get; }
         public ReactiveProperty<double> Left { get; }
@@ -54,6 +58,8 @@ namespace MultiCommentCollector
         public ReactiveCommand<object> ShowUserDataCommand { get; }
         public ReactiveCommand<MenuItem> MenuItemOpenedCommand { get; }
         public ReactiveCollection<MenuItem> ParentMenuPlugins { get; }
+
+        public CollectionViewSource CommentFilter { get; }
 
         public MainWindowViewModel()
         {
@@ -80,7 +86,7 @@ namespace MultiCommentCollector
             ToggleCommand = new ReactiveCommand<ConnectionData>().WithSubscribe(mcc.ToggleConnection).AddTo(disposable);
             ColumnHeaderClickCommand = new ReactiveCommand<RoutedEventArgs>().WithSubscribe(UserHeader_Click).AddTo(disposable);
             ShowUserSettingCommand = new ReactiveCommand<object>().WithSubscribe(x => WindowManager.ShowUserSettingWindow(x as CommentDataEx)).AddTo(disposable);
-            ShowUserDataCommand = new ReactiveCommand<object>().WithSubscribe(x => { if (x is CommentDataEx commentData) WindowManager.ShowUserDataWindow(commentData); }).AddTo(disposable);
+            ShowUserDataCommand = new ReactiveCommand<object>().WithSubscribe(x => WindowManager.ShowUserDataWindow(x as CommentDataEx)).AddTo(disposable);
             MenuItemOpenedCommand = new ReactiveCommand<MenuItem>().WithSubscribe(MenuItemCopy_Opened).AddTo(disposable);
 
             // Theme
@@ -89,7 +95,28 @@ namespace MultiCommentCollector
 
             // プラグインメニュー作成
             ParentMenuPlugins = new ReactiveCollection<MenuItem>().AddTo(disposable);
-            AddMenuItemPlugins();
+            CreateMenuItemPlugins();
+
+            // フィルター            
+            CommentFilter = new CollectionViewSource()
+            {
+                Source = CommentManager.Instance
+            };
+            CommentFilter.Filter += CommentFilter_Filter;
+
+            // 購読
+            MessageBroker.Default.Subscribe<UserData>(x => CommentFilter.View.Refresh());
+        }
+
+        private void CommentFilter_Filter(object sender, FilterEventArgs e)
+        {
+            var item = e.Item as CommentDataEx;
+            var userData = UserDataManager.Instance.Find(item);
+
+            if (userData is not null && userData.HideUser)
+                e.Accepted = false;
+            else
+                e.Accepted = true;
         }
 
         /// <summary>
@@ -115,9 +142,8 @@ namespace MultiCommentCollector
         /// <summary>
         /// プラグインのメニューリストを作成
         /// </summary>
-        private void AddMenuItemPlugins()
+        private void CreateMenuItemPlugins()
         {
-            var pluginManager = PluginManager.Instance;
             var parent = pluginManager.Parent.Select(x => new MenuItem() { Header = x.PluginName });
 
             foreach (var item in parent)

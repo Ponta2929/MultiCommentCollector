@@ -1,4 +1,5 @@
-﻿using MahApps.Metro.Controls;
+﻿using ControlzEx.Theming;
+using MahApps.Metro.Controls;
 using MCC.Core;
 using MCC.Core.Manager;
 using MCC.Core.Server;
@@ -57,8 +58,6 @@ namespace MultiCommentCollector
                 item.PluginClose();
 
             SerializeHelper.SaveToXml<Setting>("setting.xml", Setting.Instance);
-
-            logWindow.IsOwnerClose = true;
         }
 
         public static void ShowLogWindow()

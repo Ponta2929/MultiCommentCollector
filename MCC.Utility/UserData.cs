@@ -18,6 +18,13 @@ namespace MCC.Utility
         [JsonPropertyName("LiveName")]
         public string LiveName { get; set; }
 
+        private bool hideUser;
+        /// <summary>
+        /// NG
+        /// </summary>
+        [JsonPropertyName("HideUser")]
+        public bool HideUser { get => hideUser; set => Set(ref hideUser, value); }
+
         private string userName;
         /// <summary>
         /// ユーザー名
@@ -51,6 +58,7 @@ namespace MCC.Utility
 
         public UserData(CommentDataEx data)
         {
+            this.HideUser = false;
             this.LiveName = data.LiveName;
             this.UserID = data.UserID;
             this.UserName = data.UserName;
@@ -59,6 +67,16 @@ namespace MCC.Utility
             // 保存用
             this.BeforeUserName = data.UserName;
             this.BeforeBackColor = data.BackColor;
+        }
+
+        public override bool Equals(object obj)
+        {
+            var user = obj as UserData;
+
+            if (user is null)
+                return false;
+
+            return user.LiveName == LiveName && user.UserID == UserID;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

@@ -21,6 +21,7 @@ namespace MultiCommentCollector.Extensions
 
             if (userData is not null)
             {
+                userData.HideUser = user.HideUser;
                 userData.UserName = user.UserName;
                 userData.BackColor = user.BackColor;
             }
@@ -42,5 +43,8 @@ namespace MultiCommentCollector.Extensions
 
             return manager.Remove(user);
         }
+
+        public static UserData Find(this UserDataManager manager, CommentDataEx commentDataEx)
+            => manager.FirstOrDefault(x => x.LiveName.Equals(commentDataEx.LiveName) && x.UserID.Equals(commentDataEx.UserID));
     }
 }

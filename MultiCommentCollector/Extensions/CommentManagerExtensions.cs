@@ -15,7 +15,7 @@ namespace MultiCommentCollector.Extensions
             var source = manager.Where(x => x.LiveName.Equals(user.LiveName) && x.UserID.Equals(user.UserID)).ToArray();
 
             foreach (var item in source)
-            {
+            {               
                 item.BackColor = user.BackColor;
                 item.UserName = user.UserName;
             }

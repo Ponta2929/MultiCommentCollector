@@ -1,5 +1,6 @@
 ﻿using ControlzEx.Theming;
 using Reactive.Bindings;
+using Reactive.Bindings.Extensions;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;

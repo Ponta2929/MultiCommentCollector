@@ -32,6 +32,7 @@ namespace MultiCommentCollector
             disposable.Dispose();
         }
 
+        public ReactiveProperty<bool> HideUser { get; }
         public ReactiveProperty<string> LiveName { get; }
         public ReactiveProperty<string> UserID { get; }
         public ReactiveProperty<string> UserName { get; }
@@ -41,6 +42,7 @@ namespace MultiCommentCollector
 
         public UserSettingWindowViewModel(UserData user)
         {
+            HideUser = new ReactiveProperty<bool>(user.HideUser).AddTo(disposable);
             LiveName = new ReactiveProperty<string>(user.LiveName).AddTo(disposable);
             UserID = new ReactiveProperty<string>(user.UserID).AddTo(disposable);
             UserName = new ReactiveProperty<string>(user.UserName).AddTo(disposable);
@@ -57,6 +59,7 @@ namespace MultiCommentCollector
             var commentManager = CommentManager.Instance;
             var user = new UserData()
             {
+                HideUser = HideUser.Value,
                 UserID = UserID.Value,
                 UserName = UserName.Value,
                 LiveName = LiveName.Value,
@@ -72,6 +75,7 @@ namespace MultiCommentCollector
             userSetting.UserDataList = userDataManager;
 
             SerializeHelper.SaveToXml<UserSetting>("users.xml", userSetting);
+            MessageBroker.Default.Publish<UserData>(null);
 
             WindowManager.CloseWindow(this);
         }

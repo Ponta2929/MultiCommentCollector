@@ -12,7 +12,7 @@ namespace MultiCommentCollector
             InitializeComponent();
 
             // バインド
-            CommentListView.ItemsSource = CommentManager.Instance;
+            // CommentListView.ItemsSource = CommentManager.Instance;
             ConnectionListView.ItemsSource = ConnectionManager.Instance;
         }
     }

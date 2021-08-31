@@ -255,13 +255,16 @@ namespace MCC.Core
             if (userData is not null)
                 data.SetUserData(userData);
 
-            // コメントジェネレーターで送信
-            generatorServer.SendData(data);
+            if (userData is null || (userData is not null && !userData.HideUser))
+            {
+                // コメントジェネレーターで送信
+                generatorServer.SendData(data);
 
-            // プラグインで送信
-            foreach (var item in pluginManager)
-                if (item is IPluginReceiver receiver)
-                    receiver.Receive(data);
+                // プラグインで送信
+                foreach (var item in pluginManager)
+                    if (item is IPluginReceiver receiver)
+                        receiver.Receive(data);
+            }
 
             // コメント追加
             commentManager.SyncAdd(data);

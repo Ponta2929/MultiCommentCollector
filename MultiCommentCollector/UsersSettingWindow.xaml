@@ -1,16 +1,14 @@
-﻿<Controls:MetroWindow x:Class="MultiCommentCollector.UsersSettingWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:MultiCommentCollector"
-        xmlns:converter="clr-namespace:MultiCommentCollector.Converter"
-        xmlns:behavior="clr-namespace:MultiCommentCollector.Behavior"
-        xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
-        xmlns:converter_m="http://metro.mahapps.com/winfx/xaml/shared"
-                      mc:Ignorable="d"
-        Title="ユーザー設定一覧" Height="350" Width="600" Closing="UsersSettingWindow_Closing">
+﻿<local:SingleMetroWindowBase x:Class="MultiCommentCollector.UsersSettingWindow"
+                             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                             xmlns:converter_m="http://metro.mahapps.com/winfx/xaml/shared"
+                             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+                             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                             xmlns:local="clr-namespace:MultiCommentCollector"
+                             xmlns:converter="clr-namespace:MultiCommentCollector.Converter"
+                             mc:Ignorable="d"
+        Title="ユーザー設定一覧" Height="350" Width="600">
     <Window.Resources>
         <converter:HeaderWidthConverter x:Key="HeaderWidthConverter"/>
         <converter:ColorDataConverter x:Key="ColorDataConverter"/>
@@ -44,8 +42,7 @@
                     <GridViewColumn Header="配信サイト" DisplayMemberBinding="{Binding LiveName}" x:Name="ColumnLiveName" />
                     <GridViewColumn Header="ユーザーID" DisplayMemberBinding="{Binding UserID}" x:Name="ColumnUserID" Width="75" />
                     <GridViewColumn Header="ユーザー名" DisplayMemberBinding="{Binding UserName}" x:Name="ColumnUserName" Width="75" />
-                    <GridViewColumn>
-                        <GridViewColumnHeader x:Name="ColumnBackColor" Content="背景色" Width="80" IsEnabled="False" />
+                    <GridViewColumn x:Name="BackColor" Header="背景色" Width="80">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <Border x:Name="border" Background="{Binding BackColor, Converter={StaticResource ColorDataConverter}}" CornerRadius="5">
@@ -54,8 +51,15 @@
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
+                    <GridViewColumn x:Name="HideUser" Header="非表示" Width="80">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox Margin="0,0" IsChecked="{Binding HideUser}" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.RefleshCommand}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
                 </GridView>
             </ListView.View>
         </ListView>
     </Grid>
-</Controls:MetroWindow>
+</local:SingleMetroWindowBase>

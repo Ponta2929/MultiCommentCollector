@@ -19,7 +19,7 @@ namespace MultiCommentCollector
     /// <summary>
     /// UsersSettingWindow.xaml の相互作用ロジック
     /// </summary>
-    public partial class UsersSettingWindow : MahApps.Metro.Controls.MetroWindow
+    public partial class UsersSettingWindow : SingleMetroWindowBase
     {
         #region Singleton
 
@@ -27,18 +27,6 @@ namespace MultiCommentCollector
         public static UsersSettingWindow Instance => instance ??= new();
 
         #endregion
-
-        private bool _IsOwnerClose;
-
-        public bool IsOwnerClose
-        {
-            get => _IsOwnerClose;
-            set
-            {
-                if (_IsOwnerClose = value)
-                    Close();
-            }
-        }
 
         public UsersSettingWindow()
         {
@@ -78,7 +66,12 @@ namespace MultiCommentCollector
                     }
 
                     var columnBinding = headerClicked.Column.DisplayMemberBinding as Binding;
-                    var sortBy = columnBinding?.Path.Path ?? headerClicked.Column.Header as string;
+                    var sortBy = columnBinding?.Path.Path ?? headerClicked.Name ?? headerClicked.Column.Header as string;
+
+                    if (headerClicked.Column.Header.Equals("非表示"))
+                        sortBy = "HideUser";
+                    else if (headerClicked.Column.Header.Equals("背景色"))
+                        sortBy = "BackColor";
 
                     Sort(sortBy, direction);
 
@@ -110,12 +103,6 @@ namespace MultiCommentCollector
             SortDescription sd = new SortDescription(sortBy, direction);
             dataView.SortDescriptions.Add(sd);
             dataView.Refresh();
-        }
-
-        private void UsersSettingWindow_Closing(object sender, CancelEventArgs e)
-        {
-            e.Cancel = !IsOwnerClose;
-            Visibility = Visibility.Hidden;
         }
     }
 }

@@ -28,7 +28,6 @@ namespace MultiCommentCollector
 
         public void CreateViewModel(CommentDataEx user)
         {
-            this.Title = $"{user.LiveName} - " + (user.UserName is null || user.UserName.Equals("") ? user.UserID : user.UserName);
             this.DataContext = new UserDataWindowViewModel(user);
         }
     }

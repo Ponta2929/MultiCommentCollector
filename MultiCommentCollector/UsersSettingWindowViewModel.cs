@@ -4,6 +4,7 @@ using MultiCommentCollector.Extensions;
 using MultiCommentCollector.Helper;
 using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
+using Reactive.Bindings.Notifiers;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -31,11 +32,13 @@ namespace MultiCommentCollector
         private CommentManager commentManager = CommentManager.Instance;
         private UserSetting userSetting = UserSetting.Instance;
 
+        public ReactiveCommand RefleshCommand { get; }
         public ReactiveCommand<UserData> ShowUserSettingCommand { get; }
         public ReactiveCommand<UserData> DeleteUserSettingCommand { get; }
 
         public UsersSettingWindowViewModel()
         {
+            RefleshCommand = new ReactiveCommand().WithSubscribe(() => MessageBroker.Default.Publish<UserData>(null)).AddTo(disposable);
             ShowUserSettingCommand = new ReactiveCommand<UserData>().WithSubscribe(WindowManager.ShowUserSettingWindow).AddTo(disposable);
             DeleteUserSettingCommand = new ReactiveCommand<UserData>().WithSubscribe(DeleteUserSetting).AddTo(disposable);
         }
@@ -48,6 +51,8 @@ namespace MultiCommentCollector
             // 削除
             if (userDataManager.Remove(commentManager, user))
             {
+                MessageBroker.Default.Publish<UserData>(null);
+
                 // ユーザー設定保存
                 userSetting.UserDataList = userDataManager;
 

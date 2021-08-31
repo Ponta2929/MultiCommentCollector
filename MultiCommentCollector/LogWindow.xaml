@@ -1,16 +1,15 @@
-﻿<Controls:MetroWindow x:Class="MultiCommentCollector.LogWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
-        xmlns:local="clr-namespace:MultiCommentCollector"
-        xmlns:converter="clr-namespace:MultiCommentCollector.Converter"
-        xmlns:behavior="clr-namespace:MultiCommentCollector.Behavior"
-        xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
-        mc:Ignorable="d"
+﻿<local:SingleMetroWindowBase x:Class="MultiCommentCollector.LogWindow"
+                             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+                             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                             xmlns:local="clr-namespace:MultiCommentCollector"
+                             xmlns:behavior="clr-namespace:MultiCommentCollector.Behavior"
+                             xmlns:converter="clr-namespace:MultiCommentCollector.Converter"
+                             mc:Ignorable="d"
         Title="ログ " Height="{Binding Height.Value, Mode=TwoWay}" Width="{Binding Width.Value, Mode=TwoWay}"
-        Top="{Binding Top.Value, Mode=TwoWay}" Left="{Binding Left.Value, Mode=TwoWay}" WindowStartupLocation="CenterOwner" Closing="LogWindow_Closing" >
+        Top="{Binding Top.Value, Mode=TwoWay}" Left="{Binding Left.Value, Mode=TwoWay}" WindowStartupLocation="CenterOwner">
     <Window.Resources>
         <converter:HeaderWidthConverter x:Key="HeaderWidthConverter"/>
     </Window.Resources>
@@ -55,4 +54,4 @@
             </ListView>
         </DockPanel>
     </Grid>
-</Controls:MetroWindow>
+</local:SingleMetroWindowBase>

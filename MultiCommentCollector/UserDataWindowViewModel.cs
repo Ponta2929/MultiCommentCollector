@@ -11,6 +11,7 @@ using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Media;
 
 namespace MultiCommentCollector
 {
@@ -29,13 +30,20 @@ namespace MultiCommentCollector
         }
 
         private string liveName, userId;
+        public ReactiveProperty<string> Title { get; }
+        public ReactiveProperty<SolidColorBrush> BackColor { get; }
         public ReactiveCommand<MenuItem> MenuItemOpenedCommand { get; }
 
         public CollectionViewSource CommentFilter { get; }
 
         public UserDataWindowViewModel(CommentDataEx user)
         {
+            Title = new ReactiveProperty<string>().AddTo(disposable);
+            BackColor = new ReactiveProperty<SolidColorBrush>(new SolidColorBrush( Color.FromArgb(255, 0, 0, 0))).AddTo(disposable);
             MenuItemOpenedCommand = new ReactiveCommand<MenuItem>().WithSubscribe(MenuItemCopyOpened).AddTo(disposable);
+
+            user.ObserveProperty(o => o.UserName).Subscribe(value => Title.Value = $"{user.LiveName} - " + (user.UserName is null || user.UserName.Equals("") ? user.UserID : user.UserName)).AddTo(disposable);
+            user.ObserveProperty(o => o.BackColor).Subscribe(value => BackColor.Value.Color = Color.FromArgb((byte)value.A, (byte)value.R, (byte)value.G, (byte)value.B)).AddTo(disposable);
 
             this.liveName = user.LiveName;
             this.userId = user.UserID;
