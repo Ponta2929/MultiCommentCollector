@@ -1,19 +1,18 @@
 ﻿using MahApps.Metro.Controls;
 using MCC.Core.Manager;
 using MCC.Utility;
+using MultiCommentCollector.Extensions;
 using MultiCommentCollector.Helper;
 using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
 using System;
 using System.ComponentModel;
 using System.Reactive.Disposables;
-using System.Text.RegularExpressions;
-using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
 
-namespace MultiCommentCollector
+namespace MultiCommentCollector.ViewModel
 {
     internal class UserDataWindowViewModel : INotifyPropertyChanged, IDisposable
     {
@@ -38,8 +37,11 @@ namespace MultiCommentCollector
 
         public UserDataWindowViewModel(CommentDataEx user)
         {
+            CommentFilter = new() { Source = CommentManager.Instance };
+            CommentFilter.Filter += CommentFilter_Filter;
+
             Title = new ReactiveProperty<string>().AddTo(disposable);
-            BackColor = new ReactiveProperty<SolidColorBrush>(new SolidColorBrush( Color.FromArgb(255, 0, 0, 0))).AddTo(disposable);
+            BackColor = new ReactiveProperty<SolidColorBrush>(new SolidColorBrush(Color.FromArgb(255, 0, 0, 0))).AddTo(disposable);
             MenuItemOpenedCommand = new ReactiveCommand<MenuItem>().WithSubscribe(MenuItemCopyOpened).AddTo(disposable);
 
             user.ObserveProperty(o => o.UserName).Subscribe(value => Title.Value = $"{user.LiveName} - " + (user.UserName is null || user.UserName.Equals("") ? user.UserID : user.UserName)).AddTo(disposable);
@@ -47,12 +49,6 @@ namespace MultiCommentCollector
 
             this.liveName = user.LiveName;
             this.userId = user.UserID;
-
-            CommentFilter = new CollectionViewSource()
-            {
-                Source = CommentManager.Instance
-            };
-            CommentFilter.Filter += CommentFilter_Filter;
         }
 
         private void CommentFilter_Filter(object sender, FilterEventArgs e)

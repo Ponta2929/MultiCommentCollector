@@ -1,11 +1,11 @@
-﻿<Controls:MetroWindow  x:Class="MultiCommentCollector.PluginWindow"
+﻿<Controls:MetroWindow  x:Class="MultiCommentCollector.View.PluginWindow"
                        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
                        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                        xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
-                       xmlns:local="clr-namespace:MultiCommentCollector"
+                       xmlns:viewmodel="clr-namespace:MultiCommentCollector.ViewModel"
                        mc:Ignorable="d"
         Title="プラグイン" Height="350" Width="600" WindowStartupLocation="CenterOwner">
     <Window.Resources>
@@ -15,11 +15,11 @@
         </Style>
     </Window.Resources>
     <Window.DataContext>
-        <local:PluginWindowViewModel />
+        <viewmodel:PluginWindowViewModel />
     </Window.DataContext>
     <DockPanel>
         <GroupBox Header="プラグインリスト" Margin="5" DockPanel.Dock="Left">
-            <ListView x:Name="PluginList" Width="150" >
+            <ListView x:Name="PluginList" Width="150" ItemsSource="{Binding ParentPluginsView.Source}">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="SelectionChanged">
                         <i:InvokeCommandAction Command="{Binding SelectedChangedCommand}" CommandParameter="{Binding SelectedItem, ElementName=PluginList}"/>

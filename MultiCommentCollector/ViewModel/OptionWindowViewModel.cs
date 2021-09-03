@@ -1,22 +1,16 @@
 ﻿using ControlzEx.Theming;
-using MCC.Core;
 using MCC.Core.Manager;
+using MultiCommentCollector.Model;
 using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Reactive.Disposables;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
 
-namespace MultiCommentCollector
+namespace MultiCommentCollector.ViewModel
 {
-    public class OptionWindowViewModel : INotifyPropertyChanged, IDisposable
+    internal class OptionWindowViewModel : INotifyPropertyChanged, IDisposable
     {
 #pragma warning disable 0067
         public event PropertyChangedEventHandler PropertyChanged;
@@ -38,6 +32,7 @@ namespace MultiCommentCollector
         public ReactiveProperty<int> MaxLogs { get; }
         public ReactiveProperty<bool> IsDarkMode { get; }
         public ReactiveProperty<string> ThemeColor { get; }
+        public ReactiveCollection<string> Colors { get; }
 
         public OptionWindowViewModel()
         {
@@ -52,6 +47,9 @@ namespace MultiCommentCollector
             ThemeColor.Subscribe(x => ThemeManager.Current.ChangeTheme(Application.Current, $"{(IsDarkMode.Value ? "Dark" : "Light")}.{x}")).AddTo(disposable);
             MaxComments.Subscribe(x => CommentManager.Instance.MaxSize.Value = x);
             MaxLogs.Subscribe(x => LogManager.Instance.MaxSize.Value = x);
+
+            Colors = new ReactiveCollection<string>().AddTo(disposable);
+            Colors.AddRangeOnScheduler(Setting.Instance.Theme.Colors);
         }
     }
 }

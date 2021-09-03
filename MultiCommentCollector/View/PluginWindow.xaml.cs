@@ -1,7 +1,4 @@
-﻿using MCC.Core;
-using MCC.Core.Manager;
-
-namespace MultiCommentCollector
+﻿namespace MultiCommentCollector.View
 {
     /// <summary>
     /// PluginWindow.xaml の相互作用ロジック
@@ -18,9 +15,6 @@ namespace MultiCommentCollector
         public PluginWindow()
         {
             InitializeComponent();
-
-            // バインド
-            PluginList.ItemsSource = PluginManager.Instance.Parent;
         }
     }
 }

@@ -1,19 +1,14 @@
-﻿using ControlzEx.Theming;
-using MahApps.Metro.Controls;
-using MCC.Core;
-using MCC.Core.Manager;
+﻿using MCC.Core.Manager;
 using MCC.Core.Server;
 using MCC.Utility;
-using MCC.Utility.IO;
-using MCC.Utility.Text;
+using MultiCommentCollector.Extensions;
 using MultiCommentCollector.Helper;
-using Reactive.Bindings.Notifiers;
-using System;
-using System.IO;
+using MultiCommentCollector.View;
+using MultiCommentCollector.ViewModel;
 using System.Linq;
 using System.Windows;
 
-namespace MultiCommentCollector
+namespace MultiCommentCollector.Model
 {
     public static class WindowManager
     {
@@ -98,7 +93,7 @@ namespace MultiCommentCollector
                 return;
 
             var userData = new UserSettingWindow();
-            userData.CreateViewModel(user);
+            userData.DataContext = new UserSettingWindowViewModel(user);
             userData.Owner = Application.Current.MainWindow;
             userData.ShowDialog();
         }
@@ -116,7 +111,7 @@ namespace MultiCommentCollector
                 return;
 
             var userData = new UserDataWindow();
-            userData.CreateViewModel(user);
+            userData.DataContext = new UserDataWindowViewModel(user);
             userData.Owner = Application.Current.MainWindow;
             userData.Show();
         }

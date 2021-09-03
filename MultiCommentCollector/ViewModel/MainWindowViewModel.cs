@@ -5,6 +5,7 @@ using MCC.Plugin.Win;
 using MCC.Utility;
 using MultiCommentCollector.Extensions;
 using MultiCommentCollector.Helper;
+using MultiCommentCollector.Model;
 using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
 using Reactive.Bindings.Notifiers;
@@ -16,9 +17,9 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 
-namespace MultiCommentCollector
+namespace MultiCommentCollector.ViewModel
 {
-    public class MainWindowViewModel : INotifyPropertyChanged, IDisposable
+    internal class MainWindowViewModel : INotifyPropertyChanged, IDisposable
     {
 #pragma warning disable 0067
         public event PropertyChangedEventHandler PropertyChanged;
@@ -59,11 +60,17 @@ namespace MultiCommentCollector
         public ReactiveCommand<MenuItem> MenuItemOpenedCommand { get; }
         public ReactiveCollection<MenuItem> ParentMenuPlugins { get; }
 
-        public CollectionViewSource CommentFilter { get; }
+        public CollectionViewSource CommentFilterView { get; }
+        public CollectionViewSource ConnectionView { get; }
 
         public MainWindowViewModel()
         {
             WindowManager.ApplicationStart();
+
+            // フィルター            
+            ConnectionView = new() { Source = ConnectionManager.Instance };
+            CommentFilterView = new() { Source = CommentManager.Instance };
+            CommentFilterView.Filter += CommentFilter_Filter;
 
             // MainWindow
             Width = setting.MainWindow.Width.ToReactivePropertyAsSynchronized(x => x.Value).AddTo(disposable);
@@ -97,15 +104,8 @@ namespace MultiCommentCollector
             ParentMenuPlugins = new ReactiveCollection<MenuItem>().AddTo(disposable);
             CreateMenuItemPlugins();
 
-            // フィルター            
-            CommentFilter = new CollectionViewSource()
-            {
-                Source = CommentManager.Instance
-            };
-            CommentFilter.Filter += CommentFilter_Filter;
-
             // 購読
-            MessageBroker.Default.Subscribe<UserData>(x => CommentFilter.View.Refresh());
+            MessageBroker.Default.Subscribe<string>(x => { if (x.Equals("Refresh.Comment.View")) CommentFilterView.View.Refresh(); });
         }
 
         private void CommentFilter_Filter(object sender, FilterEventArgs e)

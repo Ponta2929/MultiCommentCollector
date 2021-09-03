@@ -1,15 +1,8 @@
-﻿using MahApps.Metro.Controls;
-using Microsoft.Xaml.Behaviors;
+﻿using Microsoft.Xaml.Behaviors;
+using MultiCommentCollector.Extensions;
 using MultiCommentCollector.Helper;
-using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 
 namespace MultiCommentCollector.Behavior
 {

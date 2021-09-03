@@ -1,16 +1,10 @@
 ﻿using ControlzEx.Theming;
 using Reactive.Bindings;
-using Reactive.Bindings.Extensions;
 using System;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
-using System.Reactive.Disposables;
-using System.Windows;
 using System.Xml.Serialization;
 
-namespace MultiCommentCollector
+namespace MultiCommentCollector.Model
 {
     [Serializable]
     public class Theme

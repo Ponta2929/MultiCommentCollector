@@ -1,19 +1,16 @@
 ﻿using MCC.Core.Manager;
 using MCC.Utility;
+using MultiCommentCollector.Model;
 using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Reactive.Disposables;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Data;
 
-namespace MultiCommentCollector
+namespace MultiCommentCollector.ViewModel
 {
-    public class LogWindowViewModel : INotifyPropertyChanged, IDisposable
+    internal class LogWindowViewModel : INotifyPropertyChanged, IDisposable
     {
 #pragma warning disable 0067
         public event PropertyChangedEventHandler PropertyChanged;
@@ -37,9 +34,14 @@ namespace MultiCommentCollector
         public ReactiveProperty<bool> ContextMenuWarn { get; }
         public ReactiveProperty<bool> ContextMenuInfo { get; }
         public ReactiveProperty<bool> ContextMenuDebug { get; }
+        public CollectionViewSource LogFilterView { get; }
 
         public LogWindowViewModel()
         {
+            // フィルター            
+            LogFilterView = new() { Source = LogManager.Instance };
+            LogFilterView.Filter += LogFilterViewr_Filter;
+
             Width = setting.LogWindow.Width.ToReactivePropertyAsSynchronized(x => x.Value).AddTo(disposable);
             Height = setting.LogWindow.Height.ToReactivePropertyAsSynchronized(x => x.Value).AddTo(disposable);
             Left = setting.LogWindow.Left.ToReactivePropertyAsSynchronized(x => x.Value).AddTo(disposable);
@@ -50,45 +52,26 @@ namespace MultiCommentCollector
             ContextMenuInfo = new ReactiveProperty<bool>(true).AddTo(disposable);
             ContextMenuDebug = new ReactiveProperty<bool>().AddTo(disposable);
 
-            ContextMenuError.Subscribe(x => Filtering()).AddTo(disposable);
-            ContextMenuWarn.Subscribe(x => Filtering()).AddTo(disposable);
-            ContextMenuInfo.Subscribe(x => Filtering()).AddTo(disposable);
-            ContextMenuDebug.Subscribe(x => Filtering()).AddTo(disposable);
-
-            CreateFilter();
+            ContextMenuError.Subscribe(x => LogFilterView.View.Refresh()).AddTo(disposable);
+            ContextMenuWarn.Subscribe(x => LogFilterView.View.Refresh()).AddTo(disposable);
+            ContextMenuInfo.Subscribe(x => LogFilterView.View.Refresh()).AddTo(disposable);
+            ContextMenuDebug.Subscribe(x => LogFilterView.View.Refresh()).AddTo(disposable);
         }
 
-        private void CreateFilter()
+        private void LogFilterViewr_Filter(object sender, FilterEventArgs e)
         {
-            var view = CollectionViewSource.GetDefaultView(LogManager.Instance);
-            view.Filter = new Predicate<object>(FilterPredicate);
-
-            var liveShaping = view as ICollectionViewLiveShaping;
-
-            if (liveShaping.CanChangeLiveFiltering)
-            {
-                liveShaping.LiveFilteringProperties.Add("Level");
-                liveShaping.IsLiveFiltering = true;
-            }
-        }
-
-        private bool FilterPredicate(object @object)
-        {
-            var item = @object as LogData;
+            var item = e.Item as LogData;
 
             if (item.Level == LogLevel.Debug && ContextMenuDebug.Value)
-                return true;
-            if (item.Level == LogLevel.Info && ContextMenuInfo.Value)
-                return true;
-            if (item.Level == LogLevel.Warn && ContextMenuWarn.Value)
-                return true;
-            if (item.Level == LogLevel.Error && ContextMenuError.Value)
-                return true;
-
-            return false;
+                e.Accepted = true;
+            else if (item.Level == LogLevel.Info && ContextMenuInfo.Value)
+                e.Accepted = true;
+            else if (item.Level == LogLevel.Warn && ContextMenuWarn.Value)
+                e.Accepted = true;
+            else if (item.Level == LogLevel.Error && ContextMenuError.Value)
+                e.Accepted = true;
+            else
+                e.Accepted = false;
         }
-
-        private void Filtering()
-            => CollectionViewSource.GetDefaultView(LogManager.Instance).Refresh();
     }
 }

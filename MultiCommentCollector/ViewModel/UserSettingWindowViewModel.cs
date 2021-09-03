@@ -1,22 +1,17 @@
 ﻿using MCC.Core.Manager;
 using MCC.Utility;
-using MCC.Utility.IO;
 using MultiCommentCollector.Extensions;
 using MultiCommentCollector.Helper;
+using MultiCommentCollector.Model;
 using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
 using Reactive.Bindings.Notifiers;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Reactive.Disposables;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Media;
 
-namespace MultiCommentCollector
+namespace MultiCommentCollector.ViewModel
 {
     internal class UserSettingWindowViewModel : INotifyPropertyChanged, IDisposable
     {
@@ -75,7 +70,7 @@ namespace MultiCommentCollector
             userSetting.UserDataList = userDataManager;
 
             SerializeHelper.SaveToXml<UserSetting>("users.xml", userSetting);
-            MessageBroker.Default.Publish<UserData>(null);
+            MessageBroker.Default.Publish<string>("Refresh.Comment.View");
 
             WindowManager.CloseWindow(this);
         }

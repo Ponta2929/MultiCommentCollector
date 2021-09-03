@@ -1,12 +1,6 @@
-﻿using System.Collections.Specialized;
-using System.ComponentModel;
-using System.Windows;
-using System.Windows.Data;
-using MCC.Core;
-using MCC.Core.Manager;
-using MCC.Utility;
+﻿using MultiCommentCollector.Model;
 
-namespace MultiCommentCollector
+namespace MultiCommentCollector.View
 {
     /// <summary>
     /// LogWindow.xaml の相互作用ロジック
@@ -23,9 +17,6 @@ namespace MultiCommentCollector
         public LogWindow()
         {
             InitializeComponent();
-
-            // バインド
-            LogListView.ItemsSource = LogManager.Instance;
         }
     }
 }

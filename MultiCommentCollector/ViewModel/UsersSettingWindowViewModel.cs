@@ -2,20 +2,19 @@
 using MCC.Utility;
 using MultiCommentCollector.Extensions;
 using MultiCommentCollector.Helper;
+using MultiCommentCollector.Model;
 using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
 using Reactive.Bindings.Notifiers;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Reactive.Disposables;
-using System.Text;
-using System.Threading.Tasks;
+using System.Windows.Data;
 
-namespace MultiCommentCollector
+namespace MultiCommentCollector.ViewModel
 {
-    class UsersSettingWindowViewModel : INotifyPropertyChanged, IDisposable
+    internal class UsersSettingWindowViewModel : INotifyPropertyChanged, IDisposable
     {
 #pragma warning disable 0067
         public event PropertyChangedEventHandler PropertyChanged;
@@ -28,6 +27,7 @@ namespace MultiCommentCollector
             disposable.Clear();
             disposable.Dispose();
         }
+
         private UserDataManager userDataManager = UserDataManager.Instance;
         private CommentManager commentManager = CommentManager.Instance;
         private UserSetting userSetting = UserSetting.Instance;
@@ -35,10 +35,13 @@ namespace MultiCommentCollector
         public ReactiveCommand RefleshCommand { get; }
         public ReactiveCommand<UserData> ShowUserSettingCommand { get; }
         public ReactiveCommand<UserData> DeleteUserSettingCommand { get; }
+        public CollectionViewSource UsersDataView { get; }
 
         public UsersSettingWindowViewModel()
         {
-            RefleshCommand = new ReactiveCommand().WithSubscribe(() => MessageBroker.Default.Publish<UserData>(null)).AddTo(disposable);
+            UsersDataView = new() { Source = userDataManager };
+
+            RefleshCommand = new ReactiveCommand().WithSubscribe(() => MessageBroker.Default.Publish<string>("Refresh.Comment.View")).AddTo(disposable);
             ShowUserSettingCommand = new ReactiveCommand<UserData>().WithSubscribe(WindowManager.ShowUserSettingWindow).AddTo(disposable);
             DeleteUserSettingCommand = new ReactiveCommand<UserData>().WithSubscribe(DeleteUserSetting).AddTo(disposable);
         }
@@ -51,7 +54,7 @@ namespace MultiCommentCollector
             // 削除
             if (userDataManager.Remove(commentManager, user))
             {
-                MessageBroker.Default.Publish<UserData>(null);
+                MessageBroker.Default.Publish<string>("Refresh.Comment.View");
 
                 // ユーザー設定保存
                 userSetting.UserDataList = userDataManager;

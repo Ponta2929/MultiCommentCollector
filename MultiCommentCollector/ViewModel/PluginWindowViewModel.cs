@@ -1,19 +1,15 @@
-﻿using MCC.Core;
+﻿using MCC.Core.Manager;
 using MCC.Plugin;
 using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.IO;
-using System.Linq;
 using System.Reactive.Disposables;
-using System.Text;
-using System.Threading.Tasks;
+using System.Windows.Data;
 
-namespace MultiCommentCollector
+namespace MultiCommentCollector.ViewModel
 {
-    public class PluginWindowViewModel : INotifyPropertyChanged, IDisposable
+    internal class PluginWindowViewModel : INotifyPropertyChanged, IDisposable
     {
 #pragma warning disable 0067
         public event PropertyChangedEventHandler PropertyChanged;
@@ -36,9 +32,12 @@ namespace MultiCommentCollector
 
         public ReactiveCommand<IPluginBase> SelectedChangedCommand { get; }
 
+        public CollectionViewSource ParentPluginsView { get; }
 
         public PluginWindowViewModel()
         {
+            ParentPluginsView = new() { Source = PluginManager.Instance.Parent };
+
             PluginName = new ReactiveProperty<string>("").AddTo(disposable);
             Author = new ReactiveProperty<string>("").AddTo(disposable);
             Description = new ReactiveProperty<string>("").AddTo(disposable);

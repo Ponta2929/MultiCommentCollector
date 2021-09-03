@@ -1,6 +1,4 @@
-﻿using MCC.Core.Manager;
-
-namespace MultiCommentCollector
+﻿namespace MultiCommentCollector.View
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -10,10 +8,6 @@ namespace MultiCommentCollector
         public MainWindow()
         {
             InitializeComponent();
-
-            // バインド
-            // CommentListView.ItemsSource = CommentManager.Instance;
-            ConnectionListView.ItemsSource = ConnectionManager.Instance;
         }
     }
 }
