@@ -19,9 +19,7 @@ namespace MultiCommentCollector.Helper
                 if (child is DependencyObject control)
                 {
                     if (control is TabControl tabControl)
-                    {
                         HeaderedControlHelper.SetHeaderFontSize(tabControl, size);
-                    }
 
                     SetHeaderFontSize(child as DependencyObject, size);
                 }

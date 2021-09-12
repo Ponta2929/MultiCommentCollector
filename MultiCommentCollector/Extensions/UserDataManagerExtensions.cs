@@ -1,10 +1,7 @@
 ﻿using MCC.Core.Manager;
 using MCC.Utility;
-using System;
-using System.Collections.Generic;
+using MultiCommentCollector.Models;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MultiCommentCollector.Extensions
 {
@@ -33,7 +30,7 @@ namespace MultiCommentCollector.Extensions
 
         public static bool Remove(this UserDataManager manager, CommentManager commentManager, UserData user)
         {
-            var source = commentManager.Where(x => x.LiveName.Equals(user.LiveName) && x.UserID.Equals(user.UserID)).ToArray();
+            var source = commentManager.Where(x => x.LiveName.Equals(user.LiveName) && x.UserID.Equals(user.UserID));
 
             foreach (var item in source)
             {
@@ -45,6 +42,9 @@ namespace MultiCommentCollector.Extensions
         }
 
         public static UserData Find(this UserDataManager manager, CommentDataEx commentDataEx)
-            => manager.FirstOrDefault(x => x.LiveName.Equals(commentDataEx.LiveName) && x.UserID.Equals(commentDataEx.UserID));
+            => manager.Find(commentDataEx.LiveName, commentDataEx.UserID);
+
+        public static UserData Find(this UserDataManager manager, string liveName, string userId)
+            => manager.FirstOrDefault(x => x.LiveName.Equals(liveName) && x.UserID.Equals(userId));
     }
 }

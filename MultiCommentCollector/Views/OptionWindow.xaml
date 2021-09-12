@@ -1,0 +1,77 @@
+﻿<Controls:MetroWindow x:Class="MultiCommentCollector.Views.OptionWindow"
+                      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                      xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+                      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                      xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+                      xmlns:behavior="clr-namespace:MultiCommentCollector.Behavior"
+                      xmlns:viewmodel="clr-namespace:MultiCommentCollector.ViewModels"
+                      mc:Ignorable="d"
+        Title="オプション" Height="300" Width="400" ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
+    <Window.DataContext>
+        <viewmodel:OptionWindowViewModel />
+    </Window.DataContext>
+    <TabControl x:Name="tabControl" Controls:HeaderedControlHelper.HeaderFontSize="16" Controls:TabControlHelper.Underlined="SelectedTabItem">
+        <TabItem Header="接続">
+            <StackPanel Margin="10" >
+                <GroupBox Header="コメントデーター受信サーバー" Height="87" VerticalAlignment="Top">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Label Content="待受ポート" VerticalContentAlignment="Center" Width="60"/>
+                        <TextBox Text="{Binding CommentReceiverServerPort.Value}" TextAlignment="Right" VerticalContentAlignment="Center" Width="100" InputMethod.IsInputMethodEnabled="False">
+                            <i:Interaction.Behaviors>
+                                <behavior:TextBoxBehavior/>
+                            </i:Interaction.Behaviors>
+                        </TextBox>
+                    </StackPanel>
+                </GroupBox>
+                <GroupBox Header="コメントジェネレーターサーバー" Margin="0,12,0,0" Height="87" VerticalAlignment="Top">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Label Content="待受ポート" Width="60" VerticalContentAlignment="Center"/>
+                        <TextBox Text="{Binding CommentGeneratorServerPort.Value}" TextAlignment="Right" VerticalContentAlignment="Center" Width="100" InputMethod.IsInputMethodEnabled="False">
+                            <i:Interaction.Behaviors>
+                                <behavior:TextBoxBehavior/>
+                            </i:Interaction.Behaviors>
+                        </TextBox>
+                    </StackPanel>
+                </GroupBox>
+                <Label Content="※アプリケーション再起動時に有効になります。" HorizontalAlignment="Right"/>
+            </StackPanel>
+        </TabItem>
+        <TabItem Header="リスト">
+            <StackPanel Margin="10" >
+                <GroupBox Header="コメント" Height="87" VerticalAlignment="Top">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Label Content="保持数" VerticalContentAlignment="Center" Width="50" />
+                        <TextBox Text="{Binding MaxComments.Value}" TextAlignment="Right" VerticalContentAlignment="Center" Width="100" InputMethod.IsInputMethodEnabled="False" >
+                            <i:Interaction.Behaviors>
+                                <behavior:TextBoxBehavior/>
+                            </i:Interaction.Behaviors>
+                        </TextBox>
+                    </StackPanel>
+                </GroupBox>
+                <GroupBox Header="ログ" Margin="0,12,0,0" Height="87" VerticalAlignment="Top">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Label Content="保持数" VerticalContentAlignment="Center" Width="50" />
+                        <TextBox Text="{Binding MaxLogs.Value}" TextAlignment="Right" VerticalContentAlignment="Center" Width="100" InputMethod.IsInputMethodEnabled="False">
+                            <i:Interaction.Behaviors>
+                                <behavior:TextBoxBehavior/>
+                            </i:Interaction.Behaviors>
+                        </TextBox>
+                    </StackPanel>
+                </GroupBox>
+            </StackPanel>
+        </TabItem>
+        <TabItem Header="テーマ">
+            <StackPanel Orientation="Vertical" VerticalAlignment="Center" >
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Controls:ToggleSwitch IsOn="{Binding IsDarkMode.Value}" OffContent="Light" OnContent="Dark" ContentDirection="LeftToRight"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,20">
+                    <Label Content="色" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                    <Controls:ColorPicker SelectedColor="{Binding ThemeColor.Value, UpdateSourceTrigger=LostFocus}" Width="230"/>
+                </StackPanel>
+            </StackPanel>
+        </TabItem>
+    </TabControl>
+</Controls:MetroWindow>

@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace MCC.Utility
 {
@@ -15,18 +16,22 @@ namespace MCC.Utility
         /// <summary>
         /// 透明度
         /// </summary>
+        [XmlAttribute("A")]
         public int A { get; set; }
         /// <summary>
         /// 赤度
         /// </summary>
+        [XmlAttribute("R")]
         public int R { get; set; }
         /// <summary>
         /// 緑度
         /// </summary>
+        [XmlAttribute("G")]
         public int G { get; set; }
         /// <summary>
         /// 青度
         /// </summary>
+        [XmlAttribute("B")]
         public int B { get; set; }
 
         public static ColorData FromArgb(int a, int r, int g, int b)

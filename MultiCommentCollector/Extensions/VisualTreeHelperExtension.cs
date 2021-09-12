@@ -16,7 +16,7 @@ namespace MultiCommentCollector.Extensions
         /// </summary>
         public static T FindAncestor<T>(this DependencyObject depObj) where T : DependencyObject
         {
-            while (depObj != null)
+            while (depObj is not null)
             {
                 if (depObj is T target)
                     return target;
@@ -46,6 +46,7 @@ namespace MultiCommentCollector.Extensions
                     q.Enqueue(VisualTreeHelper.GetChild(e, i));
 
             }
+
             return null;
         }
 

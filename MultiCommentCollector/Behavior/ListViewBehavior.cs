@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xaml.Behaviors;
 using MultiCommentCollector.Extensions;
-using MultiCommentCollector.Helper;
 using System.Collections.Specialized;
 using System.Windows.Controls;
 
@@ -49,7 +48,6 @@ namespace MultiCommentCollector.Behavior
                 scrollToEnd = true;
             else
                 scrollToEnd = false;
-
         }
     }
 }

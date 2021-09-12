@@ -19,7 +19,6 @@ namespace MCC.NicoLive
     {
         private Dictionary<string, string> header = new Dictionary<string, string>();
 
-        private string liveId;
         private bool resume;
         private WebSocketClient viewingClient = new();
         private WebSocketClient chatClient = new();
@@ -33,6 +32,8 @@ namespace MCC.NicoLive
         public string Author => "ぽんた";
 
         public string PluginName => "ニコニコ生放送";
+
+        public string StreamKey { get; set; }
 
         public string Description => "ニコニコ生放送の配信中のコメントを取得します。";
 
@@ -72,7 +73,7 @@ namespace MCC.NicoLive
             var livePage = url.RegexString(@"https://live[\d]*.nicovideo.jp/watch/(?<value>[\w]+)", "value");
             var communityPage = url.RegexString(@"https://com.nicovideo.jp/community/(?<value>[\w]+)", "value");
 
-            liveId = !livePage.Equals("") ? livePage : communityPage;
+            StreamKey = !livePage.Equals("") ? livePage : communityPage;
 
             if (!livePage.Equals("") || !communityPage.Equals(""))
                 return true;
@@ -102,7 +103,7 @@ namespace MCC.NicoLive
             {
                 if (!viewingClient.Connected)
                 {
-                    var get = Http.Get($"https://live2.nicovideo.jp/watch/{liveId}");
+                    var get = Http.Get($"https://live2.nicovideo.jp/watch/{StreamKey}");
                     var index = get.IndexOf("data-props=\"");
                     var last = get.IndexOf("\">", index);
                     var result = get.Substring(index, last - index).Replace("data-props=\"", "");
@@ -252,6 +253,13 @@ namespace MCC.NicoLive
                         };
 
                         OnCommentReceived?.Invoke(this, new(comment));
+
+
+                        if (data.Chat.Content.Contains("/disconnect"))
+                        {
+                            viewingClient.Abort();
+                            chatClient.Abort();
+                        }
                     }
                 }
             }

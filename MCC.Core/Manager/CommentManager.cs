@@ -1,5 +1,4 @@
 ﻿using MCC.Utility;
-using System.Linq;
 
 namespace MCC.Core.Manager
 {
@@ -9,6 +8,7 @@ namespace MCC.Core.Manager
 
         private static CommentManager instance;
         public static CommentManager Instance => instance ??= new();
+        public static void SetInstance(CommentManager inst) => instance = inst;
 
         #endregion
     }

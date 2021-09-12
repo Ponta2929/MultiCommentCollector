@@ -93,6 +93,7 @@ namespace MCC.Utility.Net
                 client.Dispose();
                 client = null;
 
+                URL = null;
                 Connected = false;
 
                 Logged(LogLevel.Info, $"接続を閉じました。");

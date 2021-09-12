@@ -19,6 +19,8 @@ namespace MCC.Twitch
 
         public string PluginName => "Twitch";
 
+        public string StreamKey { get; set; }
+
         public string Description => "Twitchのコメントを取得します。";
 
         public string Version => "1.0.0";
@@ -27,7 +29,6 @@ namespace MCC.Twitch
 
         public event CommentReceivedEventHandler OnCommentReceived;
 
-        private string userId;
         private bool resume;
 
         public bool Activate()
@@ -63,9 +64,9 @@ namespace MCC.Twitch
 
         public bool IsSupport(string url)
         {
-            userId = url.RegexString(@"https://www.twitch.tv/(?<value>[\w]+)", "value");
+            StreamKey = url.RegexString(@"https://www.twitch.tv/(?<value>[\w]+)", "value");
 
-            if (!userId.Equals(""))
+            if (!StreamKey.Equals(""))
                 return true;
 
             return false;
@@ -85,7 +86,7 @@ namespace MCC.Twitch
         {
             while (resume)
             {
-                Start("irc.twitch.tv", 6667, "mcc_twitch_bot", setting.Password, userId);
+                Start("irc.twitch.tv", 6667, "mcc_twitch_bot", setting.Password, StreamKey);
 
                 await Task.Delay(10000);
             }

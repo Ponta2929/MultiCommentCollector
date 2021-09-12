@@ -1,14 +1,6 @@
 ﻿using MCC.Plugin;
-using MCC.Utility;
 using Reactive.Bindings;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Reactive.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Serialization;
 
 namespace MCC.Core.Manager
@@ -24,6 +16,12 @@ namespace MCC.Core.Manager
         /// </summary>
         [XmlIgnore]
         public IPluginSender Plugin { get; set; }
+
+        /// <summary>
+        /// 処理するURL
+        /// </summary>
+        [XmlIgnore]
+        public string StreamKey { get; set; }
 
         /// <summary>
         /// 処理するURL

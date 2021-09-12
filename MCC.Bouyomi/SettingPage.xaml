@@ -36,7 +36,7 @@
                 <TabItem Header="ブラックリスト">
                     <DockPanel>
                         <DockPanel DockPanel.Dock="Bottom" Margin="0,5, 0,0">
-                            <Button Width="50" Content="削除" DockPanel.Dock="Right" Click="Delete_Click"/>
+                            <Button Content="削除" DockPanel.Dock="Right" Click="Delete_Click"/>
                             <CheckBox Content="ブラックリスト有効" IsChecked="{Binding BlackListEnable}"/>
                         </DockPanel>
                         <DataGrid Name="DataGrid_BlackList" AutoGenerateColumns="False" >

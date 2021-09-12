@@ -1,0 +1,185 @@
+﻿<Controls:MetroWindow x:Class="MultiCommentCollector.Views.MainWindow"
+                      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                      xmlns:icon="http://metro.mahapps.com/winfx/xaml/iconpacks"
+                      xmlns:converter_m="http://metro.mahapps.com/winfx/xaml/shared"
+                      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                      xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+                      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                      xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+                      xmlns:behavior="clr-namespace:MultiCommentCollector.Behavior"
+                      xmlns:converter="clr-namespace:MultiCommentCollector.Converter"
+                      xmlns:viewmodel="clr-namespace:MultiCommentCollector.ViewModels"
+                      xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+                      mc:Ignorable="d"
+        Title="MultiCommentCollector" Height="{Binding Height.Value, Mode=TwoWay}" Width="{Binding Width.Value, Mode=TwoWay}"
+        Top="{Binding Top.Value, Mode=TwoWay}" Left="{Binding Left.Value, Mode=TwoWay}" d:DesignWidth="1000" d:DesignHeight="600">
+    <Window.Resources>
+        <converter:HeaderWidthConverter x:Key="HeaderWidthConverter"/>
+        <converter:IsActiveToStringConverter x:Key="IsActiveToStringConverter"/>
+        <converter:ColorDataConverter x:Key="ColorDataConverter"/>
+    </Window.Resources>
+    <Window.DataContext>
+        <viewmodel:MainWindowViewModel />
+    </Window.DataContext>
+    <DockPanel>
+        <Menu x:Name="menu" VerticalAlignment="Top" DockPanel.Dock="top" FontSize="12">
+            <MenuItem Header="ファイル(_F)">
+                <MenuItem Header="終了(_X)" Command="{Binding ApplicationShutdownCommand}"/>
+            </MenuItem>
+            <MenuItem Header="プラグイン(_P)" ItemsSource="{Binding ParentMenuPlugins}"/>
+            <MenuItem Header="ウィンドウ(_W)">
+                <MenuItem Header="接続(_C)" IsChecked="{Binding IsPaneOpen.Value}" IsCheckable="True"/>
+                <Separator />
+                <MenuItem Header="ユーザー設定一覧(_U)..." Command="{Binding ShowUsersSettingWindowCommand}"/>
+                <Separator />
+                <MenuItem Header="プラグイン(_P)..." Command="{Binding ShowPluginWindowCommand}" />
+                <MenuItem Header="ログ(_L)..." Command="{Binding ShowLogWindowCommand}"/>
+            </MenuItem>
+            <MenuItem Header="ツール(_T)">
+                <MenuItem Header="オプション(_O)..." Command="{Binding ShowOptionWindowCommand}"/>
+            </MenuItem>
+        </Menu>
+        <StatusBar>
+            <StatusBarItem x:Name="StatusBarItemComments" Content="{Binding Path=CommentFilterView.Source.Count}" ContentStringFormat="総コメント数 : {0}" HorizontalContentAlignment="Right"/>
+        </StatusBar>
+        <Controls:SplitView IsPaneOpen="{Binding IsPaneOpen.Value}" DisplayMode="Inline" OpenPaneLength="{Binding PaneWidth.Value, Mode=TwoWay}" CanResizeOpenPane="true" >
+            <GroupBox Header="コメントデータ" Margin="5">
+                <ListView x:Name="CommentListView" ScrollViewer.HorizontalScrollBarVisibility="Hidden" ItemsSource="{Binding Path=CommentFilterView.View}">
+                    <i:Interaction.Behaviors>
+                        <behavior:ListViewBehavior/>
+                    </i:Interaction.Behaviors>
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="MouseDoubleClick">
+                            <i:InvokeCommandAction Command="{Binding ShowUserSettingCommand}" CommandParameter="{Binding SelectedItem, ElementName=CommentListView}"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="{x:Type ListViewItem}" BasedOn="{StaticResource MaterialDesignGridViewItem}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding BackColor.A}" Value="0">
+                                    <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.Text}"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                            <Setter Property="Background" Value="{Binding BackColor, Converter={StaticResource ColorDataConverter}}"/>
+                            <Setter Property="Foreground" Value="{Binding Background, RelativeSource={RelativeSource Self}, Converter={x:Static converter_m:BackgroundToForegroundConverter.Instance}}"/>
+                            <Setter Property="Tag" Value="{Binding DataContext, RelativeSource={RelativeSource AncestorType=ListView}}" />
+                            <Setter Property="ContextMenu">
+                                <Setter.Value>
+                                    <ContextMenu DataContext="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource Self}}">
+                                        <MenuItem Header="ユーザー設定を開く(_O)" Command="{Binding ShowUserSettingCommand}" CommandParameter="{Binding PlacementTarget.Content, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                                        <MenuItem Header="コメント一覧を開く(_L)" Command="{Binding ShowUserDataCommand}" CommandParameter="{Binding PlacementTarget.Content, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                                        <Separator />
+                                        <MenuItem Header="コピー(_C)" >
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="Loaded">
+                                                    <i:InvokeCommandAction Command="{Binding MenuItemOpenedCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=MenuItem}}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </MenuItem>
+                                    </ContextMenu>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Header="配信サイト" DisplayMemberBinding="{Binding LiveName}" x:Name="ColumnLiveName" />
+                            <GridViewColumn Header="時間" DisplayMemberBinding="{Binding PostTime, StringFormat=HH:mm:ss}" x:Name="ColumnPostTime" />
+                            <GridViewColumn x:Name="ColumnUser" Width="120" CellTemplate="{StaticResource GridViewCellItemUserName}">
+                                <GridViewColumnHeader Content="ユーザー名">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="Click">
+                                            <i:InvokeCommandAction Command="{Binding ColumnHeaderUserClickCommand}" PassEventArgsToCommand="True"/>
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </GridViewColumnHeader>
+                            </GridViewColumn>
+                            <GridViewColumn Header="コメント" DisplayMemberBinding="{Binding Comment}" x:Name="ColumnComment">
+                                <GridViewColumn.Width>
+                                    <MultiBinding Converter="{StaticResource HeaderWidthConverter}">
+                                        <Binding ElementName="CommentListView" Path="ActualWidth" />
+                                        <Binding ElementName="ColumnLiveName" Path="ActualWidth" />
+                                        <Binding ElementName="ColumnPostTime" Path="ActualWidth" />
+                                        <Binding ElementName="ColumnUser" Path="ActualWidth" />
+                                    </MultiBinding>
+                                </GridViewColumn.Width>
+                            </GridViewColumn>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </GroupBox>
+            <Controls:SplitView.Pane>
+                <DockPanel Background="{DynamicResource MahApps.Brushes.ThemeBackground}">
+                    <GroupBox Header="接続" Margin="5,5,0,0" DockPanel.Dock="Top">
+                        <DockPanel>
+                            <Label Content="URL" DockPanel.Dock="Left"/>
+                            <Button DockPanel.Dock="Right" Command="{Binding EnterCommand}" CommandParameter="{Binding Text, ElementName=ConnectURL}" ToolTip="URLを追加します。">
+                                <icon:PackIconMaterial Kind="LinkPlus" />
+                            </Button>
+                            <TextBox x:Name="ConnectURL" materialDesign:HintAssist.Hint="接続先のURLを入力してください。" Cursor="IBeam"/>
+                        </DockPanel>
+                    </GroupBox>
+                    <GroupBox Header="リスト" Margin="5,5,0,5" >
+                        <DockPanel>
+                            <StackPanel Orientation="Horizontal" DockPanel.Dock="Bottom">
+                                <Button Command="{Binding ActivateCommand}" CommandParameter="{Binding SelectedItem, ElementName=ConnectionListView}" ToolTip="URLを有効化します。">
+                                    <icon:PackIconMaterial Kind="Link" />
+                                </Button>
+                                <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Margin="2" />
+                                <Button Command="{Binding InactivateCommand}" CommandParameter="{Binding SelectedItem, ElementName=ConnectionListView}" ToolTip="URLを無効化します。">
+                                    <icon:PackIconMaterial Kind="LinkOff" />
+                                </Button>
+                                <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Margin="5" />
+                                <Button Command="{Binding DeleteCommand}" CommandParameter="{Binding SelectedItem, ElementName=ConnectionListView}" ToolTip="URLを削除します。">
+                                    <icon:PackIconMaterial Kind="Delete" />
+                                </Button>
+                            </StackPanel>
+                            <ListView x:Name="ConnectionListView" ScrollViewer.HorizontalScrollBarVisibility="Hidden" ItemsSource="{Binding ConnectionView.Source}">
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="MouseDoubleClick">
+                                        <i:InvokeCommandAction Command="{Binding ToggleCommand}" CommandParameter="{Binding SelectedItem, ElementName=ConnectionListView}"/>
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                                <ListView.View>
+                                    <GridView>
+                                        <GridViewColumn Header="サイト" DisplayMemberBinding="{Binding Plugin.SiteName}" x:Name="ConnectionSite" />
+                                        <GridViewColumn CellTemplate="{StaticResource GridViewCellItemURL }">
+                                            <GridViewColumn.Width>
+                                                <MultiBinding Converter="{StaticResource HeaderWidthConverter}">
+                                                    <Binding ElementName="ConnectionListView" Path="ActualWidth" />
+                                                    <Binding ElementName="ConnectionSite" Path="ActualWidth" />
+                                                    <Binding ElementName="ConnectionState" Path="ActualWidth" />
+                                                </MultiBinding>
+                                            </GridViewColumn.Width>
+                                            <GridViewColumnHeader Content="接続先 / URL">
+                                                <i:Interaction.Triggers>
+                                                    <i:EventTrigger EventName="Click">
+                                                        <i:InvokeCommandAction Command="{Binding ColumnHeaderConnectionClickCommand}" PassEventArgsToCommand="True"/>
+                                                    </i:EventTrigger>
+                                                </i:Interaction.Triggers>
+                                            </GridViewColumnHeader>
+                                        </GridViewColumn>
+                                        <GridViewColumn x:Name="ConnectionState" Width="30">
+                                            <GridViewColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <icon:PackIconMaterial x:Name="State" Kind="CheckboxMarked" ToolTip="有効" Width="12" Foreground="{DynamicResource PrimaryHueMidBrush}"  Background="Transparent"/>
+                                                    <DataTemplate.Triggers>
+                                                        <DataTrigger Binding="{Binding IsActive.Value}" Value="False">
+                                                            <Setter TargetName="State" Property="Kind" Value="CheckboxBlankOutline"/>
+                                                            <Setter TargetName="State" Property="ToolTip" Value="無効"/>
+                                                        </DataTrigger>
+                                                    </DataTemplate.Triggers>
+                                                </DataTemplate>
+                                            </GridViewColumn.CellTemplate>
+                                        </GridViewColumn>
+                                    </GridView>
+                                </ListView.View>
+                            </ListView>
+                        </DockPanel>
+                    </GroupBox>
+                </DockPanel>
+            </Controls:SplitView.Pane>
+        </Controls:SplitView>
+    </DockPanel>
+</Controls:MetroWindow>

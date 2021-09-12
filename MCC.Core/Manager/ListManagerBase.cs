@@ -10,12 +10,12 @@ namespace MCC.Core.Manager
         /// <summary>
         /// リストが保持できる件数です。
         /// </summary>
-        public ReactivePropertySlim<int> MaxSize { get; set; } = new(1000);
+        public ReactiveProperty<int> MaxSize { get; set; } = new(1000);
 
         /// <summary>
         /// MaxSizeを有効化します。
         /// </summary>
-        public ReactivePropertySlim<bool> IsLimit { get; set; } = new(true);
+        public ReactiveProperty<bool> IsLimit { get; set; } = new(true);
 
         public ListManagerBase()
         {

@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -16,7 +17,8 @@ namespace MultiCommentCollector.Helper
 
             var content = new MenuItem();
             content.Header = header;
-            content.Click += MenuItemCopy_Click;
+            content.Click += (sender, _) =>
+                Clipboard.SetData(DataFormats.Text, (sender as MenuItem).Header);
 
             owner.Items.Add(content);
 
@@ -57,8 +59,5 @@ namespace MultiCommentCollector.Helper
 
             return true;
         }
-
-        private static void MenuItemCopy_Click(object sender, RoutedEventArgs _)
-            => Clipboard.SetData(DataFormats.Text, (sender as MenuItem).Header);
     }
 }

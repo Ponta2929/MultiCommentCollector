@@ -16,7 +16,6 @@ namespace MCC.TwitCasting
 {
     public class TwitCasting : WebSocketClient, IPluginSender
     {
-        private string userId;
         private LatestMovie latest;
         private bool resume;
         private bool called;
@@ -24,6 +23,8 @@ namespace MCC.TwitCasting
         public string Author => "ぽんた";
 
         public string PluginName => "TwitCasting";
+
+        public string StreamKey { get; set; }
 
         public string Description => "TwitCastingの配信中のコメントを取得します。";
 
@@ -70,7 +71,7 @@ namespace MCC.TwitCasting
         private async void Connect()
         {
             // 初回ライブ情報を取得
-            latest = GetLatestMovie(userId);
+            latest = GetLatestMovie(StreamKey);
 
             while (resume)
             {
@@ -182,7 +183,7 @@ namespace MCC.TwitCasting
                 // 動画IDを60秒ごとにチェックする
                 await Task.Delay(60000);
 
-                var movie = GetLatestMovie(userId);
+                var movie = GetLatestMovie(StreamKey);
 
                 if (latest?.Movie.ID != movie?.Movie.ID)
                 {
@@ -227,9 +228,9 @@ namespace MCC.TwitCasting
         }
         public bool IsSupport(string url)
         {
-            userId = url.RegexString(@"https://twitcasting.tv/(?<value>[\w]+)", "value");
+            StreamKey = url.RegexString(@"https://twitcasting.tv/(?<value>[\w]+)", "value");
 
-            if (!userId.Equals(""))
+            if (!StreamKey.Equals(""))
                 return true;
 
             return false;

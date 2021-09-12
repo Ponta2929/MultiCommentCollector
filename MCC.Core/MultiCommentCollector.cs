@@ -80,6 +80,7 @@ namespace MCC.Core
                 if (@interface.IsSupport(info.URL))
                 {
                     info.Plugin = @interface;
+                    info.StreamKey = @interface.StreamKey;
 
                     if (info.IsActive.Value)
                     {
@@ -182,6 +183,7 @@ namespace MCC.Core
                     {
                         Plugin = @interface,
                         IsActive = new(false),
+                        StreamKey = @interface.StreamKey,
                         URL = url
                     };
 
@@ -230,6 +232,9 @@ namespace MCC.Core
         /// <param name="connection"></param>
         public void RemoveConnection(ConnectionData connection)
         {
+            if (connection is null)
+                return;
+
             Inactivate(connection);
 
             // 削除

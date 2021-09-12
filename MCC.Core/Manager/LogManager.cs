@@ -8,6 +8,7 @@ namespace MCC.Core.Manager
 
         private static LogManager instance;
         public static LogManager Instance => instance ??= new();
+        public static void SetInstance(LogManager inst) => instance = inst;
 
         #endregion
     }

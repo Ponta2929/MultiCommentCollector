@@ -19,6 +19,16 @@ namespace MCC.Utility.IO
         }
 
         /// <summary>
+        /// Xmlデータをファイルに書き込みます。
+        /// </summary>
+        /// <param name="fileName">対象のファイル名。</param>
+        public static void FileSerialize(string fileName, object @object)
+        {
+            using (var stream = new FileStream(fileName, FileMode.Create, FileAccess.Write))
+                (new System.Xml.Serialization.XmlSerializer(@object.GetType())).Serialize(stream, @object);
+        }
+
+        /// <summary>
         /// Xmlデータをファイルから読み込みます。
         /// </summary>
         /// <param name="fileName">対象のファイル名。</param>

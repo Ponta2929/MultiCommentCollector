@@ -1,6 +1,4 @@
 ﻿using MCC.Plugin;
-using MCC.Utility.Reflection;
-using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -18,6 +16,7 @@ namespace MCC.Core.Manager
 
         private static PluginManager instance;
         public static PluginManager Instance => instance ??= new();
+        public static void SetInstance(PluginManager inst) => instance = inst;
 
         #endregion
 

@@ -22,6 +22,12 @@ namespace MCC.Plugin
         /// </summary>
         string SiteName { get; }
 
+        [XmlIgnore]
+        /// <summary>
+        /// サイト名です。
+        /// </summary>
+        string StreamKey { get; set; }
+
         /// <summary>
         /// プラグインがアクティブになると呼び出されます。
         /// </summary>

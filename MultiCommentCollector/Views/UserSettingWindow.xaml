@@ -1,0 +1,35 @@
+﻿<Controls:MetroWindow x:Class="MultiCommentCollector.Views.UserSettingWindow"
+                      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                      xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+                      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                      xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+                      mc:Ignorable="d"
+        Title="ユーザー設定" Width="350" WindowStartupLocation="CenterOwner" SizeToContent="Height">
+    <Grid Margin="10">
+        <StackPanel Orientation="Vertical">
+            <CheckBox Content="非表示" HorizontalAlignment="Right" IsChecked="{Binding HideUser.Value}"/>
+            <DockPanel Margin="5">
+                <TextBlock Text="配信サイト" Width="100" />
+                <TextBlock Text="{Binding LiveName.Value}" />
+            </DockPanel>
+            <DockPanel Margin="5">
+                <TextBlock Text="ユーザーID" Width="100" />
+                <TextBlock Text="{Binding UserID.Value}"/>
+            </DockPanel>
+            <DockPanel Margin="5">
+                <TextBlock Text="ユーザー名" Width="100" VerticalAlignment="Center" />
+                <TextBox Text="{Binding UserName.Value}" materialDesign:HintAssist.Hint="任意の名前を入力してください。"/>
+            </DockPanel>
+            <DockPanel Margin="5">
+                <TextBlock Text="背景色" Width="100" VerticalAlignment="Center" />
+                <Controls:ColorPicker SelectedColor="{Binding BackgroundColor.Value}"/>
+            </DockPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="5">
+                <Button Content="OK" Width="90" Margin="0,0,10,0"  Command="{Binding OkClickCommand}"/>
+                <Button Content="キャンセル" Width="90" Command="{Binding CloseWindowCommand}"/>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</Controls:MetroWindow>
