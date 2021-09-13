@@ -1,15 +1,9 @@
-﻿using ControlzEx.Theming;
-using MaterialDesignThemes.Wpf;
-using MCC.Core.Manager;
-using MultiCommentCollector.Extensions;
+﻿using MultiCommentCollector.Extensions;
 using MultiCommentCollector.Helper;
 using MultiCommentCollector.Models;
 using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
 using System;
-using System.ComponentModel;
-using System.Reactive.Disposables;
-using System.Windows;
 using System.Windows.Media;
 
 namespace MultiCommentCollector.ViewModels

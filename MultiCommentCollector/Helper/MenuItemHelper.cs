@@ -1,5 +1,4 @@
-﻿using System;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -13,7 +12,9 @@ namespace MultiCommentCollector.Helper
         public static bool CreateMenuItemToCopy(MenuItem owner, string header)
         {
             if (header is null || header.Equals(""))
+            {
                 return false;
+            }
 
             var content = new MenuItem();
             content.Header = header;
@@ -31,7 +32,9 @@ namespace MultiCommentCollector.Helper
         public static bool CreateMenuItemToCopyURL(MenuItem owner, string header, bool separator = true)
         {
             if (header is null || header.Equals(""))
+            {
                 return false;
+            }
 
             var created = false;
             var reg = @"http(s)?://([\w-]+\.)+[\w-]+(/[\w- ./?%&=]*)?";

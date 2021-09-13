@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace MCC.NicoLive
 {
@@ -43,7 +39,8 @@ namespace MCC.NicoLive
         [JsonPropertyName("uri")]
         public string URI { get; set; }
     }
-    public class ReceiveChat {
+    public class ReceiveChat
+    {
 
         [JsonPropertyName("chat")]
         public Chat Chat { get; set; }

@@ -33,7 +33,9 @@ namespace MCC.Core.Manager
         public void Load(string folderPath)
         {
             if (!Directory.Exists(folderPath))
+            {
                 throw new DirectoryNotFoundException();
+            }
 
             var interfaceName = typeof(IPluginBase).Name;
             var plugins = Directory.GetFiles(folderPath, "*.dll", SearchOption.AllDirectories);
@@ -63,7 +65,9 @@ namespace MCC.Core.Manager
             var receiver = Parent.Where(x => x is IPluginReceiver).Select(x => CreateInstance(x)).ToArray();
 
             foreach (var item in receiver)
+            {
                 item.PluginLoad();
+            }
 
             AddRange(receiver);
         }

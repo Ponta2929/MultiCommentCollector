@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -76,7 +75,9 @@ namespace MCC.NicoLive
             StreamKey = !livePage.Equals("") ? livePage : communityPage;
 
             if (!livePage.Equals("") || !communityPage.Equals(""))
+            {
                 return true;
+            }
 
             return false;
         }
@@ -120,7 +121,10 @@ namespace MCC.NicoLive
                             while (true)
                             {
                                 if (chatClient.URL is not null)
+                                {
                                     break;
+                                }
+
                                 Task.Delay(1000);
                             }
 
@@ -158,13 +162,17 @@ namespace MCC.NicoLive
                         var result = await socket.ReceiveAsync(segment, CancellationToken.None);
 
                         if (result.MessageType == WebSocketMessageType.Close)
+                        {
                             return;
+                        }
 
                         received.AddRange(buffer);
                         count += result.Count;
 
                         if (result.EndOfMessage)
+                        {
                             break;
+                        }
                     }
 
                     var receive = Encoding.UTF8.GetString(received.ToArray(), 0, count);
@@ -227,13 +235,17 @@ namespace MCC.NicoLive
                         var result = await socket.ReceiveAsync(segment, CancellationToken.None);
 
                         if (result.MessageType == WebSocketMessageType.Close)
+                        {
                             return;
+                        }
 
                         received.AddRange(buffer);
                         count += result.Count;
 
                         if (result.EndOfMessage)
+                        {
                             break;
+                        }
                     }
 
                     var receive = Encoding.UTF8.GetString(received.ToArray(), 0, count);
@@ -305,7 +317,9 @@ namespace MCC.NicoLive
             foreach (Match m in collection)
             {
                 if (m.Success)
+                {
                     return m.Groups["text"].Value.Trim();
+                }
             }
 
             return message;

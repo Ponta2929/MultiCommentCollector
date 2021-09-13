@@ -21,7 +21,9 @@ namespace MCC.Utility.IO
         public static void FileSerialize<T>(string fileName, object @object)
         {
             using (var stream = new FileStream(fileName, FileMode.Create, FileAccess.Write))
+            {
                 new DataContractJsonSerializer(typeof(T), Settings).WriteObject(stream, @object);
+            }
         }
 
         /// <summary>
@@ -31,10 +33,14 @@ namespace MCC.Utility.IO
         public static T FileDeserialize<T>(string fileName) where T : new()
         {
             if (!File.Exists(fileName))
+            {
                 return new T();
+            }
 
             using (var stream = new FileStream(fileName, FileMode.Open, FileAccess.Read))
+            {
                 return (T)new DataContractJsonSerializer(typeof(T), Settings).ReadObject(stream);
+            }
         }
 
         /// <summary>
@@ -56,7 +62,9 @@ namespace MCC.Utility.IO
         public static T Deserialize<T>(string json)
         {
             using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(json)))
+            {
                 return (T)new DataContractJsonSerializer(typeof(T), Settings).ReadObject(stream);
+            }
         }
     }
 
@@ -73,7 +81,9 @@ namespace MCC.Utility.IO
         public void FileSerialize(string fileName)
         {
             using (var stream = new FileStream(fileName, FileMode.Create, FileAccess.Write))
+            {
                 new DataContractJsonSerializer(typeof(T), JsonSerializer.Settings).WriteObject(stream, this);
+            }
         }
 
         /// <summary>
@@ -87,7 +97,9 @@ namespace MCC.Utility.IO
                 var t = (T)new DataContractJsonSerializer(typeof(T), JsonSerializer.Settings).ReadObject(stream);
 
                 foreach (var info in t.GetType().GetFields())
+                {
                     info.SetValue(this, info.GetValue(t));
+                }
 
                 foreach (var info in t.GetType().GetProperties())
                 {
@@ -122,7 +134,9 @@ namespace MCC.Utility.IO
                 var t = (T)new DataContractJsonSerializer(typeof(T), JsonSerializer.Settings).ReadObject(stream);
 
                 foreach (var info in t.GetType().GetFields())
+                {
                     info.SetValue(this, info.GetValue(t));
+                }
 
                 foreach (var info in t.GetType().GetProperties())
                 {

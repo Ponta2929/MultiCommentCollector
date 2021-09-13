@@ -3,7 +3,6 @@ using MCC.Plugin.Win;
 using MCC.Utility;
 using MCC.Utility.Net;
 using MCC.Utility.Text;
-using System.Collections;
 using System.Diagnostics;
 using System.IO;
 using System.Text.RegularExpressions;
@@ -35,7 +34,9 @@ namespace MCC.Bouyomi
         public void PluginLoad()
         {
             foreach (var item in Setting.Instance.BlackListItems)
+            {
                 BlackList.Instance.Add(item);
+            }
         }
 
         public void Receive(CommentData comment)
@@ -69,7 +70,7 @@ namespace MCC.Bouyomi
             window.SizeToContent = SizeToContent.WidthAndHeight;
             window.WindowStartupLocation = WindowStartupLocation.CenterOwner;
             window.Show();
-        }     
+        }
 
         public bool IsRead(CommentData comment)
         {
@@ -80,38 +81,66 @@ namespace MCC.Bouyomi
                 var (userName, userId, liveName, commente) = (false, false, false, false);
 
                 if (item.LiveName.Equals("*") && item.UserName.Equals("*") && item.UserID.Equals("*") && item.Comment.Equals("*"))
+                {
                     continue;
+                }
 
                 if (IsRegex(item.Comment))
+                {
                     commente = Regex(item.Comment, comment.Comment);
+                }
                 else if (item.Comment.Equals("*"))
+                {
                     commente = true;
+                }
                 else
+                {
                     commente = comment.Comment.Equals(item.Comment);
+                }
 
                 if (IsRegex(item.LiveName))
+                {
                     liveName = Regex(item.LiveName, comment.LiveName);
+                }
                 else if (item.LiveName.Equals("*"))
+                {
                     liveName = true;
+                }
                 else
+                {
                     liveName = comment.LiveName.Equals(item.LiveName);
+                }
 
                 if (IsRegex(item.UserID))
+                {
                     userId = Regex(item.UserID, comment.UserID);
+                }
                 else if (item.UserID.Equals("*"))
+                {
                     userId = true;
+                }
                 else
+                {
                     userId = comment.UserID.Equals(item.UserID);
+                }
 
                 if (IsRegex(item.UserName))
+                {
                     userName = Regex(item.UserName, comment.UserName);
+                }
                 else if (item.UserName.Equals("*"))
+                {
                     userName = true;
+                }
                 else
+                {
                     userName = comment.UserName.Equals(item.UserName);
+                }
 
                 if (userName && userId && liveName && commente)
+                {
                     return false;
+                }
             }
 
             return true;
@@ -128,7 +157,9 @@ namespace MCC.Bouyomi
             var last = target.LastIndexOf(")");
 
             if (index != -1 && last != -1)
+            {
                 return true;
+            }
 
             return false;
         }

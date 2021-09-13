@@ -12,7 +12,6 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Linq;
 
 namespace MultiCommentCollector.ViewModels
 {
@@ -48,15 +47,21 @@ namespace MultiCommentCollector.ViewModels
             var word = SearchText.Value.ToLower();
 
             if (SearchText.Value is null || SearchText.Value is "" || item.LiveName.ToLower().Contains(word) || item.UserID.ToLower().Contains(word) || item.UserName.ToLower().Contains(word))
+            {
                 e.Accepted = true;
+            }
             else
+            {
                 e.Accepted = false;
+            }
         }
 
         private void DeleteUserSetting(UserData user)
         {
             if (user is null)
+            {
                 return;
+            }
 
             // 削除
             if (userDataManager.Remove(commentManager, user))
@@ -78,22 +83,32 @@ namespace MultiCommentCollector.ViewModels
                 if (header.Role is not GridViewColumnHeaderRole.Padding)
                 {
                     if (header != owner.Tag)
+                    {
                         header.Tag = ListSortDirection.Ascending;
+                    }
                     else
                     {
                         if (header.Tag is ListSortDirection.Ascending)
+                        {
                             header.Tag = ListSortDirection.Descending;
+                        }
                         else
+                        {
                             header.Tag = ListSortDirection.Ascending;
+                        }
                     }
 
                     var columnBinding = header.Column.DisplayMemberBinding as Binding;
                     var sortBy = columnBinding?.Path.Path ?? header.Column.Header as string;
 
                     if (sortBy.Equals("非表示"))
+                    {
                         sortBy = "HideUser";
+                    }
                     else if (sortBy.Equals("背景色"))
+                    {
                         sortBy = "BackColor";
+                    }
 
                     Sort(sortBy, (ListSortDirection)header.Tag);
 

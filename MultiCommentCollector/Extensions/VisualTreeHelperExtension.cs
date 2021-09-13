@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Media;
 
@@ -19,7 +15,9 @@ namespace MultiCommentCollector.Extensions
             while (depObj is not null)
             {
                 if (depObj is T target)
+                {
                     return target;
+                }
 
                 depObj = VisualTreeHelper.GetParent(depObj);
             }
@@ -38,13 +36,16 @@ namespace MultiCommentCollector.Extensions
                 var e = q.Dequeue();
 
                 if (e is T)
+                {
                     return e as T;
+                }
 
                 var c = VisualTreeHelper.GetChildrenCount(e);
 
                 for (var i = 0; i < c; ++i)
+                {
                     q.Enqueue(VisualTreeHelper.GetChild(e, i));
-
+                }
             }
 
             return null;

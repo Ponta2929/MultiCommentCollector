@@ -1,6 +1,5 @@
 ﻿using ControlzEx.Theming;
 using MaterialDesignThemes.Wpf;
-using MCC.Utility;
 using MultiCommentCollector.Extensions;
 using System.Windows.Media;
 
@@ -23,7 +22,7 @@ namespace MultiCommentCollector.Helper
             // Material
             var ss = new MaterialDesignThemes.MahApps.MahAppsBundledTheme();
             var paletteHelper = new PaletteHelper();
-            ITheme theme = paletteHelper.GetTheme();
+            var theme = paletteHelper.GetTheme();
             theme.SetBaseTheme(isDarkMode ? new MaterialDesignDarkTheme() : new MaterialDesignLightTheme());
             theme.SetPrimaryColor(color);
             paletteHelper.SetTheme(theme);

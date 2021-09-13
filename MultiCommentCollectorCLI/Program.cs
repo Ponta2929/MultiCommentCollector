@@ -1,8 +1,6 @@
 ﻿using MCC.Core;
 using MCC.Core.Manager;
 using MCC.Utility.IO;
-using MCC.Utility.Text;
-using Reactive.Bindings;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -24,7 +22,7 @@ namespace MultiCommentCollectorCLI
             // コマンド解析
             ExecuteCommand(AnalyzeCommand(args));
 
-            bool exit = false;
+            var exit = false;
 
             while (!exit)
             {
@@ -49,7 +47,9 @@ namespace MultiCommentCollectorCLI
         static void ExecuteCommand(Dictionary<string, string> commands)
         {
             if (commands is null)
+            {
                 return;
+            }
 
             if (commands.ContainsKey("exit"))
             {
@@ -62,18 +62,23 @@ namespace MultiCommentCollectorCLI
                 Console.WriteLine($"接続リスト一覧");
 
                 if (ConnectionManager.Instance.Count == 0)
+                {
                     Console.WriteLine($"    なし");
+                }
                 else
+                {
                     for (var i = 0; i < ConnectionManager.Instance.Count; i++)
                     {
                         var item = ConnectionManager.Instance[i];
                         Console.WriteLine($"{i} - {item.Plugin.PluginName}　URL:{item.URL}　状態:{(item.IsActive.Value ? "有効" : "無効")}");
                     }
+                }
             }
 
             if (commands.TryGetValue("-add", out var url))
+            {
                 MultiCommentCollector.Instance.AddURL(url, true);
-
+            }
 
             if (commands.TryGetValue("-remove", out var remove))
             {
@@ -142,12 +147,14 @@ namespace MultiCommentCollectorCLI
         static void ApplicationStart()
         {
             AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
-            Setting setting = Setting.Instance;
+            var setting = Setting.Instance;
             LogManager.Instance.CollectionChanged += Log_CollectionChanged;
             CommentManager.Instance.CollectionChanged += Comment_CollectionChanged;
 
             foreach (var item in Setting.Instance.ConnectionList)
+            {
                 ConnectionManager.Instance.Add(item);
+            }
 
             MultiCommentCollector.Instance.Apply();
             MultiCommentCollector.Instance.ServerStart();
@@ -160,7 +167,9 @@ namespace MultiCommentCollectorCLI
             Setting.Instance.ConnectionList = ConnectionManager.Instance;
 
             foreach (var item in PluginManager.Instance)
+            {
                 item.PluginClose();
+            }
 
             try
             {

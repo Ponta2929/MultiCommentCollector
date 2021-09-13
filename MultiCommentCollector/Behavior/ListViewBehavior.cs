@@ -30,13 +30,17 @@ namespace MultiCommentCollector.Behavior
                 scrollViewer = AssociatedObject.FindElement<ScrollViewer>();
 
                 if (scrollViewer is not null)
+                {
                     scrollViewer.ScrollChanged += ScrollViewer_ScrollChanged;
+                }
             }
 
             if (e.Action == NotifyCollectionChangedAction.Add)
             {
                 if (scrollToEnd)
+                {
                     scrollViewer.ScrollToEnd();
+                }
             }
         }
 
@@ -45,9 +49,13 @@ namespace MultiCommentCollector.Behavior
         private void ScrollViewer_ScrollChanged(object sender, ScrollChangedEventArgs e)
         {
             if (scrollViewer.ScrollableHeight == scrollViewer.VerticalOffset)
+            {
                 scrollToEnd = true;
+            }
             else
+            {
                 scrollToEnd = false;
+            }
         }
     }
 }

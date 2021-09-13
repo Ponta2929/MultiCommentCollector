@@ -1,6 +1,8 @@
-﻿namespace MCC.Utility
+﻿using MCC.Utility.Binding;
+
+namespace MCC.Utility
 {
-    public class PostHeader
+    public class PostHeader : BindableBase
     {
         public PostType PostType { get; set; }
     }

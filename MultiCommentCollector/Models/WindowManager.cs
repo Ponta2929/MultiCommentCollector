@@ -57,7 +57,9 @@ namespace MultiCommentCollector.Models
         public static void ShowUserSettingWindow(UserData user)
         {
             if (user is null)
+            {
                 return;
+            }
 
             var userData = new UserSettingWindow();
             userData.DataContext = new UserSettingWindowViewModel(user);
@@ -74,7 +76,9 @@ namespace MultiCommentCollector.Models
         public static void ShowUserDataWindow(CommentDataEx user)
         {
             if (user is null || WindowHelper.SearchUserDataWindow(user.LiveName, user.UserID))
+            {
                 return;
+            }
 
             var userData = new UserDataWindow();
             userData.DataContext = new UserDataWindowViewModel(user);

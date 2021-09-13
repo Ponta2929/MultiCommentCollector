@@ -1,8 +1,4 @@
-﻿using MCC.Core.Manager;
-using MCC.Utility;
-using MultiCommentCollector.Helper;
-using Reactive.Bindings;
-using System;
+﻿using System;
 
 namespace MultiCommentCollector.Models
 {

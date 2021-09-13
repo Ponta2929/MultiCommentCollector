@@ -7,8 +7,6 @@ using MultiCommentCollector.Models;
 using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
 using System;
-using System.ComponentModel;
-using System.Reactive.Disposables;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
@@ -49,9 +47,13 @@ namespace MultiCommentCollector.ViewModels
             var item = e.Item as CommentDataEx;
 
             if (item is not null && LiveName == item.LiveName && UserId == item.UserID)
+            {
                 e.Accepted = true;
+            }
             else
+            {
                 e.Accepted = false;
+            }
         }
 
         /// <summary>

@@ -44,7 +44,9 @@ namespace MCC.Core.Server
         private async void StartListen()
         {
             if (listener is null)
+            {
                 listener = new();
+            }
 
             if (!listener.IsListening)
             {
@@ -151,7 +153,9 @@ namespace MCC.Core.Server
                     var socket = Sockets[i];
 
                     if (socket.State == WebSocketState.Open)
+                    {
                         socket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "OK", CancellationToken.None);
+                    }
 
                     socket.Dispose();
                 }
@@ -168,7 +172,9 @@ namespace MCC.Core.Server
         public void Close(WebSocket socket)
         {
             if (socket.State == WebSocketState.Open)
+            {
                 socket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "OK", CancellationToken.None);
+            }
 
             socket.Dispose();
 

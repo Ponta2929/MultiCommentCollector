@@ -17,7 +17,9 @@ namespace MCC.Utility.Text
             var mc = Regex.Matches(text, regex, RegexOptions.IgnoreCase | RegexOptions.Singleline);
 
             foreach (Match m in mc)
+            {
                 return m.Groups[param].Value;
+            }
 
             return string.Empty;
         }
@@ -36,7 +38,9 @@ namespace MCC.Utility.Text
             var value = new List<string>();
 
             foreach (Match m in mc)
+            {
                 value.Add(m.Groups[param].Value);
+            }
 
             return value.ToArray();
         }
@@ -53,7 +57,9 @@ namespace MCC.Utility.Text
             var mc = Regex.Matches(text, regex, RegexOptions.IgnoreCase | RegexOptions.Singleline);
 
             foreach (Match m in mc)
+            {
                 return m.Value;
+            }
 
             return string.Empty;
         }

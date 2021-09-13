@@ -96,7 +96,7 @@ namespace MultiCommentCollector.ViewModels
             CreateMenuItemPlugins();
 
             // コメントフィルタリング
-            MessageBroker.Default.Subscribe<MessageArgs>(x => { if (x.Identifier is "Refresh.Comment.View") CommentFilterView.View.Refresh(); }).AddTo(Disposable);
+            MessageBroker.Default.Subscribe<MessageArgs>(x => { if (x.Identifier is "Refresh.Comment.View") { CommentFilterView.View.Refresh(); } }).AddTo(Disposable);
         }
 
         private void CommentFilter_Filter(object _, FilterEventArgs e)
@@ -105,9 +105,13 @@ namespace MultiCommentCollector.ViewModels
             var userData = UserDataManager.Instance.Find(item);
 
             if (userData is not null && userData.HideUser)
+            {
                 e.Accepted = false;
+            }
             else
+            {
                 e.Accepted = true;
+            }
         }
 
         /// <summary>
@@ -178,7 +182,7 @@ namespace MultiCommentCollector.ViewModels
 
                 (item.Items[0] as ISetting).ShowWindow(window);
 
-               Helper.TabControlHelper.SetHeaderFontSize(window, 14);
+                Helper.TabControlHelper.SetHeaderFontSize(window, 14);
             }
         }
 

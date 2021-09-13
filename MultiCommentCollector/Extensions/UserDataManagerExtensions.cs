@@ -1,6 +1,5 @@
 ﻿using MCC.Core.Manager;
 using MCC.Utility;
-using MultiCommentCollector.Models;
 using System.Linq;
 
 namespace MultiCommentCollector.Extensions

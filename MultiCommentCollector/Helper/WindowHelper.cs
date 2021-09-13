@@ -1,9 +1,4 @@
 ﻿using MultiCommentCollector.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace MultiCommentCollector.Helper
@@ -25,7 +20,9 @@ namespace MultiCommentCollector.Helper
                 if (target.DataContext is not null && target.DataContext is UserDataWindowViewModel user)
                 {
                     if (user.LiveName == liveName && user.UserId == userId)
+                    {
                         return true;
+                    }
                 }
             }
 
@@ -44,7 +41,9 @@ namespace MultiCommentCollector.Helper
                 var target = window as Window;
 
                 if (target.DataContext is not null && target.DataContext.Equals(viewModel))
+                {
                     return target;
+                }
             }
 
             return null;
@@ -61,7 +60,9 @@ namespace MultiCommentCollector.Helper
                 var target = window as Window;
 
                 if (target.DataContext is not null && target.DataContext.Equals(viewModel))
+                {
                     target.Close();
+                }
             }
         }
 

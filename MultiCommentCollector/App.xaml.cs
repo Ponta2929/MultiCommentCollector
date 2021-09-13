@@ -44,7 +44,9 @@ namespace MultiCommentCollector
 
             // プラグイン終了処理
             foreach (var item in PluginManager.Instance)
+            {
                 item.PluginClose();
+            }
 
             // 設定保存
             SerializerHelper.XmlSerialize("users.xml", UserDataManager.Instance);

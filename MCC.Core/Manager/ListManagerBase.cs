@@ -67,14 +67,18 @@ namespace MCC.Core.Manager
             lock (syncObject)
             {
                 foreach (var item in items)
+                {
                     Add(item);
+                }
             }
         }
 
         private void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (!IsLimit.Value)
+            {
                 return;
+            }
 
             try
             {

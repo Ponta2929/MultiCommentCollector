@@ -5,7 +5,6 @@ using MCC.Utility.Text;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
@@ -126,7 +125,9 @@ namespace MCC.TwitCasting
                         count += result.Count;
 
                         if (result.EndOfMessage)
+                        {
                             break;
+                        }
                     }
 
                     var message = Encoding.UTF8.GetString(received.ToArray(), 0, count);
@@ -231,7 +232,9 @@ namespace MCC.TwitCasting
             StreamKey = url.RegexString(@"https://twitcasting.tv/(?<value>[\w]+)", "value");
 
             if (!StreamKey.Equals(""))
+            {
                 return true;
+            }
 
             return false;
         }

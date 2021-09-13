@@ -14,7 +14,9 @@ namespace MultiCommentCollector.Models
             set
             {
                 if (_IsOwnerClose = value)
+                {
                     Close();
+                }
             }
         }
 

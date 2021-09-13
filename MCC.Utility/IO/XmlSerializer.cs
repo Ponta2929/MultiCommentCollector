@@ -15,7 +15,9 @@ namespace MCC.Utility.IO
         public static void FileSerialize<T>(string fileName, object @object)
         {
             using (var stream = new FileStream(fileName, FileMode.Create, FileAccess.Write))
-                (new System.Xml.Serialization.XmlSerializer(typeof(T))).Serialize(stream, @object);
+            {
+                new System.Xml.Serialization.XmlSerializer(typeof(T)).Serialize(stream, @object);
+            }
         }
 
         /// <summary>
@@ -25,7 +27,9 @@ namespace MCC.Utility.IO
         public static void FileSerialize(string fileName, object @object)
         {
             using (var stream = new FileStream(fileName, FileMode.Create, FileAccess.Write))
-                (new System.Xml.Serialization.XmlSerializer(@object.GetType())).Serialize(stream, @object);
+            {
+                new System.Xml.Serialization.XmlSerializer(@object.GetType()).Serialize(stream, @object);
+            }
         }
 
         /// <summary>
@@ -35,10 +39,14 @@ namespace MCC.Utility.IO
         public static T FileDeserialize<T>(string fileName) where T : new()
         {
             if (!File.Exists(fileName))
+            {
                 return new T();
+            }
 
             using (var stream = new FileStream(fileName, FileMode.Open, FileAccess.Read))
-                return (T)((new System.Xml.Serialization.XmlSerializer(typeof(T))).Deserialize(stream) ?? new T());
+            {
+                return (T)(new System.Xml.Serialization.XmlSerializer(typeof(T)).Deserialize(stream) ?? new T());
+            }
         }
 
         /// <summary>
@@ -49,7 +57,7 @@ namespace MCC.Utility.IO
         {
             using (var stream = new MemoryStream())
             {
-                (new System.Xml.Serialization.XmlSerializer(typeof(T))).Serialize(stream, @object);
+                new System.Xml.Serialization.XmlSerializer(typeof(T)).Serialize(stream, @object);
                 return Encoding.UTF8.GetString(stream.ToArray());
             }
         }
@@ -60,7 +68,9 @@ namespace MCC.Utility.IO
         public static T Deserialize<T>(string xml)
         {
             using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(xml)))
-                return (T)(new System.Xml.Serialization.XmlSerializer(typeof(T))).Deserialize(stream);
+            {
+                return (T)new System.Xml.Serialization.XmlSerializer(typeof(T)).Deserialize(stream);
+            }
         }
     }
 
@@ -77,7 +87,9 @@ namespace MCC.Utility.IO
         public void FileSerialize(string fileName)
         {
             using (var stream = new FileStream(fileName, FileMode.Create, FileAccess.Write))
-                (new System.Xml.Serialization.XmlSerializer(typeof(T))).Serialize(stream, this);
+            {
+                new System.Xml.Serialization.XmlSerializer(typeof(T)).Serialize(stream, this);
+            }
         }
 
         /// <summary>
@@ -88,10 +100,12 @@ namespace MCC.Utility.IO
         {
             using (var stream = new FileStream(fileName, FileMode.Open, FileAccess.Read))
             {
-                var t = (T)(new System.Xml.Serialization.XmlSerializer(typeof(T))).Deserialize(stream);
+                var t = (T)new System.Xml.Serialization.XmlSerializer(typeof(T)).Deserialize(stream);
 
                 foreach (var info in t.GetType().GetFields())
+                {
                     info.SetValue(this, info.GetValue(t));
+                }
 
                 foreach (var info in t.GetType().GetProperties())
                 {
@@ -111,7 +125,7 @@ namespace MCC.Utility.IO
         {
             using (var stream = new MemoryStream())
             {
-                (new System.Xml.Serialization.XmlSerializer(typeof(T))).Serialize(stream, this);
+                new System.Xml.Serialization.XmlSerializer(typeof(T)).Serialize(stream, this);
                 return Encoding.UTF8.GetString(stream.ToArray());
             }
         }
@@ -123,10 +137,12 @@ namespace MCC.Utility.IO
         {
             using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(xml)))
             {
-                var t = (T)(new System.Xml.Serialization.XmlSerializer(typeof(T))).Deserialize(stream);
+                var t = (T)new System.Xml.Serialization.XmlSerializer(typeof(T)).Deserialize(stream);
 
                 foreach (var info in t.GetType().GetFields())
+                {
                     info.SetValue(this, info.GetValue(t));
+                }
 
                 foreach (var info in t.GetType().GetProperties())
                 {

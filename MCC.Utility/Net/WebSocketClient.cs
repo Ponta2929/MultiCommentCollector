@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace MCC.Utility.Net
 {
@@ -32,7 +30,9 @@ namespace MCC.Utility.Net
         public async void Start(Action<ClientWebSocket> action, Dictionary<string, string> header = null)
         {
             if (client is null)
+            {
                 client = new();
+            }
 
             if (!Connected)
             {

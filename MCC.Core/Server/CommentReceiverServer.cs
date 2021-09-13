@@ -48,13 +48,17 @@ namespace MCC.Core.Server
                         var result = await socket.ReceiveAsync(segment, CancellationToken.None);
 
                         if (result.MessageType == WebSocketMessageType.Close)
+                        {
                             return;
+                        }
 
                         received.AddRange(buffer);
                         count += result.Count;
 
                         if (result.EndOfMessage)
+                        {
                             break;
+                        }
                     }
 
                     var receive = Encoding.UTF8.GetString(received.ToArray(), 0, count);
@@ -62,7 +66,9 @@ namespace MCC.Core.Server
 
                     // コメント処理
                     if (dataType.PostType == PostType.Comment)
+                    {
                         OnCommentReceived?.Invoke(this, new(JsonSerializer.Deserialize<CommentData>(receive)));
+                    }
                 }
             }
             catch (WebSocketException e)

@@ -67,7 +67,9 @@ namespace MCC.Twitch
             StreamKey = url.RegexString(@"https://www.twitch.tv/(?<value>[\w]+)", "value");
 
             if (!StreamKey.Equals(""))
+            {
                 return true;
+            }
 
             return false;
         }

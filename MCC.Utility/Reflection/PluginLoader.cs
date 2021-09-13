@@ -9,7 +9,9 @@ namespace MCC.Utility.Reflection
         public static T[] Load<T>(string fileName) where T : class
         {
             if (!File.Exists(fileName))
+            {
                 throw new FileNotFoundException();
+            }
 
             var interfaceName = typeof(T).Name;
             var interfaces = new List<T>();
@@ -37,7 +39,9 @@ namespace MCC.Utility.Reflection
         public static bool IsImplementation<T>(string fileName)
         {
             if (!File.Exists(fileName))
+            {
                 throw new FileNotFoundException();
+            }
 
             var interfaceName = typeof(T).Name;
 

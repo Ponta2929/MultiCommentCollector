@@ -6,7 +6,6 @@
                          xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                          xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
                          xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-                         xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
                          xmlns:converter="clr-namespace:MultiCommentCollector.Converter"
                          xmlns:model="clr-namespace:MultiCommentCollector.Models"
                          xmlns:viewmodel="clr-namespace:MultiCommentCollector.ViewModels"
@@ -60,7 +59,7 @@
                     <GridViewColumn Header="非表示" x:Name="ColumnHideUser" Width="110">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <CheckBox IsChecked="{Binding HideUser}" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.RefleshCommand}"/>
+                                <CheckBox IsChecked="{Binding HideUser}"  Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.RefleshCommand}"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>

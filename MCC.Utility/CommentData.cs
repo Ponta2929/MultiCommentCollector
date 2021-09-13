@@ -1,12 +1,10 @@
 ﻿using System;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
 
 namespace MCC.Utility
 {
     [Serializable]
-    public class CommentData : PostHeader, INotifyPropertyChanged
+    public class CommentData : PostHeader
     {
         /// <summary>
         /// 投稿時間
@@ -39,27 +37,5 @@ namespace MCC.Utility
         /// </summary>
         [JsonPropertyName("Comment")]
         public string Comment { get; set; }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        /// <summary>
-        /// プロパティの値が変更されたことを通知します。
-        /// </summary>
-        /// <param name="propertyName"></param>
-        protected virtual void OnPropertyChanged(string propertyName)
-            => PropertyChanged?.Invoke(this, new(propertyName));
-
-        protected void Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
-        {
-            if (Equals(storage, value))
-            {
-                return;
-            }
-
-            storage = value;
-
-            // イベント
-            OnPropertyChanged(propertyName);
-        }
     }
 }

@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 using System.Xml.Serialization;
 
 namespace MCC.Utility
@@ -63,9 +59,13 @@ namespace MCC.Utility
         public override void Write(Utf8JsonWriter writer, ColorData value, JsonSerializerOptions options)
         {
             if (value.A == 0)
+            {
                 writer.WriteStringValue("#none");
+            }
             else
+            {
                 writer.WriteStringValue(string.Format("#{0:X2}{1:X2}{2:X2}{3:X2}", value.R, value.G, value.B, value.A));
+            }
         }
     }
 }

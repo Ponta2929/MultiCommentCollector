@@ -90,9 +90,13 @@ namespace MCC.Core.Server
                         var response = string.Empty;
 
                         if (type == DataType.Json)
+                        {
                             response = System.Text.Json.JsonSerializer.Serialize<T>(converted as T);
+                        }
                         else if (type == DataType.Xml)
+                        {
                             response = XmlSerializer.Serialize<T>(converted);
+                        }
 
                         var buffer = Encoding.UTF8.GetBytes(response);
                         var segment = new ArraySegment<byte>(buffer);
@@ -109,12 +113,20 @@ namespace MCC.Core.Server
         private object XSSConvert(object data)
         {
             foreach (var info in data.GetType().GetFields())
+            {
                 if (info.FieldType == typeof(string))
+                {
                     info.SetValue(data, XSSFilter(info.GetValue(data) as string));
+                }
+            }
 
             foreach (var info in data.GetType().GetProperties())
+            {
                 if (info.PropertyType == typeof(string))
+                {
                     info.SetValue(data, XSSFilter(info.GetValue(data) as string));
+                }
+            }
 
             return data;
         }
@@ -122,7 +134,9 @@ namespace MCC.Core.Server
         private string XSSFilter(string data)
         {
             if (data is null)
+            {
                 return null;
+            }
 
             data = data.Replace("<", "&lt;");
             data = data.Replace(">", "&gt;");

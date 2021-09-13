@@ -1,15 +1,8 @@
-﻿using MCC.Core;
-using MCC.Core.Manager;
+﻿using MCC.Core.Manager;
 using MCC.Utility.IO;
 using Reactive.Bindings;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MultiCommentCollectorCLI
 {
@@ -22,7 +15,7 @@ namespace MultiCommentCollectorCLI
             XmlSerializer.FileDeserialize<Setting>($"{Path.GetDirectoryName(Environment.GetCommandLineArgs()[0])}\\setting.xml");
 
         #endregion
-       
+
         /// <summary>
         /// Servers
         /// </summary>

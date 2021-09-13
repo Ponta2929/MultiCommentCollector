@@ -1,11 +1,7 @@
 ﻿using MCC.Utility;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net.Sockets;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MCC.Twitch
 {
@@ -27,7 +23,9 @@ namespace MCC.Twitch
         public async void Start(Action<StreamReader> action, string ip, int port, string userName, string password, string channel)
         {
             if (TcpClient is null)
+            {
                 TcpClient = new();
+            }
 
             if (!Connected)
             {

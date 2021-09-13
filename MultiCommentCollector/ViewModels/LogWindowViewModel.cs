@@ -4,8 +4,6 @@ using MultiCommentCollector.Models;
 using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
 using System;
-using System.ComponentModel;
-using System.Reactive.Disposables;
 using System.Windows.Data;
 
 namespace MultiCommentCollector.ViewModels
@@ -50,15 +48,25 @@ namespace MultiCommentCollector.ViewModels
             var item = e.Item as LogData;
 
             if (item.Level is LogLevel.Debug && ContextMenuDebug.Value)
+            {
                 e.Accepted = true;
+            }
             else if (item.Level is LogLevel.Info && ContextMenuInfo.Value)
+            {
                 e.Accepted = true;
+            }
             else if (item.Level is LogLevel.Warn && ContextMenuWarn.Value)
+            {
                 e.Accepted = true;
+            }
             else if (item.Level is LogLevel.Error && ContextMenuError.Value)
+            {
                 e.Accepted = true;
+            }
             else
+            {
                 e.Accepted = false;
+            }
         }
     }
 }

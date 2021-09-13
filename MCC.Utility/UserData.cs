@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
+﻿using MCC.Utility.Binding;
+using System;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace MCC.Utility
 {
     [Serializable]
-    public class UserData : INotifyPropertyChanged
+    public class UserData : BindableBase
     {
         /// <summary>
         /// 配信サイト名
@@ -74,31 +69,14 @@ namespace MCC.Utility
             var user = obj as UserData;
 
             if (user is null)
+            {
                 return false;
+            }
 
             return user.LiveName == LiveName && user.UserID == UserID;
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        /// <summary>
-        /// プロパティの値が変更されたことを通知します。
-        /// </summary>
-        /// <param name="propertyName"></param>
-        protected virtual void OnPropertyChanged(string propertyName)
-            => PropertyChanged?.Invoke(this, new(propertyName));
-
-        protected void Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
-        {
-            if (Equals(storage, value))
-            {
-                return;
-            }
-
-            storage = value;
-
-            // イベント
-            OnPropertyChanged(propertyName);
-        }
+        public override int GetHashCode()
+            => LiveName.GetHashCode() ^ UserID.GetHashCode();
     }
 }

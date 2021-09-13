@@ -32,9 +32,13 @@ namespace MCC.Core
             var path = "";
 
             if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+            {
                 path = $"{Path.GetDirectoryName(Environment.GetCommandLineArgs()[0])}\\plugins";
+            }
             else
+            {
                 path = $"{Path.GetDirectoryName(Environment.GetCommandLineArgs()[0])}/plugins";
+            }
 
             // プラグイン
             pluginManager.Load(path);
@@ -67,7 +71,9 @@ namespace MCC.Core
         public void Apply(ConnectionData info)
         {
             if (info.Plugin is not null)
+            {
                 return;
+            }
 
             var plugins = pluginManager.Parent.Where(x => x is IPluginSender).ToArray();
 
@@ -134,10 +140,14 @@ namespace MCC.Core
         public void Activate(ConnectionData info, bool forced = false)
         {
             if (info is null || info.IsActive.Value && !forced)
+            {
                 return;
+            }
 
             if (info.Plugin is ILogged log)
+            {
                 log.OnLogged += OnLogged;
+            }
 
             info.Plugin.OnCommentReceived += OnCommentReceived;
             info.IsActive.Value = info.Plugin.Activate();
@@ -151,12 +161,16 @@ namespace MCC.Core
         public void Inactivate(ConnectionData info)
         {
             if (info is null || !info.IsActive.Value)
+            {
                 return;
+            }
 
             info.IsActive.Value = !info.Plugin.Inactivate();
 
             if (info.Plugin is ILogged log)
+            {
                 log.OnLogged -= OnLogged;
+            }
 
             info.Plugin.OnCommentReceived -= OnCommentReceived;
 
@@ -166,7 +180,9 @@ namespace MCC.Core
         public void AddURL(string url, bool isActive = false)
         {
             if (url.Length == 0)
+            {
                 return;
+            }
 
             var isSupport = false;
             var plugins = pluginManager.Parent.Where(x => x is IPluginSender).ToArray();
@@ -209,7 +225,9 @@ namespace MCC.Core
             }
 
             if (!isSupport)
+            {
                 OnLogged(this, new(LogLevel.Info, $"無効なURLが入力されました。[{url}]"));
+            }
         }
 
         /// <summary>
@@ -218,12 +236,18 @@ namespace MCC.Core
         public void ToggleConnection(ConnectionData connection)
         {
             if (connection is null)
+            {
                 return;
+            }
 
             if (connection.IsActive.Value)
+            {
                 Inactivate(connection);
+            }
             else
+            {
                 Activate(connection);
+            }
         }
 
         /// <summary>
@@ -233,7 +257,9 @@ namespace MCC.Core
         public void RemoveConnection(ConnectionData connection)
         {
             if (connection is null)
+            {
                 return;
+            }
 
             Inactivate(connection);
 
@@ -245,9 +271,13 @@ namespace MCC.Core
         private void OnLogged(object sender, LoggedEventArgs e)
         {
             if (sender is IPluginBase pluginSender)
+            {
                 logManager.SyncAdd(new(pluginSender.PluginName, e.Level, e.Date, e.Log));
+            }
             else
+            {
                 logManager.SyncAdd(new(sender, e.Level, e.Date, e.Log));
+            }
         }
 
         private void OnCommentReceived(object sender, CommentReceivedEventArgs e)
@@ -258,7 +288,9 @@ namespace MCC.Core
             var userData = userDataManager.FirstOrDefault(x => x.LiveName.Equals(data.LiveName) && x.UserID.Equals(data.UserID));
 
             if (userData is not null)
+            {
                 data.SetUserData(userData);
+            }
 
             if (userData is null || (userData is not null && !userData.HideUser))
             {
@@ -267,8 +299,12 @@ namespace MCC.Core
 
                 // プラグインで送信
                 foreach (var item in pluginManager)
+                {
                     if (item is IPluginReceiver receiver)
+                    {
                         receiver.Receive(data);
+                    }
+                }
             }
 
             // コメント追加

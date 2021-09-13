@@ -6,9 +6,6 @@ using MultiCommentCollector.Models;
 using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
 using Reactive.Bindings.Notifiers;
-using System;
-using System.ComponentModel;
-using System.Reactive.Disposables;
 using System.Windows.Media;
 
 namespace MultiCommentCollector.ViewModels
@@ -30,7 +27,7 @@ namespace MultiCommentCollector.ViewModels
             UserID = new ReactiveProperty<string>(user.UserID).AddTo(Disposable);
             UserName = new ReactiveProperty<string>(user.UserName).AddTo(Disposable);
             BackgroundColor = new ReactiveProperty<Color>(Color.FromArgb((byte)user.BackColor.A, (byte)user.BackColor.R, (byte)user.BackColor.G, (byte)user.BackColor.B)).AddTo(Disposable);
-            
+
             // Commands
             OkClickCommand = new ReactiveCommand().WithSubscribe(OkButtonClick).AddTo(Disposable);
             CloseWindowCommand = new ReactiveCommand().WithSubscribe(() => WindowHelper.CloseWindow(this)).AddTo(Disposable);
