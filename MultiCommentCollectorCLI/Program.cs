@@ -181,9 +181,6 @@ namespace MultiCommentCollectorCLI
             }
         }
 
-        static void CurrentDomain_ProcessExit(object sender, EventArgs e)
-        {
-            ApplicationExit();
-        }
+        static void CurrentDomain_ProcessExit(object sender, EventArgs e) => ApplicationExit();
     }
 }

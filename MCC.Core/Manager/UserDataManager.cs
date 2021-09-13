@@ -14,9 +14,6 @@ namespace MCC.Core.Manager
 
         #endregion
 
-        public UserDataManager()
-        {
-            IsLimit.Value = false;
-        }
+        public UserDataManager() => IsLimit.Value = false;
     }
 }

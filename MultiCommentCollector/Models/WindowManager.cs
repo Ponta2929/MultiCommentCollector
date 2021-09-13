@@ -1,5 +1,4 @@
 ﻿using MCC.Core.Manager;
-using MCC.Core.Server;
 using MCC.Utility;
 using MultiCommentCollector.Helper;
 using MultiCommentCollector.ViewModels;
@@ -11,22 +10,10 @@ namespace MultiCommentCollector.Models
 {
     public static class WindowManager
     {
-        private static MCC.Core.Win.MultiCommentCollector mcc = MCC.Core.Win.MultiCommentCollector.Instance;
-        private static CommentReceiverServer receiverServer = CommentReceiverServer.Instance;
-        private static CommentGeneratorServer generatorServer = CommentGeneratorServer.Instance;
-        private static ConnectionManager connectionManager = ConnectionManager.Instance;
-        private static CommentManager commentManager = CommentManager.Instance;
-        private static PluginManager pluginManager = PluginManager.Instance;
-        private static LogManager logManager = LogManager.Instance;
-        private static UserDataManager userDataManager = UserDataManager.Instance;
-        private static Setting setting = Setting.Instance;
-        private static LogWindow logWindow = LogWindow.Instance;
-        private static UsersSettingWindow usersSettingWindow = UsersSettingWindow.Instance;
-
         public static void ShowLogWindow()
         {
-            logWindow.Show();
-            logWindow.Activate();
+            LogWindow.Instance.Show();
+            LogWindow.Instance.Activate();
         }
 
         public static void ShowPluginWindow()
@@ -47,7 +34,7 @@ namespace MultiCommentCollector.Models
         {
             if (commentData is not null)
             {
-                var usersData = userDataManager.FirstOrDefault(x => x.LiveName.Equals(commentData.LiveName) && x.UserID.Equals(commentData.UserID));
+                var usersData = UserDataManager.Instance.FirstOrDefault(x => x.LiveName.Equals(commentData.LiveName) && x.UserID.Equals(commentData.UserID));
 
                 // ウィンドウ表示
                 ShowUserSettingWindow(usersData ?? new(commentData));
@@ -69,8 +56,8 @@ namespace MultiCommentCollector.Models
 
         public static void ShowUsersSettingWindow()
         {
-            usersSettingWindow.Show();
-            usersSettingWindow.Activate();
+            UsersSettingWindow.Instance.Show();
+            UsersSettingWindow.Instance.Activate();
         }
 
         public static void ShowUserDataWindow(CommentDataEx user)
@@ -82,11 +69,11 @@ namespace MultiCommentCollector.Models
 
             var userData = new UserDataWindow();
             userData.DataContext = new UserDataWindowViewModel(user);
+            userData.Owner = Application.Current.MainWindow;
             userData.Show();
             userData.Activate();
         }
 
-        public static void ApplicationShutdown()
-            => Application.Current.MainWindow.Close();
+        public static void ApplicationShutdown() => Application.Current.MainWindow.Close();
     }
 }

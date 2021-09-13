@@ -14,9 +14,6 @@ namespace MultiCommentCollector.Views
 
         #endregion
 
-        public LogWindow()
-        {
-            InitializeComponent();
-        }
+        public LogWindow() => InitializeComponent();
     }
 }

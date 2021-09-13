@@ -7,10 +7,7 @@ namespace MCC.Twitch
     {
         private IrcClient client;
 
-        public PingSender(IrcClient irc)
-        {
-            client = irc;
-        }
+        public PingSender(IrcClient irc) => client = irc;
 
         public void Start()
         {
@@ -28,9 +25,6 @@ namespace MCC.Twitch
             });
         }
 
-        private void Logged(LogLevel level, string message)
-        {
-            client.Logged(level, message);
-        }
+        private void Logged(LogLevel level, string message) => client.Logged(level, message);
     }
 }

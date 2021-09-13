@@ -57,15 +57,9 @@ namespace MCC.TwitCasting
             return true;
         }
 
-        public void PluginClose()
-        {
-            Abort();
-        }
+        public void PluginClose() => Abort();
 
-        public void PluginLoad()
-        {
-            options.Converters.Add(new DateTimeOffsetConverter());
-        }
+        public void PluginLoad() => options.Converters.Add(new DateTimeOffsetConverter());
 
         private async void Connect()
         {

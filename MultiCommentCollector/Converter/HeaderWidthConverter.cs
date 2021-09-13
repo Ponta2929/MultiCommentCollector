@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Windows;
 using System.Windows.Data;
 
 namespace MultiCommentCollector.Converter
@@ -23,12 +24,11 @@ namespace MultiCommentCollector.Converter
                 width -= (double)values[i];
             }
 
+            width -= SystemParameters.VerticalScrollBarWidth;
+
             return width > 0 ? width : 0;
         }
 
-        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture) => throw new NotImplementedException();
     }
 }

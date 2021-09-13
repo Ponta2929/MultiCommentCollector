@@ -22,10 +22,7 @@ namespace MCC.Utility.Net
 
         public event LoggedEventHandler OnLogged;
 
-        public async void Start(Dictionary<string, string> header = null)
-        {
-            Start(v => Process(v), header);
-        }
+        public async void Start(Dictionary<string, string> header = null) => Start(v => Process(v), header);
 
         public async void Start(Action<ClientWebSocket> action, Dictionary<string, string> header = null)
         {
@@ -62,10 +59,7 @@ namespace MCC.Utility.Net
             }
         }
 
-        public async void Send(string message)
-        {
-            Send(message, Encoding.UTF8);
-        }
+        public async void Send(string message) => Send(message, Encoding.UTF8);
 
         public async void Send(string message, Encoding encoding)
         {
@@ -75,10 +69,7 @@ namespace MCC.Utility.Net
             await client.SendAsync(segment, WebSocketMessageType.Text, true, CancellationToken.None);
         }
 
-        protected virtual void Process(ClientWebSocket client)
-        {
-            throw new NotImplementedException();
-        }
+        protected virtual void Process(ClientWebSocket client) => throw new NotImplementedException();
 
         public void Abort()
         {
@@ -100,9 +91,6 @@ namespace MCC.Utility.Net
             }
         }
 
-        public void Logged(LogLevel level, string message)
-        {
-            OnLogged?.Invoke(this, new(level, message));
-        }
+        public void Logged(LogLevel level, string message) => OnLogged?.Invoke(this, new(level, message));
     }
 }

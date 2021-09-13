@@ -17,9 +17,6 @@ namespace MCC.Twitch
 
         public string Password;
 
-        public void Save()
-        {
-            JsonSerializer.FileSerialize<Setting>(FilePath, Setting.Instance);
-        }
+        public void Save() => JsonSerializer.FileSerialize<Setting>(FilePath, Setting.Instance);
     }
 }

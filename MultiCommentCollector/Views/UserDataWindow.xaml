@@ -12,7 +12,7 @@
         <converter:HeaderWidthConverter x:Key="HeaderWidthConverter"/>
     </Window.Resources>
     <Controls:MetroWindow.RightWindowCommands>
-        <Controls:WindowCommands ShowLastSeparator="False">
+        <Controls:WindowCommands ShowLastSeparator="True">
             <Button ToolTip="ユーザー設定を開く" Command="{Binding ShowUserSettingCommand}">
                 <icon:PackIconMaterial Kind="AccountCog" />
             </Button>

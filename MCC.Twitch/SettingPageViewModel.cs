@@ -1,6 +1,4 @@
 ﻿using MCC.Utility.Binding;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 
 namespace MCC.Twitch
 {

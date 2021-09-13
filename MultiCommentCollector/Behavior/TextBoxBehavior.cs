@@ -9,10 +9,7 @@ namespace MultiCommentCollector.Behavior
     {
         private ExecutedRoutedEventHandler handler;
 
-        public TextBoxBehavior()
-        {
-            handler = new(PreviewExecuted);
-        }
+        public TextBoxBehavior() => handler = new(PreviewExecuted);
 
         protected override void OnAttached()
         {
@@ -38,11 +35,9 @@ namespace MultiCommentCollector.Behavior
             }
         }
 
-        private void PreviewTextInput(object sender, TextCompositionEventArgs e)
-        {
+        private void PreviewTextInput(object sender, TextCompositionEventArgs e) =>
             // 0-9のみ
             e.Handled = !new Regex("[0-9]").IsMatch(e.Text);
-        }
 
         private void PreviewExecuted(object sender, ExecutedRoutedEventArgs e)
         {

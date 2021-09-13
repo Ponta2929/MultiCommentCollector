@@ -8,10 +8,7 @@ namespace MCC.Twitch
     /// </summary>
     public partial class SettingPage : Page
     {
-        public SettingPage()
-        {
-            InitializeComponent();
-        }
+        public SettingPage() => InitializeComponent();
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
         {

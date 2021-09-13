@@ -61,6 +61,12 @@
                                     <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.Text}"/>
                                 </DataTrigger>
                             </Style.Triggers>
+                            <Style.Resources>
+                                <Style TargetType="{x:Type TextBlock}">
+                                    <Setter Property="ToolTip" Value="{Binding Text, RelativeSource={RelativeSource Self}}" />
+                                    <Setter Property="TextWrapping" Value="Wrap" />
+                                </Style>
+                            </Style.Resources>
                             <Setter Property="Background" Value="{Binding BackColor, Converter={StaticResource ColorDataConverter}}"/>
                             <Setter Property="Foreground" Value="{Binding Background, RelativeSource={RelativeSource Self}, Converter={x:Static converter_m:BackgroundToForegroundConverter.Instance}}"/>
                             <Setter Property="Tag" Value="{Binding DataContext, RelativeSource={RelativeSource AncestorType=ListView}}" />
@@ -87,7 +93,7 @@
                             <GridViewColumn Header="配信サイト" DisplayMemberBinding="{Binding LiveName}" x:Name="ColumnLiveName" />
                             <GridViewColumn Header="時間" DisplayMemberBinding="{Binding PostTime, StringFormat=HH:mm:ss}" x:Name="ColumnPostTime" />
                             <GridViewColumn x:Name="ColumnUser" Width="120" CellTemplate="{StaticResource GridViewCellItemUserName}">
-                                <GridViewColumnHeader Content="ユーザー名">
+                                <GridViewColumnHeader Content="ユーザー名" Cursor="Hand">
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="Click">
                                             <i:InvokeCommandAction Command="{Binding ColumnHeaderUserClickCommand}" PassEventArgsToCommand="True"/>

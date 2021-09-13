@@ -193,7 +193,7 @@ namespace MCC.Core
 
                 @interface.PluginLoad();
 
-                if (@interface.IsSupport(url))
+                if (@interface.IsSupport(url) && pluginManager.FirstOrDefault(x => x is IPluginSender sender && sender.StreamKey.Equals(@interface.StreamKey)) is null)
                 {
                     var info = new ConnectionData()
                     {

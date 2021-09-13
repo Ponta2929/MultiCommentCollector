@@ -12,9 +12,6 @@
 
         #endregion
 
-        public PluginWindow()
-        {
-            InitializeComponent();
-        }
+        public PluginWindow() => InitializeComponent();
     }
 }

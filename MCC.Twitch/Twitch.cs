@@ -52,10 +52,7 @@ namespace MCC.Twitch
             return true;
         }
 
-        public void PluginClose()
-        {
-            Abort();
-        }
+        public void PluginClose() => Abort();
 
         public void PluginLoad()
         {

@@ -15,10 +15,7 @@ namespace MCC.Twitch
 
         public event LoggedEventHandler OnLogged;
 
-        public async void Start(string ip, int port, string userName, string password, string channel)
-        {
-            Start(v => Process(v), ip, port, userName, password, channel);
-        }
+        public async void Start(string ip, int port, string userName, string password, string channel) => Start(v => Process(v), ip, port, userName, password, channel);
 
         public async void Start(Action<StreamReader> action, string ip, int port, string userName, string password, string channel)
         {
@@ -73,10 +70,7 @@ namespace MCC.Twitch
             }
         }
 
-        protected virtual void Process(StreamReader reader)
-        {
-            throw new NotImplementedException();
-        }
+        protected virtual void Process(StreamReader reader) => throw new NotImplementedException();
 
         public void Abort()
         {
@@ -93,9 +87,6 @@ namespace MCC.Twitch
             }
         }
 
-        public void Logged(LogLevel level, string message)
-        {
-            OnLogged?.Invoke(this, new(level, message));
-        }
+        public void Logged(LogLevel level, string message) => OnLogged?.Invoke(this, new(level, message));
     }
 }

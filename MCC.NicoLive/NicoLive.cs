@@ -298,15 +298,9 @@ namespace MCC.NicoLive
             }
         }
 
-        private void Client_OnLogged(object sender, LoggedEventArgs e)
-        {
-            OnLogged?.Invoke(this, e);
-        }
+        private void Client_OnLogged(object sender, LoggedEventArgs e) => OnLogged?.Invoke(this, e);
 
-        public void Logged(LogLevel level, string message)
-        {
-            OnLogged?.Invoke(this, new(level, message));
-        }
+        public void Logged(LogLevel level, string message) => OnLogged?.Invoke(this, new(level, message));
 
         public string ConvertHTMLCode(string message)
         {

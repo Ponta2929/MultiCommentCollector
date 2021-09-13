@@ -17,10 +17,7 @@ namespace MCC.Core.Manager
         /// </summary>
         public ReactiveProperty<bool> IsLimit { get; set; } = new(true);
 
-        public ListManagerBase()
-        {
-            CollectionChanged += OnCollectionChanged;
-        }
+        public ListManagerBase() => CollectionChanged += OnCollectionChanged;
 
         public void SyncAdd(T item)
         {

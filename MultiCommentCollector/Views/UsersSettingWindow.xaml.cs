@@ -14,9 +14,6 @@ namespace MultiCommentCollector.Views
 
         #endregion
 
-        public UsersSettingWindow()
-        {
-            InitializeComponent();
-        }
+        public UsersSettingWindow() => InitializeComponent();
     }
 }

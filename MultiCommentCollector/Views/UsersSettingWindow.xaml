@@ -8,7 +8,7 @@
                          xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                          xmlns:converter="clr-namespace:MultiCommentCollector.Converter"
                          xmlns:model="clr-namespace:MultiCommentCollector.Models"
-                         xmlns:viewmodel="clr-namespace:MultiCommentCollector.ViewModels"
+                         xmlns:viewmodel="clr-namespace:MultiCommentCollector.ViewModels" xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
                          mc:Ignorable="d" Title="ユーザー設定一覧" Height="350" Width="600" WindowStartupLocation="CenterOwner">
     <Window.Resources>
         <converter:HeaderWidthConverter x:Key="HeaderWidthConverter"/>
@@ -19,7 +19,23 @@
     </Window.DataContext>
     <DockPanel>
         <StatusBar>
-            <TextBox Width="150" Text="{Binding SearchText.Value, UpdateSourceTrigger=PropertyChanged}" materialDesign:HintAssist.Hint="Search..." FontSize="10" Cursor="IBeam" />
+            <TextBox x:Name="SearchBox" Width="150" Text="{Binding SearchText.Value, UpdateSourceTrigger=PropertyChanged}" materialDesign:HintAssist.Hint="Search..." FontSize="10" Cursor="IBeam" ToolTip="項目を検索します。" />
+            <TextBlock Text="r" FontFamily="Webdings" Height="{Binding ElementName=SearchBox, Path=Height}" ToolTip="検索項目をクリアします。">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="MouseDown">
+                        <i:InvokeCommandAction Command="{Binding SearchBoxClearCommand}" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+                <TextBlock.Style>
+                    <Style BasedOn="{StaticResource MaterialDesignButtonTextBlock}" TargetType="{x:Type TextBlock}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding SearchText.Value}" Value="" >
+                                <Setter Property="Visibility" Value="Hidden" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
             <StatusBarItem x:Name="StatusBarItemUsers" Content="{Binding Path=UsersDataView.Source.Count}" ContentStringFormat="登録数 : {0}" HorizontalContentAlignment="Right" />
         </StatusBar>
         <ListView x:Name="UsersListView" ScrollViewer.HorizontalScrollBarVisibility="Hidden" ItemsSource="{Binding UsersDataView.View}">

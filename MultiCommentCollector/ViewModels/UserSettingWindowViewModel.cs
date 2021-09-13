@@ -17,8 +17,8 @@ namespace MultiCommentCollector.ViewModels
         public ReactiveProperty<string> UserID { get; }
         public ReactiveProperty<string> UserName { get; }
         public ReactiveProperty<Color> BackgroundColor { get; }
-        public ReactiveCommand CloseWindowCommand { get; }
         public ReactiveCommand OkClickCommand { get; }
+        public ReactiveCommand CloseWindowCommand { get; }
 
         public UserSettingWindowViewModel(UserData user)
         {

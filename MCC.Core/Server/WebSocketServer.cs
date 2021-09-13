@@ -31,15 +31,9 @@ namespace MCC.Core.Server
         public WebSocketServer(string serverName, int port)
             => (ServerName, Port) = (serverName, port);
 
-        public void Start()
-        {
-            Task.Run(StartListen);
-        }
+        public void Start() => Task.Run(StartListen);
 
-        public void Stop()
-        {
-            Abort();
-        }
+        public void Stop() => Abort();
 
         private async void StartListen()
         {
@@ -136,10 +130,7 @@ namespace MCC.Core.Server
             }
         }
 
-        protected virtual void Process(WebSocket socket)
-        {
-            throw new NotImplementedException();
-        }
+        protected virtual void Process(WebSocket socket) => throw new NotImplementedException();
 
         /// <summary>
         /// 開いているソケットを終了させます。
@@ -190,9 +181,6 @@ namespace MCC.Core.Server
         /// ログ送信
         /// </summary>
         /// <param name="message"></param>
-        public void Logged(LogLevel level, string message)
-        {
-            OnLogged?.Invoke(this, new(level, message));
-        }
+        public void Logged(LogLevel level, string message) => OnLogged?.Invoke(this, new(level, message));
     }
 }

@@ -13,9 +13,6 @@ namespace MCC.Core.Manager
 
         #endregion
 
-        public ConnectionManager()
-        {
-            IsLimit.Value = false;
-        }
+        public ConnectionManager() => IsLimit.Value = false;
     }
 }

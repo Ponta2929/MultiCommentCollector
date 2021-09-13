@@ -21,10 +21,7 @@ namespace MCC.Core.Manager
         #endregion
 
 
-        public PluginManager()
-        {
-            IsLimit.Value = false;
-        }
+        public PluginManager() => IsLimit.Value = false;
 
         /// <summary>
         /// プラグインを基礎プラグインとして読み込みます。

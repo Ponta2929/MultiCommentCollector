@@ -35,10 +35,8 @@ namespace MCC.Bouyomi
             }
         }
 
-        private void Page_Unloaded(object sender, RoutedEventArgs e)
-        {
+        private void Page_Unloaded(object sender, RoutedEventArgs e) =>
             // 配列設定
             DataGrid_BlackList.ItemsSource = null;
-        }
     }
 }

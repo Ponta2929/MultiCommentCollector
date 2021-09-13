@@ -45,10 +45,7 @@ namespace MCC.Utility
         public override string ToString()
             => string.Format("#{0:X2}{1:X2}{2:X2}{3:X2}", A, R, G, B);
 
-        public int CompareTo(object obj)
-        {
-            return ToString().CompareTo(obj.ToString());
-        }
+        public int CompareTo(object obj) => ToString().CompareTo(obj.ToString());
     }
 
     public class ColorDataJsonConverter : JsonConverter<ColorData>

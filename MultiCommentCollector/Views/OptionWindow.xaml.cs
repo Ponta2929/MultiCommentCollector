@@ -5,9 +5,6 @@
     /// </summary>
     public partial class OptionWindow : MahApps.Metro.Controls.MetroWindow
     {
-        public OptionWindow()
-        {
-            InitializeComponent();
-        }
+        public OptionWindow() => InitializeComponent();
     }
 }

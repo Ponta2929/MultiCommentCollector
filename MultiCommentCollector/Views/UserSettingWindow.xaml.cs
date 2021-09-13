@@ -5,9 +5,6 @@
     /// </summary>
     public partial class UserSettingWindow : MahApps.Metro.Controls.MetroWindow
     {
-        public UserSettingWindow()
-        {
-            InitializeComponent();
-        }
+        public UserSettingWindow() => InitializeComponent();
     }
 }

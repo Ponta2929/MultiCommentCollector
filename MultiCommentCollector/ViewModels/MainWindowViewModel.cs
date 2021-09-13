@@ -163,8 +163,8 @@ namespace MultiCommentCollector.ViewModels
 
             foreach (var item in parent)
             {
+                item.ItemContainerStyle = Application.Current.Resources["MenuItemPluginSender"] as Style;
                 item.ItemsSource = pluginManager.Parent.Where(x => x.PluginName.Equals(item.Header) && x is ISetting);
-                item.DisplayMemberPath = "MenuItemName";
                 item.Click += MeunItemSetting_Click;
 
                 // 追加

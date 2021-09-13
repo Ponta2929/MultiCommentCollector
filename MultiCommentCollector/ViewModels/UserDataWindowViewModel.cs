@@ -32,8 +32,8 @@ namespace MultiCommentCollector.ViewModels
 
             Title = new ReactiveProperty<string>().AddTo(Disposable);
             BackColor = new ReactiveProperty<SolidColorBrush>(new SolidColorBrush(Color.FromArgb(255, 0, 0, 0))).AddTo(Disposable);
-            MenuItemOpenedCommand = new ReactiveCommand<MenuItem>().WithSubscribe(MenuItemCopyOpened).AddTo(Disposable);
             ShowUserSettingCommand = new ReactiveCommand().WithSubscribe(() => WindowManager.ShowUserSettingWindow(user)).AddTo(Disposable);
+            MenuItemOpenedCommand = new ReactiveCommand<MenuItem>().WithSubscribe(MenuItemCopyOpened).AddTo(Disposable);
 
             CommentFilter = new() { Source = CommentManager.Instance };
             CommentFilter.Filter += CommentFilter_Filter;
