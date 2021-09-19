@@ -3,6 +3,7 @@ using MCC.Plugin.Win;
 using MCC.Utility;
 using MCC.Utility.Net;
 using MCC.Utility.Text;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows;
@@ -13,6 +14,7 @@ namespace MCC.Youtube
     {
         private Setting setting = Setting.Instance;
         private YoutubeConnector connector = new();
+        private Hashtable table = new();
 
         public string SiteName => "Youtube";
 
@@ -66,6 +68,10 @@ namespace MCC.Youtube
         {
             connector.OnLogged += BaseLogged;
             connector.OnReceived += OnReceived;
+
+            table["Streamer"] = new AdditionalData() { Data = "Streamer", Description = "Streamer" };
+            table["M"] = new AdditionalData() { Data = "M", Description = "モデレーター" };
+            table["S"] = new AdditionalData() { Data = "S", Description = "スポンサー" };
         }
 
         private void OnReceived(object sender, ChatReceivedEventArgs e)
@@ -84,22 +90,22 @@ namespace MCC.Youtube
                 };
                 if (item.authorDetails.isChatOwner)
                 {
-                    list.Add(new AdditionalData() { Data = "Streamer", Description = "Streamer", Enable = item.authorDetails.isChatOwner });
+                    list.Add(table["Streamer"] as AdditionalData);
                 }
 
                 if (item.authorDetails.isChatModerator)
                 {
-                    list.Add(new AdditionalData() { Data = "M", Description = "モデレーター", Enable = item.authorDetails.isChatModerator });
+                    list.Add(table["M"] as AdditionalData);
                 }
 
                 if (item.authorDetails.isChatSponsor)
                 {
-                    list.Add(new AdditionalData() { Data = "S", Description = "スポンサー", Enable = item.authorDetails.isChatSponsor });
+                    list.Add(table["S"] as AdditionalData);
                 }
 
                 if (item.snippet.type.Equals("superChatEvent"))
                 {
-                    list.Add(new AdditionalData() { Data = "$", Description = $"スパチャ : {item.snippet.superChatDetails.amountDisplayString}", Enable = true });
+                    list.Add(new AdditionalData() { Data = "$$", Description = $"スパチャ : {item.snippet.superChatDetails.amountDisplayString}", Enable = true });
                     commentData.Comment = item.snippet.superChatDetails.userComment;
                 }
 

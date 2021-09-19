@@ -199,7 +199,7 @@ namespace MCC.NicoLive
 
                         OnReceived?.Invoke(this, new(data));
 
-                        if (data.Chat.Premium == 3 && data.Chat.Content.Contains("/disconnect"))
+                        if (data.Chat.Premium == 2 && data.Chat.Content.Contains("/disconnect"))
                         {
                             break;
                         }

@@ -103,19 +103,7 @@ namespace MCC.TwitCasting
                     {
                         if (comment.Type.Equals("comment"))
                         {
-                            if (comment.Item is not null)
-                            {
-
-                            }
                             OnReceived?.Invoke(this, new(comment));
-                        }
-                        else if (comment.Type.Equals("gift"))
-                        {
-                            OnReceived?.Invoke(this, new(comment));
-                        }
-                        else
-                        {
-
                         }
                     }
                 }

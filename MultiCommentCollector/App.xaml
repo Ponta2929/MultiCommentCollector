@@ -29,7 +29,7 @@
             <!-- GridViewCellItem/User -->
             <DataTemplate x:Key="GridViewCellItemUserName">
                 <DockPanel>
-                    <icon:PackIconMaterial Kind="CommentTextOutline" Margin="0,0,5,0" DockPanel.Dock="Left" Cursor="Hand" Background="Transparent" Foreground="{Binding Background, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Converter={x:Static Converter:BackgroundColorConverter.Instance}}">
+                    <icon:PackIconMaterial Kind="CommentTextOutline" Margin="0,0,5,0" DockPanel.Dock="Left" ToolTip="コメント一覧を開く" Cursor="Hand" Background="Transparent" Foreground="{Binding Background, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Converter={x:Static Converter:BackgroundColorConverter.Instance}}">
                         <i:Interaction.Triggers>
                             <i:EventTrigger EventName="MouseLeftButtonDown">
                                 <i:InvokeCommandAction Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.CellItemUserClickCommand}"  PassEventArgsToCommand="True"/>
@@ -41,7 +41,7 @@
             </DataTemplate>
             <DataTemplate x:Key="GridViewCellItemUserID">
                 <DockPanel>
-                    <icon:PackIconMaterial Kind="CommentTextOutline" Margin="0,0,5,0" DockPanel.Dock="Left" Cursor="Hand" Background="Transparent" Foreground="{Binding Background, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Converter={x:Static Converter:BackgroundColorConverter.Instance}}">
+                    <icon:PackIconMaterial Kind="CommentTextOutline" Margin="0,0,5,0" DockPanel.Dock="Left" ToolTip="コメント一覧を開く" Cursor="Hand" Background="Transparent" Foreground="{Binding Background, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Converter={x:Static Converter:BackgroundColorConverter.Instance}}">
                         <i:Interaction.Triggers>
                             <i:EventTrigger EventName="MouseLeftButtonDown">
                                 <i:InvokeCommandAction Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.CellItemUserClickCommand}"  PassEventArgsToCommand="True"/>

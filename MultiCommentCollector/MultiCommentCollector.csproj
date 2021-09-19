@@ -4,7 +4,7 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net5.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
-    <ApplicationIcon>C:\Users\reaer\source\repos\MultiCommentCollector\MultiCommentCollector\Image\icon.ico</ApplicationIcon>
+    <ApplicationIcon>..\MultiCommentCollector\Image\icon.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>

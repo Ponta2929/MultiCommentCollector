@@ -3,6 +3,7 @@ using MCC.Plugin.Win;
 using MCC.Utility;
 using MCC.Utility.Text;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows;
@@ -13,6 +14,7 @@ namespace MCC.Twitch
     {
         private Setting setting = Setting.Instance;
         private TwitchConnector connector = new();
+        private Hashtable table = new();
 
         public string SiteName => "Twitch";
 
@@ -56,6 +58,8 @@ namespace MCC.Twitch
         {
             connector.OnLogged += BaseLogged;
             connector.OnReceived += OnReceived;
+
+            table["Streamer"] = new AdditionalData() { Data = "Streamer", Description = "Streamer" };
         }
 
         private void OnReceived(object sender, ChatReceivedEventArgs e)
@@ -70,7 +74,7 @@ namespace MCC.Twitch
 
             if (userName.Equals(streamer))
             {
-                list.Add(new AdditionalData() { Data = "Streamer", Description = "Streamer", Enable = true });
+                list.Add(table["Streamer"] as AdditionalData);
             }
 
             var commentData = new CommentData()

@@ -22,7 +22,6 @@ namespace MultiCommentCollector.ViewModels
 
         public ReactiveProperty<string> SearchText { get; }
         public ReactiveCommand RefleshCommand { get; }
-        public ReactiveCommand SearchBoxClearCommand { get; }
         public ReactiveCommand<RoutedEventArgs> ColumnHeaderClickCommand { get; }
         public ReactiveCommand<UserData> ShowUserSettingCommand { get; }
         public ReactiveCommand<UserData> DeleteUserSettingCommand { get; }
@@ -32,7 +31,6 @@ namespace MultiCommentCollector.ViewModels
         {
             SearchText = new ReactiveProperty<string>("").AddTo(Disposable);
             RefleshCommand = new ReactiveCommand().WithSubscribe(() => MessageBroker.Default.Publish<MessageArgs>(new() { Identifier = "Refresh.Comment.View" })).AddTo(Disposable);
-            SearchBoxClearCommand = new ReactiveCommand().WithSubscribe(() => SearchText.Value = "").AddTo(Disposable);
             ColumnHeaderClickCommand = new ReactiveCommand<RoutedEventArgs>().WithSubscribe(ColumnHeader_Click).AddTo(Disposable);
             ShowUserSettingCommand = new ReactiveCommand<UserData>().WithSubscribe(WindowManager.ShowUserSettingWindow).AddTo(Disposable);
             DeleteUserSettingCommand = new ReactiveCommand<UserData>().WithSubscribe(DeleteUserSetting).AddTo(Disposable);
@@ -40,7 +38,12 @@ namespace MultiCommentCollector.ViewModels
             UsersDataView = new() { Source = userDataManager };
             UsersDataView.Filter += UsersDataView_Filter;
 
-            SearchText.Subscribe(x => UsersDataView.View.Refresh()).AddTo(Disposable);
+            SearchText.Subscribe(x =>
+            {
+                if (x is null)
+                    SearchText.Value = string.Empty;
+                UsersDataView.View.Refresh();
+            }).AddTo(Disposable);
         }
 
         private void UsersDataView_Filter(object _, FilterEventArgs e)

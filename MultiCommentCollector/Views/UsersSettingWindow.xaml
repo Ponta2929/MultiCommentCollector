@@ -19,23 +19,7 @@
     </Window.DataContext>
     <DockPanel>
         <StatusBar>
-            <TextBox x:Name="SearchBox" Width="150" Text="{Binding SearchText.Value, UpdateSourceTrigger=PropertyChanged}" materialDesign:HintAssist.Hint="Search..." FontSize="10" Cursor="IBeam" ToolTip="項目を検索します。" />
-            <TextBlock Text="r" FontFamily="Webdings" Height="{Binding ElementName=SearchBox, Path=Height}" ToolTip="検索項目をクリアします。">
-                <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="MouseDown">
-                        <i:InvokeCommandAction Command="{Binding SearchBoxClearCommand}" />
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
-                <TextBlock.Style>
-                    <Style BasedOn="{StaticResource MaterialDesignButtonTextBlock}" TargetType="{x:Type TextBlock}">
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding SearchText.Value}" Value="" >
-                                <Setter Property="Visibility" Value="Hidden" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </TextBlock.Style>
-            </TextBlock>
+            <TextBox x:Name="SearchBox" Width="150" Text="{Binding SearchText.Value, UpdateSourceTrigger=PropertyChanged}" materialDesign:TextFieldAssist.HasClearButton="True" materialDesign:HintAssist.Hint="Search..." Cursor="IBeam" ToolTip="項目を検索します。" Margin="0,-3,0,0"/>
             <StatusBarItem x:Name="StatusBarItemUsers" Content="{Binding Path=UsersDataView.Source.Count}" ContentStringFormat="登録数 : {0}" HorizontalContentAlignment="Right" />
         </StatusBar>
         <ListView x:Name="UsersListView" ScrollViewer.HorizontalScrollBarVisibility="Hidden" ItemsSource="{Binding UsersDataView.View}">

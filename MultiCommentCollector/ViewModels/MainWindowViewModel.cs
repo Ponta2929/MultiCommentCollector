@@ -32,6 +32,7 @@ namespace MultiCommentCollector.ViewModels
         public ReactiveProperty<double> Top { get; }
         public ReactiveProperty<bool> IsPaneOpen { get; }
         public ReactiveProperty<int> PaneWidth { get; }
+        public ReactiveProperty<string> SearchText { get; }
 
         public ReactiveCommand ShowLogWindowCommand { get; }
         public ReactiveCommand ShowPluginWindowCommand { get; }
@@ -65,6 +66,7 @@ namespace MultiCommentCollector.ViewModels
             PaneWidth = pane.PaneWidth.ToReactivePropertyAsSynchronized(x => x.Value).AddTo(Disposable);
 
             // Commands
+            SearchText = new ReactiveProperty<string>("").AddTo(Disposable);
             ShowLogWindowCommand = new ReactiveCommand().WithSubscribe(WindowManager.ShowLogWindow).AddTo(Disposable);
             ShowPluginWindowCommand = new ReactiveCommand().WithSubscribe(WindowManager.ShowPluginWindow).AddTo(Disposable);
             ShowOptionWindowCommand = new ReactiveCommand().WithSubscribe(WindowManager.ShowOptionWindow).AddTo(Disposable);
@@ -96,6 +98,12 @@ namespace MultiCommentCollector.ViewModels
             CreateMenuItemPlugins();
 
             // コメントフィルタリング
+            SearchText.Subscribe(x =>
+            {
+                if (x is null)
+                    SearchText.Value = string.Empty;
+                CommentFilterView.View.Refresh();
+            }).AddTo(Disposable);
             MessageBroker.Default.Subscribe<MessageArgs>(x => { if (x.Identifier is "Refresh.Comment.View") { CommentFilterView.View.Refresh(); } }).AddTo(Disposable);
         }
 
@@ -103,14 +111,19 @@ namespace MultiCommentCollector.ViewModels
         {
             var item = e.Item as CommentDataEx;
             var userData = UserDataManager.Instance.Find(item);
+            var word = SearchText.Value.ToLower();
 
             if (userData is not null && userData.HideUser)
             {
                 e.Accepted = false;
             }
-            else
+            else if (string.IsNullOrEmpty(SearchText.Value) || item.LiveName.ToLower().Contains(word) || item.UserID.ToLower().Contains(word) || item.UserName.ToLower().Contains(word) || item.Comment.ToLower().Contains(word))
             {
                 e.Accepted = true;
+            }
+            else
+            {
+                e.Accepted = false;
             }
         }
 

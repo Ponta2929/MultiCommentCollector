@@ -1,6 +1,7 @@
 ﻿using MCC.Plugin;
 using MCC.Utility;
 using MCC.Utility.Text;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -11,6 +12,7 @@ namespace MCC.NicoLive
     public class NicoLive : IPluginSender, ILogged
     {
         private NicoLiveConnector connector = new();
+        private Hashtable table = new();
 
         public string Author => "ぽんた";
 
@@ -66,6 +68,14 @@ namespace MCC.NicoLive
         {
             connector.OnLogged += BaseLogged;
             connector.OnReceived += OnReceived;
+
+            table["Emotion"] = new AdditionalData() { Data = "Emotion", Description = "エモーション" };
+            table["Request"] = new AdditionalData() { Data = "Request", Description = "放送ネタ" };
+            table["Gift"] = new AdditionalData() { Data = "Gift", Description = "ギフト" };
+            table["184"] = new AdditionalData() { Data = "184", Description = "184" };
+            table["Ad"] = new AdditionalData() { Data = "Ad", Description = "ニコニコ広告" };
+            table["P"] = new AdditionalData() { Data = "P", Description = "プレミアム会員" };
+            table["運"] = new AdditionalData() { Data = "運", Description = "運営コメント" };
         }
 
         private void OnReceived(object sender, ChatReceivedEventArgs e)
@@ -84,31 +94,34 @@ namespace MCC.NicoLive
 
             if (chat.Premium == 3 && chat.Content.StartsWith("/emotion"))
             {
-                list.Add(new AdditionalData() { Data = "Emotion", Description = "エモーション", Enable = true });
+                list.Add(table["Emotion"] as AdditionalData);
                 comment.Comment = e.ReceiveData.Chat.Content.Replace("/emotion ", null);
             }
             else if (chat.Premium == 3 && chat.Content.StartsWith("/spi"))
             {
-                list.Add(new AdditionalData() { Data = "Request", Description = "放送ネタ", Enable = true });
+                list.Add(table["Request"] as AdditionalData);
                 comment.Comment = e.ReceiveData.Chat.Content.Replace("/spi ", null).Replace("\"", null);
             }
             else if (chat.Premium == 3 && chat.Content.StartsWith("/gift"))
             {
-                list.Add(new AdditionalData() { Data = "Gift", Description = "ギフト", Enable = true });
+                list.Add(table["Gift"] as AdditionalData);
                 comment.Comment = e.ReceiveData.Chat.Content.Split(" ")[6].Replace("\"", null);
             }
             else if (chat.Premium == 3 && chat.Content.StartsWith("/nicoad"))
             {
                 var replace = chat.Content.Replace("/nicoad ", null);
                 var ad = JsonSerializer.Deserialize<NicoAd>(replace);
-                list.Add(new AdditionalData() { Data = "Ad", Description = "ニコニコ広告", Enable = true });
+                list.Add(table["Ad"] as AdditionalData);
                 comment.Comment = ad.Message;
             }
             else
             {
-                list.Add(new AdditionalData() { Data = "P", Description = "プレミアム会員", Enable = e.ReceiveData.Chat.Premium == 1 });
-                list.Add(new AdditionalData() { Data = "184", Description = "184", Enable = e.ReceiveData.Chat.Anonymity });
-                list.Add(new AdditionalData() { Data = "運", Description = "運営コメント", Enable = e.ReceiveData.Chat.Premium == 3 });
+                if (e.ReceiveData.Chat.Premium == 1)
+                    list.Add(table["P"] as AdditionalData);
+                if (e.ReceiveData.Chat.Anonymity)
+                    list.Add(table["184"] as AdditionalData);
+                if (e.ReceiveData.Chat.Premium == 3)
+                    list.Add(table["運"] as AdditionalData);
 
                 if (chat.Premium == 3 && chat.Content.StartsWith("/info 3"))
                 {
