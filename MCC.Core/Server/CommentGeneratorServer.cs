@@ -106,6 +106,38 @@ namespace MCC.Core.Server
                 }
             }
         }
+        /// <summary>
+        /// データ送信
+        /// </summary>
+        public void SendData(CommentDataEx data, DataType type = DataType.Json)
+        {
+            lock (syncObject)
+            {
+                foreach (var socket in Sockets)
+                {
+                    if (socket.State == WebSocketState.Open)
+                    {
+                        var converted = XSSConvert(data.Clone());
+                        var response = string.Empty;
+
+                        if (type == DataType.Json)
+                        {
+                            response = System.Text.Json.JsonSerializer.Serialize<CommentDataEx>(converted as CommentDataEx);
+                        }
+                        else if (type == DataType.Xml)
+                        {
+                            response = XmlSerializer.Serialize<CommentDataEx>(converted);
+                        }
+
+                        var buffer = Encoding.UTF8.GetBytes(response);
+                        var segment = new ArraySegment<byte>(buffer);
+
+                        socket.SendAsync(segment, WebSocketMessageType.Text, true, CancellationToken.None);
+                    }
+                }
+            }
+        }
+
 
         /// <summary>
         /// クロスサイトスクリプト変換

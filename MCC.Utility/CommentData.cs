@@ -37,5 +37,11 @@ namespace MCC.Utility
         /// </summary>
         [JsonPropertyName("Comment")]
         public string Comment { get; set; }
+
+        /// <summary>
+        /// 追加情報
+        /// </summary>
+        [JsonPropertyName("Additional")]
+        public AdditionalData[] Additional { get; set; }
     }
 }

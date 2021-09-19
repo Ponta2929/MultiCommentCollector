@@ -39,12 +39,26 @@ namespace MCC.NicoLive
         [JsonPropertyName("uri")]
         public string URI { get; set; }
     }
-    public class ReceiveChat
+
+    public class NicoAd
+    {
+        [JsonPropertyName("totalAdPoint")]
+        public int TotalAdPoint { get; set; }
+
+        [JsonPropertyName("message")]
+        public string Message { get; set; }
+
+        [JsonPropertyName("version")]
+        public string Version { get; set; }
+    }
+
+    public class JsonData
     {
 
         [JsonPropertyName("chat")]
         public Chat Chat { get; set; }
     }
+
     public class Chat
     {
         [JsonPropertyName("thread")]
@@ -62,11 +76,17 @@ namespace MCC.NicoLive
         [JsonPropertyName("date_usec")]
         public int DateUsec { get; set; }
 
+        [JsonPropertyName("mail")]
+        public string Mail { get; set; }
+
         [JsonPropertyName("user_id")]
         public string UserId { get; set; }
 
         [JsonPropertyName("premium")]
         public int Premium { get; set; }
+
+        [JsonPropertyName("anonymity")]
+        public bool Anonymity { get; set; }
 
         [JsonPropertyName("content")]
         public string Content { get; set; }

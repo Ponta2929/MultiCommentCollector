@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using System.Net.Sockets;
+using System.Threading.Tasks;
 
 namespace MCC.Twitch
 {
@@ -15,7 +16,7 @@ namespace MCC.Twitch
 
         public event LoggedEventHandler OnLogged;
 
-        public async void Start(string ip, int port, string userName, string password, string channel) => Start(v => Process(v), ip, port, userName, password, channel);
+        public void Start(string ip, int port, string userName, string password, string channel) => Start(v => Process(v), ip, port, userName, password, channel);
 
         public async void Start(Action<StreamReader> action, string ip, int port, string userName, string password, string channel)
         {
@@ -45,7 +46,7 @@ namespace MCC.Twitch
                     Logged(LogLevel.Info, $"接続を開始しました。");
 
                     // Ping
-                    new PingSender(this).Start();
+                    await Task.Run(Ping);
 
                     // 受信開始
                     action(input);
@@ -67,6 +68,19 @@ namespace MCC.Twitch
             catch (Exception e)
             {
                 Logged(LogLevel.Error, $"[{e.InnerException}] {e.Message.ToString()}");
+            }
+        }
+
+        private async void Ping()
+        {
+            while (Connected)
+            {
+                Send("PING irc.twitch.tv");
+
+                Logged(LogLevel.Debug, $"PING irc.twitch.tv");
+
+                // 5分待つ
+                await Task.Delay(300000);
             }
         }
 

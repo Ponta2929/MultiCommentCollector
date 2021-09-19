@@ -48,7 +48,7 @@ namespace MultiCommentCollector.ViewModels
             var item = e.Item as UserData;
             var word = SearchText.Value.ToLower();
 
-            if (SearchText.Value is null || SearchText.Value is "" || item.LiveName.ToLower().Contains(word) || item.UserID.ToLower().Contains(word) || item.UserName.ToLower().Contains(word))
+            if (string.IsNullOrEmpty(SearchText.Value) || item.LiveName.ToLower().Contains(word) || item.UserID.ToLower().Contains(word) || item.UserName.ToLower().Contains(word))
             {
                 e.Accepted = true;
             }

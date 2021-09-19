@@ -3,15 +3,16 @@ using MCC.Plugin.Win;
 using MCC.Utility;
 using MCC.Utility.Text;
 using System;
-using System.IO;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows;
 
 namespace MCC.Twitch
 {
-    public class Twitch : IrcClient, IPluginSender, ISetting
+    public class Twitch : IPluginSender, ILogged, ISetting
     {
         private Setting setting = Setting.Instance;
+        private TwitchConnector connector = new();
 
         public string SiteName => "Twitch";
 
@@ -28,47 +29,68 @@ namespace MCC.Twitch
         public string MenuItemName => "設定";
 
         public event CommentReceivedEventHandler OnCommentReceived;
+        public event LoggedEventHandler OnLogged;
 
-        private bool resume;
 
         public bool Activate()
         {
-            resume = true;
+            connector.Resume = true;
 
-            if (!Connected)
-            {
-                Task.Run(Connect);
-            }
+            Task.Run(() => connector.Connect(setting.Password, StreamKey));
 
             return true;
         }
 
         public bool Inactivate()
         {
-            resume = false;
+            connector.Resume = false;
 
-            Abort();
+            connector.Abort();
 
             return true;
         }
 
-        public void PluginClose() => Abort();
+        public void PluginClose() => Inactivate();
 
         public void PluginLoad()
         {
+            connector.OnLogged += BaseLogged;
+            connector.OnReceived += OnReceived;
+        }
 
+        private void OnReceived(object sender, ChatReceivedEventArgs e)
+        {
+            var list = new List<AdditionalData>();
+            var intIndexParseSign = e.ReceiveData.IndexOf('!');
+            var userName = e.ReceiveData.Substring(1, intIndexParseSign - 1);
+            intIndexParseSign = e.ReceiveData.IndexOf("#");
+            var streamer = e.ReceiveData.Substring(intIndexParseSign + 1, e.ReceiveData.IndexOf(" :") - intIndexParseSign - 1);
+            intIndexParseSign = e.ReceiveData.IndexOf(" :");
+            var comment = e.ReceiveData.Substring(intIndexParseSign + 2);
+
+            if (userName.Equals(streamer))
+            {
+                list.Add(new AdditionalData() { Data = "Streamer", Description = "Streamer", Enable = true });
+            }
+
+            var commentData = new CommentData()
+            {
+                LiveName = "Twitch",
+                PostTime = DateTime.Now,
+                Comment = comment,
+                UserName = string.Empty,
+                UserID = userName,
+                Additional = list.ToArray()
+            };
+
+            OnCommentReceived?.Invoke(this, new(commentData));
         }
 
         public bool IsSupport(string url)
         {
             StreamKey = url.RegexString(@"https://www.twitch.tv/(?<value>[\w]+)", "value");
 
-            if (!StreamKey.Equals(""))
-            {
-                return true;
-            }
-
-            return false;
+            return !string.IsNullOrEmpty(StreamKey);
         }
 
         public void ShowWindow(Window window)
@@ -81,56 +103,6 @@ namespace MCC.Twitch
             window.Show();
         }
 
-        public async void Connect()
-        {
-            while (resume)
-            {
-                Start("irc.twitch.tv", 6667, "mcc_twitch_bot", setting.Password, StreamKey);
-
-                await Task.Delay(10000);
-            }
-        }
-
-        protected override async void Process(StreamReader reader)
-        {
-            try
-            {
-                while (Connected)
-                {
-                    var message = await reader.ReadLineAsync();
-
-                    if (message != null)
-                    {
-                        if (message.Contains("PRIVMSG"))
-                        {
-                            var intIndexParseSign = message.IndexOf('!');
-                            var userName = message.Substring(1, intIndexParseSign - 1);
-                            intIndexParseSign = message.IndexOf(" :");
-                            message = message.Substring(intIndexParseSign + 2);
-
-                            var commentData = new CommentData()
-                            {
-                                LiveName = "Twitch",
-                                PostTime = DateTime.Now,
-                                Comment = message,
-                                UserName = "",
-                                UserID = userName
-                            };
-
-                            OnCommentReceived?.Invoke(this, new(commentData));
-                        }
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                Logged(LogLevel.Error, $"[{e.InnerException}] {e.Message.ToString()}");
-            }
-            finally
-            {
-                // 終了
-                Abort();
-            }
-        }
+        private void BaseLogged(object sender, LoggedEventArgs e) => OnLogged?.Invoke(this, e);
     }
 }

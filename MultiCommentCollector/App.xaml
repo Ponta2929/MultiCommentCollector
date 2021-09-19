@@ -4,6 +4,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+             xmlns:Converter="clr-namespace:MultiCommentCollector.Converter"
+                         xmlns:converter_m="http://metro.mahapps.com/winfx/xaml/shared"
              Startup="ApplicationStartup"
              Exit="ApplicationShutdown">
     <Application.Resources>
@@ -27,7 +29,7 @@
             <!-- GridViewCellItem/User -->
             <DataTemplate x:Key="GridViewCellItemUserName">
                 <DockPanel>
-                    <icon:PackIconMaterial Kind="CommentTextOutline" Margin="0,0,5,0" DockPanel.Dock="Left" Cursor="Hand" Background="Transparent">
+                    <icon:PackIconMaterial Kind="CommentTextOutline" Margin="0,0,5,0" DockPanel.Dock="Left" Cursor="Hand" Background="Transparent" Foreground="{Binding Background, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Converter={x:Static Converter:BackgroundColorConverter.Instance}}">
                         <i:Interaction.Triggers>
                             <i:EventTrigger EventName="MouseLeftButtonDown">
                                 <i:InvokeCommandAction Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.CellItemUserClickCommand}"  PassEventArgsToCommand="True"/>
@@ -39,7 +41,7 @@
             </DataTemplate>
             <DataTemplate x:Key="GridViewCellItemUserID">
                 <DockPanel>
-                    <icon:PackIconMaterial Kind="CommentTextOutline" Margin="0,0,5,0" DockPanel.Dock="Left" Cursor="Hand" Background="Transparent">
+                    <icon:PackIconMaterial Kind="CommentTextOutline" Margin="0,0,5,0" DockPanel.Dock="Left" Cursor="Hand" Background="Transparent" Foreground="{Binding Background, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Converter={x:Static Converter:BackgroundColorConverter.Instance}}">
                         <i:Interaction.Triggers>
                             <i:EventTrigger EventName="MouseLeftButtonDown">
                                 <i:InvokeCommandAction Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.CellItemUserClickCommand}"  PassEventArgsToCommand="True"/>
@@ -69,7 +71,7 @@
             </DataTemplate>
 
             <!-- Styles -->
-            <Style x:Key="MenuItemPluginSender" TargetType="{x:Type MenuItem}" BasedOn="{StaticResource MaterialDesignMenuItem}">
+            <Style x:Key="MenuItemPluginSetting" TargetType="{x:Type MenuItem}" BasedOn="{StaticResource MaterialDesignMenuItem}">
                 <Setter Property="Header" Value="{Binding MenuItemName}" />
             </Style>
             <Style TargetType="{x:Type StatusBar}" BasedOn="{StaticResource MahApps.Styles.StatusBar}">
@@ -81,6 +83,287 @@
                 <Setter Property="Controls:HeaderedControlHelper.HeaderFontSize" Value="16" />
                 <Setter Property="Controls:TabControlHelper.Underlined" Value="SelectedTabItem" />
             </Style>
+            <Style x:Key="BorderPluginAdditional" TargetType="{x:Type Border}">
+                <Setter Property="BorderThickness" Value="2" />
+                <Setter Property="CornerRadius" Value="2" />
+                <Setter Property="Padding" Value="3,0,3,0" />
+                <Setter Property="Margin" Value="0,0,2,0" />
+                <Setter Property="BorderBrush" Value="{Binding Background, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Converter={x:Static Converter:BackgroundColorConverter.Instance}}" />
+                <Setter Property="Visibility" Value="Visible"/>
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding BackColor.A}" Value="0">
+                        <Setter Property="BorderBrush" Value="{Binding Background, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}, Converter={x:Static Converter:BackgroundColorConverter.Instance}}"/>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Tag, RelativeSource={RelativeSource Self}}" Value="{x:Null}">
+                        <Setter Property="Visibility" Value="Hidden"/>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Tag.Enable, RelativeSource={RelativeSource Self}}" Value="False">
+                        <Setter Property="Visibility" Value="Hidden"/>
+                    </DataTrigger>
+                </Style.Triggers>
+                <Style.Resources>
+                    <Style TargetType="{x:Type TextBlock}">
+                        <Setter Property="Foreground" Value="{Binding BorderBrush, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Border}}}"/>
+                        <Setter Property="Text" Value="{Binding Tag.Data, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Border}}}" />
+                        <Setter Property="FontWeight" Value="Bold" />
+                        <Setter Property="ToolTip" Value="{Binding Tag.Description, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Border}}}" />
+                        <Setter Property="FontSize" Value="10" />
+                    </Style>
+                </Style.Resources>
+            </Style>
+            <!-- GridViewCellItem/Info -->
+            <DataTemplate x:Key="Additional_Null">
+                <TextBlock />
+            </DataTemplate>
+            <DataTemplate x:Key="Additional_1">
+                <Border Style="{DynamicResource BorderPluginAdditional}"  Tag="{Binding Additional[0]}" >
+                    <TextBlock />
+                </Border>
+            </DataTemplate>
+            <DataTemplate x:Key="Additional_2">
+                <StackPanel Orientation="Horizontal">
+                    <Border Style="{DynamicResource BorderPluginAdditional}"  Tag="{Binding Additional[0]}" >
+                        <TextBlock />
+                    </Border>
+                    <Border Style="{DynamicResource BorderPluginAdditional}"  Tag="{Binding Additional[1]}" >
+                        <TextBlock />
+                    </Border>
+                </StackPanel>
+            </DataTemplate>
+            <DataTemplate x:Key="Additional_3">
+                <StackPanel Orientation="Horizontal">
+                    <Border Style="{DynamicResource BorderPluginAdditional}"  Tag="{Binding Additional[0]}" >
+                        <TextBlock />
+                    </Border>
+                    <Border Style="{DynamicResource BorderPluginAdditional}"  Tag="{Binding Additional[1]}" >
+                        <TextBlock />
+                    </Border>
+                    <Border Style="{DynamicResource BorderPluginAdditional}"  Tag="{Binding Additional[2]}" >
+                        <TextBlock />
+                    </Border>
+                </StackPanel>
+            </DataTemplate>
+            <DataTemplate x:Key="Additional_4">
+                <StackPanel Orientation="Horizontal">
+                    <Border Style="{DynamicResource BorderPluginAdditional}"  Tag="{Binding Additional[0]}" >
+                        <TextBlock />
+                    </Border>
+                    <Border Style="{DynamicResource BorderPluginAdditional}"  Tag="{Binding Additional[1]}" >
+                        <TextBlock />
+                    </Border>
+                    <Border Style="{DynamicResource BorderPluginAdditional}"  Tag="{Binding Additional[2]}" >
+                        <TextBlock />
+                    </Border>
+                    <Border Style="{DynamicResource BorderPluginAdditional}"  Tag="{Binding Additional[3]}" >
+                        <TextBlock />
+                    </Border>
+                </StackPanel>
+            </DataTemplate>
+            <DataTemplate x:Key="Additional_5">
+                <StackPanel Orientation="Horizontal">
+                    <Border Style="{DynamicResource BorderPluginAdditional}"  Tag="{Binding Additional[0]}" >
+                        <TextBlock />
+                    </Border>
+                    <Border Style="{DynamicResource BorderPluginAdditional}"  Tag="{Binding Additional[1]}" >
+                        <TextBlock />
+                    </Border>
+                    <Border Style="{DynamicResource BorderPluginAdditional}"  Tag="{Binding Additional[2]}" >
+                        <TextBlock />
+                    </Border>
+                    <Border Style="{DynamicResource BorderPluginAdditional}"  Tag="{Binding Additional[3]}" >
+                        <TextBlock />
+                    </Border>
+                    <Border Style="{DynamicResource BorderPluginAdditional}"  Tag="{Binding Additional[4]}" >
+                        <TextBlock />
+                    </Border>
+                </StackPanel>
+            </DataTemplate>
+            <DataTemplate x:Key="Additional_6">
+                <StackPanel Orientation="Horizontal">
+                    <Border Style="{DynamicResource BorderPluginAdditional}"  Tag="{Binding Additional[0]}" >
+                        <TextBlock />
+                    </Border>
+                    <Border Style="{DynamicResource BorderPluginAdditional}"  Tag="{Binding Additional[1]}" >
+                        <TextBlock />
+                    </Border>
+                    <Border Style="{DynamicResource BorderPluginAdditional}"  Tag="{Binding Additional[2]}" >
+                        <TextBlock />
+                    </Border>
+                    <Border Style="{DynamicResource BorderPluginAdditional}"  Tag="{Binding Additional[3]}" >
+                        <TextBlock />
+                    </Border>
+                    <Border Style="{DynamicResource BorderPluginAdditional}"  Tag="{Binding Additional[4]}" >
+                        <TextBlock />
+                    </Border>
+                    <Border Style="{DynamicResource BorderPluginAdditional}"  Tag="{Binding Additional[5]}" >
+                        <TextBlock />
+                    </Border>
+                </StackPanel>
+            </DataTemplate>
+            <DataTemplate x:Key="Additional_7">
+                <StackPanel Orientation="Horizontal">
+                    <Border Style="{DynamicResource BorderPluginAdditional}"  Tag="{Binding Additional[0]}" >
+                        <TextBlock />
+                    </Border>
+                    <Border Style="{DynamicResource BorderPluginAdditional}"  Tag="{Binding Additional[1]}" >
+                        <TextBlock />
+                    </Border>
+                    <Border Style="{DynamicResource BorderPluginAdditional}"  Tag="{Binding Additional[2]}" >
+                        <TextBlock />
+                    </Border>
+                    <Border Style="{DynamicResource BorderPluginAdditional}"  Tag="{Binding Additional[3]}" >
+                        <TextBlock />
+                    </Border>
+                    <Border Style="{DynamicResource BorderPluginAdditional}"  Tag="{Binding Additional[4]}" >
+                        <TextBlock />
+                    </Border>
+                    <Border Style="{DynamicResource BorderPluginAdditional}"  Tag="{Binding Additional[5]}" >
+                        <TextBlock />
+                    </Border>
+                    <Border Style="{DynamicResource BorderPluginAdditional}"  Tag="{Binding Additional[6]}" >
+                        <TextBlock />
+                    </Border>
+                </StackPanel>
+            </DataTemplate>
+            <DataTemplate x:Key="Additional_8">
+                <StackPanel Orientation="Horizontal">
+                    <Border Style="{DynamicResource BorderPluginAdditional}"  Tag="{Binding Additional[0]}" >
+                        <TextBlock />
+                    </Border>
+                    <Border Style="{DynamicResource BorderPluginAdditional}"  Tag="{Binding Additional[1]}" >
+                        <TextBlock />
+                    </Border>
+                    <Border Style="{DynamicResource BorderPluginAdditional}"  Tag="{Binding Additional[2]}" >
+                        <TextBlock />
+                    </Border>
+                    <Border Style="{DynamicResource BorderPluginAdditional}"  Tag="{Binding Additional[3]}" >
+                        <TextBlock />
+                    </Border>
+                    <Border Style="{DynamicResource BorderPluginAdditional}"  Tag="{Binding Additional[4]}" >
+                        <TextBlock />
+                    </Border>
+                    <Border Style="{DynamicResource BorderPluginAdditional}"  Tag="{Binding Additional[5]}" >
+                        <TextBlock />
+                    </Border>
+                    <Border Style="{DynamicResource BorderPluginAdditional}"  Tag="{Binding Additional[6]}" >
+                        <TextBlock />
+                    </Border>
+                    <Border Style="{DynamicResource BorderPluginAdditional}"  Tag="{Binding Additional[7]}" >
+                        <TextBlock />
+                    </Border>
+                </StackPanel>
+            </DataTemplate>
+            <DataTemplate x:Key="Additional_9">
+                <StackPanel Orientation="Horizontal">
+                    <Border Style="{DynamicResource BorderPluginAdditional}"  Tag="{Binding Additional[0]}" >
+                        <TextBlock />
+                    </Border>
+                    <Border Style="{DynamicResource BorderPluginAdditional}"  Tag="{Binding Additional[1]}" >
+                        <TextBlock />
+                    </Border>
+                    <Border Style="{DynamicResource BorderPluginAdditional}"  Tag="{Binding Additional[2]}" >
+                        <TextBlock />
+                    </Border>
+                    <Border Style="{DynamicResource BorderPluginAdditional}"  Tag="{Binding Additional[3]}" >
+                        <TextBlock />
+                    </Border>
+                    <Border Style="{DynamicResource BorderPluginAdditional}"  Tag="{Binding Additional[4]}" >
+                        <TextBlock />
+                    </Border>
+                    <Border Style="{DynamicResource BorderPluginAdditional}"  Tag="{Binding Additional[5]}" >
+                        <TextBlock />
+                    </Border>
+                    <Border Style="{DynamicResource BorderPluginAdditional}"  Tag="{Binding Additional[6]}" >
+                        <TextBlock />
+                    </Border>
+                    <Border Style="{DynamicResource BorderPluginAdditional}"  Tag="{Binding Additional[7]}" >
+                        <TextBlock />
+                    </Border>
+                    <Border Style="{DynamicResource BorderPluginAdditional}"  Tag="{Binding Additional[8]}" >
+                        <TextBlock />
+                    </Border>
+                </StackPanel>
+            </DataTemplate>
+            <DataTemplate x:Key="Additional_10">
+                <StackPanel Orientation="Horizontal">
+                    <Border Style="{DynamicResource BorderPluginAdditional}"  Tag="{Binding Additional[0]}" >
+                        <TextBlock />
+                    </Border>
+                    <Border Style="{DynamicResource BorderPluginAdditional}"  Tag="{Binding Additional[1]}" >
+                        <TextBlock />
+                    </Border>
+                    <Border Style="{DynamicResource BorderPluginAdditional}"  Tag="{Binding Additional[2]}" >
+                        <TextBlock />
+                    </Border>
+                    <Border Style="{DynamicResource BorderPluginAdditional}"  Tag="{Binding Additional[3]}" >
+                        <TextBlock />
+                    </Border>
+                    <Border Style="{DynamicResource BorderPluginAdditional}"  Tag="{Binding Additional[4]}" >
+                        <TextBlock />
+                    </Border>
+                    <Border Style="{DynamicResource BorderPluginAdditional}"  Tag="{Binding Additional[5]}" >
+                        <TextBlock />
+                    </Border>
+                    <Border Style="{DynamicResource BorderPluginAdditional}"  Tag="{Binding Additional[6]}" >
+                        <TextBlock />
+                    </Border>
+                    <Border Style="{DynamicResource BorderPluginAdditional}"  Tag="{Binding Additional[7]}" >
+                        <TextBlock />
+                    </Border>
+                    <Border Style="{DynamicResource BorderPluginAdditional}"  Tag="{Binding Additional[8]}" >
+                        <TextBlock />
+                    </Border>
+                    <Border Style="{DynamicResource BorderPluginAdditional}"  Tag="{Binding Additional[9]}" >
+                        <TextBlock />
+                    </Border>
+                </StackPanel>
+            </DataTemplate>
+            <DataTemplate x:Key="GridViewCellItemAdditional">
+                <ContentControl Content="{Binding}" Tag="{Binding Additional}">
+                    <ContentControl.Style>
+                        <Style TargetType="{x:Type ContentControl}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Tag.Length, RelativeSource={RelativeSource Self}}" Value="{x:Null}">
+                                    <Setter Property="ContentTemplate" Value="{StaticResource Additional_Null}" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Tag.Length, RelativeSource={RelativeSource Self}}" Value="0">
+                                    <Setter Property="ContentTemplate" Value="{StaticResource Additional_Null}" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Tag.Length, RelativeSource={RelativeSource Self}}" Value="1">
+                                    <Setter Property="ContentTemplate" Value="{StaticResource Additional_1}" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Tag.Length, RelativeSource={RelativeSource Self}}" Value="2">
+                                    <Setter Property="ContentTemplate" Value="{StaticResource Additional_2}" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Tag.Length, RelativeSource={RelativeSource Self}}" Value="3">
+                                    <Setter Property="ContentTemplate" Value="{StaticResource Additional_3}" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Tag.Length, RelativeSource={RelativeSource Self}}" Value="4">
+                                    <Setter Property="ContentTemplate" Value="{StaticResource Additional_4}" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Tag.Length, RelativeSource={RelativeSource Self}}" Value="5">
+                                    <Setter Property="ContentTemplate" Value="{StaticResource Additional_5}" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Tag.Length, RelativeSource={RelativeSource Self}}" Value="6">
+                                    <Setter Property="ContentTemplate" Value="{StaticResource Additional_6}" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Tag.Length, RelativeSource={RelativeSource Self}}" Value="7">
+                                    <Setter Property="ContentTemplate" Value="{StaticResource Additional_7}" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Tag.Length, RelativeSource={RelativeSource Self}}" Value="8">
+                                    <Setter Property="ContentTemplate" Value="{StaticResource Additional_8}" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Tag.Length, RelativeSource={RelativeSource Self}}" Value="9">
+                                    <Setter Property="ContentTemplate" Value="{StaticResource Additional_9}" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Tag.Length, RelativeSource={RelativeSource Self}}" Value="10">
+                                    <Setter Property="ContentTemplate" Value="{StaticResource Additional_10}" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ContentControl.Style>
+                </ContentControl>
+            </DataTemplate>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

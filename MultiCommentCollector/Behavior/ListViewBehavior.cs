@@ -9,6 +9,8 @@ namespace MultiCommentCollector.Behavior
     {
         private ScrollViewer scrollViewer;
 
+        public int AutoResizeToItemColmunNumber { get; set; } = -1;
+
         protected override void OnAttached()
         {
             base.OnAttached();
@@ -40,6 +42,14 @@ namespace MultiCommentCollector.Behavior
                 if (scrollToEnd)
                 {
                     scrollViewer.ScrollToEnd();
+
+                    if (AutoResizeToItemColmunNumber > -1)
+                    {
+                        var view = AssociatedObject.View as GridView;
+
+                        view.Columns[AutoResizeToItemColmunNumber].Width = 0;
+                        view.Columns[AutoResizeToItemColmunNumber].Width = double.NaN;
+                    }
                 }
             }
         }

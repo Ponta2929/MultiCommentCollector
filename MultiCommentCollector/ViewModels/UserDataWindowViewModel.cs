@@ -38,7 +38,7 @@ namespace MultiCommentCollector.ViewModels
             CommentFilter = new() { Source = CommentManager.Instance };
             CommentFilter.Filter += CommentFilter_Filter;
 
-            user.ObserveProperty(o => o.UserName).Subscribe(value => Title.Value = $"{user.LiveName} - " + (user.UserName is null || user.UserName.Equals("") ? user.UserID : user.UserName)).AddTo(Disposable);
+            user.ObserveProperty(o => o.UserName).Subscribe(value => Title.Value = $"{user.LiveName} - " + (string.IsNullOrEmpty(user.UserName) ? user.UserID : user.UserName)).AddTo(Disposable);
             user.ObserveProperty(o => o.BackColor).Subscribe(value => BackColor.Value.Color = value.ToArgb()).AddTo(Disposable);
         }
 

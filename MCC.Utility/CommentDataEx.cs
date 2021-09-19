@@ -21,6 +21,7 @@ namespace MCC.Utility
             this.PostType = data.PostType;
             this.UserID = data.UserID;
             this.UserName = data.UserName;
+            this.Additional = data.Additional;
         }
 
         public void SetUserData(UserData userData)
@@ -28,5 +29,7 @@ namespace MCC.Utility
             this.BackColor = userData.BackColor;
             this.UserName = userData.UserName;
         }
+
+        public CommentDataEx Clone() => this.MemberwiseClone() as CommentDataEx;
     }
 }

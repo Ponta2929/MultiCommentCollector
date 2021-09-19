@@ -2,7 +2,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace MCC.NicoLive
+namespace MCC.NicoLive.Converter
 {
     public class DateTimeOffsetConverter : JsonConverter<DateTimeOffset>
     {

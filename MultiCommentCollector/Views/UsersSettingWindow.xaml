@@ -8,7 +8,7 @@
                          xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                          xmlns:converter="clr-namespace:MultiCommentCollector.Converter"
                          xmlns:model="clr-namespace:MultiCommentCollector.Models"
-                         xmlns:viewmodel="clr-namespace:MultiCommentCollector.ViewModels" xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
+                         xmlns:viewmodel="clr-namespace:MultiCommentCollector.ViewModels"
                          mc:Ignorable="d" Title="ユーザー設定一覧" Height="350" Width="600" WindowStartupLocation="CenterOwner">
     <Window.Resources>
         <converter:HeaderWidthConverter x:Key="HeaderWidthConverter"/>

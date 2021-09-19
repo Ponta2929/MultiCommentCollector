@@ -1,32 +1,16 @@
 ﻿using MCC.Plugin;
 using MCC.Utility;
-using MCC.Utility.Net;
 using MCC.Utility.Text;
-using System;
 using System.Collections.Generic;
-using System.Net.WebSockets;
-using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
-using System.Threading;
 using System.Threading.Tasks;
-using System.Web;
 
 namespace MCC.NicoLive
 {
     public class NicoLive : IPluginSender, ILogged
     {
-        private Dictionary<string, string> header = new Dictionary<string, string>();
-
-        private bool resume;
-        private WebSocketClient viewingClient = new();
-        private WebSocketClient chatClient = new();
-
-        private const string message_1 = "{\"type\":\"startWatching\",\"data\":{\"stream\":{\"quality\":\"abr\",\"protocol\":\"hls\",\"latency\":\"low\",\"chasePlay\":false},\"room\":{\"protocol\":\"webSocket\",\"commentable\":true},\"reconnect\":false}}";
-        private const string message_2 = "{\"type\":\"getAkashic\",\"data\":{\"chasePlay\":false}}";
-        private const string message_pong = "{\"type\":\"pong\"}";
-        private const string message_keepSeat = "{\"type\":\"keepSeat\"}";
-        private string message_chat = "";
+        private NicoLiveConnector connector = new();
 
         public string Author => "ぽんた";
 
@@ -43,26 +27,20 @@ namespace MCC.NicoLive
         public event CommentReceivedEventHandler OnCommentReceived;
         public event LoggedEventHandler OnLogged;
 
-        private JsonSerializerOptions options = new();
-
         public bool Activate()
         {
-            resume = true;
+            connector.Resume = true;
 
-            if (!viewingClient.Connected)
-            {
-                Task.Run(Connect);
-            }
+            Task.Run(() => connector.Connect(StreamKey));
 
             return true;
         }
 
         public bool Inactivate()
         {
-            resume = false;
+            connector.Resume = false;
 
-            viewingClient.Abort();
-            chatClient.Abort();
+            connector.Abort();
 
             return true;
         }
@@ -72,9 +50,9 @@ namespace MCC.NicoLive
             var livePage = url.RegexString(@"https://live[\d]*.nicovideo.jp/watch/(?<value>[\w]+)", "value");
             var communityPage = url.RegexString(@"https://com.nicovideo.jp/community/(?<value>[\w]+)", "value");
 
-            StreamKey = !livePage.Equals("") ? livePage : communityPage;
+            StreamKey = !string.IsNullOrEmpty(livePage) ? livePage : communityPage;
 
-            if (!livePage.Equals("") || !communityPage.Equals(""))
+            if (!string.IsNullOrEmpty(livePage) || !string.IsNullOrEmpty(communityPage))
             {
                 return true;
             }
@@ -82,227 +60,83 @@ namespace MCC.NicoLive
             return false;
         }
 
-        public void PluginClose()
-        {
-            viewingClient.Abort();
-            chatClient.Abort();
-
-            chatClient.OnLogged -= Client_OnLogged;
-        }
+        public void PluginClose() => Inactivate();
 
         public void PluginLoad()
         {
-            options.Converters.Add(new DateTimeOffsetConverter());
-            header.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100");
-
-            chatClient.OnLogged += Client_OnLogged;
+            connector.OnLogged += BaseLogged;
+            connector.OnReceived += OnReceived;
         }
 
-        private async void Connect()
+        private void OnReceived(object sender, ChatReceivedEventArgs e)
         {
-            while (resume)
+            var chat = e.ReceiveData.Chat;
+            var list = new List<AdditionalData>();
+
+            var comment = new CommentData()
             {
-                if (!viewingClient.Connected)
-                {
-                    var get = Http.Get($"https://live2.nicovideo.jp/watch/{StreamKey}");
-                    var index = get.IndexOf("data-props=\"");
-                    var last = get.IndexOf("\">", index);
-                    var result = get.Substring(index, last - index).Replace("data-props=\"", "");
-                    var decode = HttpUtility.HtmlDecode(result);
-                    var json = JsonSerializer.Deserialize<NicoLiveJson>(decode);
+                LiveName = "NicoLive",
+                PostType = PostType.Comment,
+                UserID = e.ReceiveData.Chat.UserId,
+                PostTime = e.ReceiveData.Chat.Date.LocalDateTime,
+                UserName = string.Empty,
+            };
 
-                    if (json.Site.ReLive.WebSocketURL is not null && !json.Site.ReLive.WebSocketURL.Equals(""))
-                    {
-                        viewingClient.URL = new(json.Site.ReLive.WebSocketURL);
-                        viewingClient.Start(ViewingProcess, header);
-
-                        await Task.Run(() =>
-                        {
-                            while (true)
-                            {
-                                if (chatClient.URL is not null)
-                                {
-                                    break;
-                                }
-
-                                Task.Delay(1000);
-                            }
-
-                        }).ContinueWith(t =>
-                        {
-                            chatClient.Start(ChatProcess, header);
-                        });
-                    }
-                }
-
-                await Task.Delay(60000);
+            if (chat.Premium == 3 && chat.Content.StartsWith("/emotion"))
+            {
+                list.Add(new AdditionalData() { Data = "Emotion", Description = "エモーション", Enable = true });
+                comment.Comment = e.ReceiveData.Chat.Content.Replace("/emotion ", null);
             }
-        }
-
-        protected async void ViewingProcess(ClientWebSocket socket)
-        {
-            // 初回データ送信
-            viewingClient.Send(message_1);
-            viewingClient.Send(message_2);
-
-            var received = new List<byte>();
-            var buffer = new byte[4096];
-
-            try
+            else if (chat.Premium == 3 && chat.Content.StartsWith("/spi"))
             {
-                while (socket.State == WebSocketState.Open)
+                list.Add(new AdditionalData() { Data = "Request", Description = "放送ネタ", Enable = true });
+                comment.Comment = e.ReceiveData.Chat.Content.Replace("/spi ", null).Replace("\"", null);
+            }
+            else if (chat.Premium == 3 && chat.Content.StartsWith("/gift"))
+            {
+                list.Add(new AdditionalData() { Data = "Gift", Description = "ギフト", Enable = true });
+                comment.Comment = e.ReceiveData.Chat.Content.Split(" ")[6].Replace("\"", null);
+            }
+            else if (chat.Premium == 3 && chat.Content.StartsWith("/nicoad"))
+            {
+                var replace = chat.Content.Replace("/nicoad ", null);
+                var ad = JsonSerializer.Deserialize<NicoAd>(replace);
+                list.Add(new AdditionalData() { Data = "Ad", Description = "ニコニコ広告", Enable = true });
+                comment.Comment = ad.Message;
+            }
+            else
+            {
+                list.Add(new AdditionalData() { Data = "P", Description = "プレミアム会員", Enable = e.ReceiveData.Chat.Premium == 1 });
+                list.Add(new AdditionalData() { Data = "184", Description = "184", Enable = e.ReceiveData.Chat.Anonymity });
+                list.Add(new AdditionalData() { Data = "運", Description = "運営コメント", Enable = e.ReceiveData.Chat.Premium == 3 });
+
+                if (chat.Premium == 3 && chat.Content.StartsWith("/info 3"))
                 {
-                    received.Clear();
-
-                    var segment = new ArraySegment<byte>(buffer);
-                    var count = 0;
-
-                    while (true)
-                    {
-                        var result = await socket.ReceiveAsync(segment, CancellationToken.None);
-
-                        if (result.MessageType == WebSocketMessageType.Close)
-                        {
-                            return;
-                        }
-
-                        received.AddRange(buffer);
-                        count += result.Count;
-
-                        if (result.EndOfMessage)
-                        {
-                            break;
-                        }
-                    }
-
-                    var receive = Encoding.UTF8.GetString(received.ToArray(), 0, count);
-                    var type = JsonSerializer.Deserialize<Receive>(receive);
-
-                    if (type.Type == "room")
-                    {
-                        message_chat = "[{\"ping\": {\"content\": \"rs:0\"}},{\"ping\": {\"content\": \"ps:0\"}},{\"thread\": {\"thread\": \"" + type.Data.ThreadId + "\",\"version\": \"20061206\",\"user_id\": \"guest\",\"res_from\": 0,\"with_global\": 1,\"scores\": 1,\"nicoru\": 0}},{\"ping\": {\"content\": \"pf:0\"}},{\"ping\": {\"content\": \"rf:0\"}}]";
-                        chatClient.URL = new(type.Data.MessageServer.URI);
-                    }
-                    else if (type.Type == "ping")
-                    {
-                        viewingClient.Send(message_pong);
-                        viewingClient.Send(message_keepSeat);
-                    }
+                    comment.Comment = e.ReceiveData.Chat.Content.Replace("/info 3 ", null);
+                }
+                else if (chat.Premium == 3 && chat.Content.StartsWith("/info 10"))
+                {
+                    comment.Comment = e.ReceiveData.Chat.Content.Replace("/info 10 ", null);
+                }
+                else if (chat.Premium == 3 && chat.Content.StartsWith("/perm"))
+                {
+                    comment.Comment = ConvertHTMLCode(e.ReceiveData.Chat.Content.Replace("/perm ", null));
+                }
+                else
+                {
+                    comment.Comment = ConvertHTMLCode(e.ReceiveData.Chat.Content);
                 }
             }
-            catch (WebSocketException e)
-            {
-                Logged(LogLevel.Error, $"[{e.InnerException}] 接続エラーが発生しました。");
-            }
-            catch (JsonException e)
-            {
-                Logged(LogLevel.Error, $"[{e.InnerException}] デコードエラーが発生しました。");
-            }
-            catch (OperationCanceledException e)
-            {
-                Logged(LogLevel.Error, $"[{e.InnerException}] 受信データ待受エラーが発生しました。");
-            }
-            catch (Exception e)
-            {
-                Logged(LogLevel.Error, $"[{e.InnerException}] {e.Message.ToString()}");
-            }
-            finally
-            {
-                // 終了
-                viewingClient.Abort();
-            }
+
+            // 追加情報
+            comment.Additional = list.ToArray();
+
+            OnCommentReceived?.Invoke(this, new(comment));
         }
 
-        protected async void ChatProcess(ClientWebSocket socket)
-        {
-            // 初回データ送信
-            chatClient.Send(message_chat);
+        private void BaseLogged(object sender, LoggedEventArgs e) => OnLogged?.Invoke(this, e);
 
-            var received = new List<byte>();
-            var buffer = new byte[4096];
-
-            try
-            {
-                while (socket.State == WebSocketState.Open)
-                {
-                    received.Clear();
-
-                    var segment = new ArraySegment<byte>(buffer);
-                    var count = 0;
-
-                    while (true)
-                    {
-                        var result = await socket.ReceiveAsync(segment, CancellationToken.None);
-
-                        if (result.MessageType == WebSocketMessageType.Close)
-                        {
-                            return;
-                        }
-
-                        received.AddRange(buffer);
-                        count += result.Count;
-
-                        if (result.EndOfMessage)
-                        {
-                            break;
-                        }
-                    }
-
-                    var receive = Encoding.UTF8.GetString(received.ToArray(), 0, count);
-
-                    if (receive.Contains("chat"))
-                    {
-                        var data = JsonSerializer.Deserialize<ReceiveChat>(receive, options);
-
-                        var comment = new CommentData()
-                        {
-                            LiveName = "NicoLive",
-                            PostType = PostType.Comment,
-                            Comment = ConvertHTMLCode(data.Chat.Content),
-                            UserID = data.Chat.UserId,
-                            PostTime = data.Chat.Date.LocalDateTime,
-                            UserName = ""
-                        };
-
-                        OnCommentReceived?.Invoke(this, new(comment));
-
-
-                        if (data.Chat.Content.Contains("/disconnect"))
-                        {
-                            viewingClient.Abort();
-                            chatClient.Abort();
-                        }
-                    }
-                }
-            }
-            catch (WebSocketException e)
-            {
-                Logged(LogLevel.Error, $"[{e.InnerException}] 接続エラーが発生しました。");
-            }
-            catch (JsonException e)
-            {
-                Logged(LogLevel.Error, $"[{e.InnerException}] デコードエラーが発生しました。");
-            }
-            catch (OperationCanceledException e)
-            {
-                Logged(LogLevel.Error, $"[{e.InnerException}] 受信データ待受エラーが発生しました。");
-            }
-            catch (Exception e)
-            {
-                Logged(LogLevel.Error, $"[{e.InnerException}] {e.Message.ToString()}");
-            }
-            finally
-            {
-                // 終了
-                chatClient.Abort();
-            }
-        }
-
-        private void Client_OnLogged(object sender, LoggedEventArgs e) => OnLogged?.Invoke(this, e);
-
-        public void Logged(LogLevel level, string message) => OnLogged?.Invoke(this, new(level, message));
-
-        public string ConvertHTMLCode(string message)
+        private string ConvertHTMLCode(string message)
         {
             var reg = @"<a\s+[^>]*href\s*=\s*[""'](?<href>[^""']*)[""'][^>]*>(?<text>[^<]*)</a>";
             var r = new Regex(reg, RegexOptions.IgnoreCase);

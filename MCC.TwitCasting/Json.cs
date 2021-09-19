@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace MCC.TwitCasting
 {
-    public class Comment
+    public class JsonData
     {
         [JsonPropertyName("type")]
         public string Type { get; set; }
@@ -17,8 +17,14 @@ namespace MCC.TwitCasting
         [JsonPropertyName("createdAt")]
         public DateTimeOffset CreatedAt { get; set; }
 
+        [JsonPropertyName("item")]
+        public Item Item { get; set; }
+
         [JsonPropertyName("author")]
         public User Author { get; set; }
+
+        [JsonPropertyName("sender")]
+        public User Sender { get; set; }
 
         [JsonPropertyName("numComments")]
         public int Comments { get; set; }
@@ -40,6 +46,18 @@ namespace MCC.TwitCasting
 
         [JsonPropertyName("grade")]
         public int Grade { get; set; }
+    }
+
+    public class Item
+    {
+        [JsonPropertyName("name")]
+        public string Name { get; set; }
+
+        [JsonPropertyName("image")]
+        public string Image { get; set; }
+
+        [JsonPropertyName("effectCommand")]
+        public string ProfileImage { get; set; }
     }
 
     public class LatestMovie

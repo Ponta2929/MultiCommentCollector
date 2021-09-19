@@ -25,6 +25,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MCC.NicoLive", "MCC.NicoLiv
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MCC.Twitch", "MCC.Twitch\MCC.Twitch.csproj", "{16F15A31-0C93-45F8-939C-05F1E4AFF054}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MCC.Youtube", "MCC.Youtube\MCC.Youtube.csproj", "{A9AC68AC-CB9D-4027-8197-0B7798B4A5E2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -159,6 +161,18 @@ Global
 		{16F15A31-0C93-45F8-939C-05F1E4AFF054}.Release|Mac.Build.0 = Release|Any CPU
 		{16F15A31-0C93-45F8-939C-05F1E4AFF054}.Release|Win.ActiveCfg = Release|Any CPU
 		{16F15A31-0C93-45F8-939C-05F1E4AFF054}.Release|Win.Build.0 = Release|Any CPU
+		{A9AC68AC-CB9D-4027-8197-0B7798B4A5E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A9AC68AC-CB9D-4027-8197-0B7798B4A5E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A9AC68AC-CB9D-4027-8197-0B7798B4A5E2}.Debug|Mac.ActiveCfg = Debug|Any CPU
+		{A9AC68AC-CB9D-4027-8197-0B7798B4A5E2}.Debug|Mac.Build.0 = Debug|Any CPU
+		{A9AC68AC-CB9D-4027-8197-0B7798B4A5E2}.Debug|Win.ActiveCfg = Debug|Any CPU
+		{A9AC68AC-CB9D-4027-8197-0B7798B4A5E2}.Debug|Win.Build.0 = Debug|Any CPU
+		{A9AC68AC-CB9D-4027-8197-0B7798B4A5E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A9AC68AC-CB9D-4027-8197-0B7798B4A5E2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A9AC68AC-CB9D-4027-8197-0B7798B4A5E2}.Release|Mac.ActiveCfg = Release|Any CPU
+		{A9AC68AC-CB9D-4027-8197-0B7798B4A5E2}.Release|Mac.Build.0 = Release|Any CPU
+		{A9AC68AC-CB9D-4027-8197-0B7798B4A5E2}.Release|Win.ActiveCfg = Release|Any CPU
+		{A9AC68AC-CB9D-4027-8197-0B7798B4A5E2}.Release|Win.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

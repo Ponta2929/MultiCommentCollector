@@ -47,7 +47,7 @@
             <GroupBox Header="コメントデータ" Margin="5">
                 <ListView x:Name="CommentListView" ScrollViewer.HorizontalScrollBarVisibility="Hidden" ItemsSource="{Binding Path=CommentFilterView.View}">
                     <i:Interaction.Behaviors>
-                        <behavior:ListViewBehavior/>
+                        <behavior:ListViewBehavior AutoResizeToItemColmunNumber="4" />
                     </i:Interaction.Behaviors>
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="MouseDoubleClick">
@@ -108,9 +108,11 @@
                                         <Binding ElementName="ColumnLiveName" Path="ActualWidth" />
                                         <Binding ElementName="ColumnPostTime" Path="ActualWidth" />
                                         <Binding ElementName="ColumnUser" Path="ActualWidth" />
+                                        <Binding ElementName="ColumnAdditional" Path="ActualWidth" />
                                     </MultiBinding>
                                 </GridViewColumn.Width>
                             </GridViewColumn>
+                            <GridViewColumn Header="情報" x:Name="ColumnAdditional" CellTemplate="{StaticResource GridViewCellItemAdditional}" />
                         </GridView>
                     </ListView.View>
                 </ListView>

@@ -11,7 +11,7 @@ namespace MultiCommentCollector.Helper
         /// </summary>
         public static bool CreateMenuItemToCopy(MenuItem owner, string header)
         {
-            if (header is null || header.Equals(""))
+            if (string.IsNullOrEmpty(header))
             {
                 return false;
             }
@@ -31,7 +31,7 @@ namespace MultiCommentCollector.Helper
         /// </summary>
         public static bool CreateMenuItemToCopyURL(MenuItem owner, string header, bool separator = true)
         {
-            if (header is null || header.Equals(""))
+            if (string.IsNullOrEmpty(header))
             {
                 return false;
             }
